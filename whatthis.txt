@@ -6,7 +6,8 @@ render instructions like tile orientations (for inclines),
 render animation frame ranges,
 render from 8 different angles,
 save your sprite projects, etc.
-uses diffuse, specular, and normal/bump mapping
+uses diffuse, specular, normal/bump mapping
+and generates team colour map
 
 also thinking about adding particle effect animation sprite rendering
 
