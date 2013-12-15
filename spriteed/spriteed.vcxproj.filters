@@ -1,0 +1,511 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="source">
+      <UniqueIdentifier>{40b2597e-fc00-4bbd-b5c0-e2a1cce8ed9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{a23b18c9-a229-429c-ab43-5b7daac1b63f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common">
+      <UniqueIdentifier>{716d98e8-f3d3-41f2-9e24-cc508f45ffeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\draw">
+      <UniqueIdentifier>{c4e4899f-79f7-45af-a2de-9ecd38edd4ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\gui">
+      <UniqueIdentifier>{b5a9f418-332c-4aac-a7dc-27f32ad4eba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\sim">
+      <UniqueIdentifier>{8bdf5d1a-3d08-4e33-996a-94f647fc6040}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\math">
+      <UniqueIdentifier>{51ea97fd-46d6-410c-b7dc-81624eb274fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\phys">
+      <UniqueIdentifier>{64d5afb4-14d1-4435-ba4a-728c291b7b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\save">
+      <UniqueIdentifier>{44c8c41b-0b72-4b8c-a159-f8ecda8bd644}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\net">
+      <UniqueIdentifier>{7ec686b1-6925-4988-be03-7755191cb27b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="hammer.ico">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="segui.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="sesim.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="seviewport.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="undo.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\debug.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\platform.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sound.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\texture.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\utils.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\window.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\billboard.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\foliage.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\model.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\ms3d.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\particle.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\projectile.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\shader.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\shadow.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\sortb.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\vertexarray.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\draw\water.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\barbutton.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\button.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\checkbox.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\dropdownl.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\dropdownm.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\dropdowns.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\editbox.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\font.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\frame.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\gui.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\hscroller.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\image.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\insdraw.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\link.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\listbox.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\text.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\textarea.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\textblock.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\touchlistener.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\view.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\viewportw.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\widget.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\3dmath.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\brush.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\brushside.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\camera.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\edge.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\frustum.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\line.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\matrix.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\physics.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\plane.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\polygon.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\quaternion.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\vec3f.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\math\vec4f.cpp">
+      <Filter>source\common\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\compilemap.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\edmap.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\save.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\saveedm.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\save\savemap.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\phys\collider.cpp">
+      <Filter>source\common\phys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\battlecomp.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\character.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\door.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\entity.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\entitytype.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\map.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\selection.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\sim.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\statesoldier.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\draw2d.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\tile.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="res.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="segui.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="sesim.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="seviewport.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="undo.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\debug.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\platform.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sound.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\texture.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\utils.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\window.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\billboard.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\foliage.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\model.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\ms3d.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\particle.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\projectile.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\shader.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\shadow.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\sortb.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\vertexarray.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\water.h">
+      <Filter>source\common\draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\barbutton.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\button.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\checkbox.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\dropdownl.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\dropdownm.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\dropdowns.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\editbox.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\font.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\frame.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\gui.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\hscroller.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\image.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\insdraw.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\link.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\listbox.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\text.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\textarea.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\textblock.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\touchlistener.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\view.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\viewportw.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\widget.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\3dmath.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\brush.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\brushside.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\camera.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\edge.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\frustum.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\line.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\matrix.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\physics.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\plane.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\polygon.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\quaternion.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\triangle.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\vec2f.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\vec2i.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\vec3f.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\math\vec4f.h">
+      <Filter>source\common\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\compilemap.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\edmap.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\save.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\saveedm.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\savemap.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\phys\collider.h">
+      <Filter>source\common\phys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\battlecomp.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\character.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\door.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\entity.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\entitytype.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\map.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\selection.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\sim.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\statesoldier.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\draw2d.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\tile.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
