@@ -88,5 +88,6 @@ int MatchGlyphF(const char* text, int fnt, int matchx, float startx, float start
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const char* text, int starti, int endi);
 void NextLineBreak();
 void AdvanceGlyph();
+int TextWidth(int fnt, const char* text);
 
 #endif

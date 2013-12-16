@@ -6,6 +6,7 @@
 #include "../math/vec3f.h"
 
 extern unsigned int g_depth;
+extern Vec3f g_lightOff;
 extern Vec3f g_lightPos;
 extern Vec3f g_lightEye;
 extern Vec3f g_lightUp;

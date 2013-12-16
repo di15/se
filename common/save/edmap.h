@@ -21,8 +21,9 @@ extern vector<Brush*> g_selB;
 extern Brush* g_sel1b;	//drag selected brush
 extern int g_dragV;	//drag vertex of selected brush
 extern int g_dragS;	//drag side of selected brush
-extern bool g_dragB;
+extern bool g_dragW;
 extern int g_dragD;
+extern int g_dragM;	//drag model holder
 
 #define DRAG_DOOR_POINT		1
 #define DRAG_DOOR_AXIS		2

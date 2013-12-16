@@ -75,6 +75,7 @@ void ReadBrushSide(FILE* fp, BrushSide* s, TexRef* texrefs)
 	s->m_diffusem = texrefs[ texrefindex ].diffindex;
 	s->m_specularm = texrefs[ texrefindex ].specindex;
 	s->m_normalm = texrefs[ texrefindex ].normindex;
+	s->m_ownerm = texrefs[ texrefindex ].ownindex;
 	fread(&s->m_ntris, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
@@ -364,6 +365,11 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 		NormPath(basepath, normpath);
 
 		CreateTexture(tr->normindex, normpath, false);
+		
+		char ownpath[MAX_PATH+1];
+		OwnPath(basepath, ownpath);
+
+		CreateTexture(tr->ownindex, ownpath, false);
 	}
 }
 
@@ -465,7 +471,7 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	if(tag[0] != realtag[0] ||  tag[1] != realtag[1] || tag[2] != realtag[2] || tag[3] != realtag[3] || tag[4] != realtag[4])
 	{
 		fclose(fp);
-		MessageBox(g_hWnd, "Not a map project file (invalid header tag).", "Error", NULL);
+		MessageBox(g_hWnd, "Not a project file (invalid header tag).", "Error", NULL);
 		return false;
 	}
 	
@@ -521,7 +527,8 @@ void FreeEdMap(EdMap* map)
 	g_dragV = -1;
 	g_dragS = -1;
 	g_dragD = -1;
-	g_dragB = false;
+	g_dragW = false;
+	g_dragM = -1;
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
@@ -539,4 +546,6 @@ void FreeEdMap(EdMap* map)
 	}
 
 	map->m_brush.clear();
+
+	FreeModels();
 }

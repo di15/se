@@ -38,7 +38,7 @@ void InitOnce()
 	float charCrouch = (charMax.y-charMin.y)/3.0f;
 	float charAnimRate = 1.0f;
 
-	g_entityT[ENTITY_BATTLECOMPUTER] = EntityT(-1, "models/battlecomp/battlecomp.ms3d", Vec3f(2.57f,2.57f,2.57f), Vec3f(0,0,0), charMin, charMax, charMaxStep, charSpeed, charJump, charCrouch, charAnimRate, -1);
+	//g_entityT[ENTITY_BATTLECOMPUTER] = EntityT(-1, "models/battlecomp/battlecomp.ms3d", Vec3f(2.57f,2.57f,2.57f), Vec3f(0,0,0), charMin, charMax, charMaxStep, charSpeed, charJump, charCrouch, charAnimRate, -1);
 
 }
 

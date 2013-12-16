@@ -89,5 +89,6 @@ void FreeTexture(int i);
 void DiffPath(const char* basepath, char* diffpath);
 void SpecPath(const char* basepath, char* specpath);
 void NormPath(const char* basepath, char* normpath);
+void OwnPath(const char* basepath, char* ownpath);
 
 #endif

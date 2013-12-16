@@ -70,6 +70,7 @@
     <ClCompile Include="..\common\platform.cpp" />
     <ClCompile Include="..\common\save\compilemap.cpp" />
     <ClCompile Include="..\common\save\edmap.cpp" />
+    <ClCompile Include="..\common\save\modelholder.cpp" />
     <ClCompile Include="..\common\save\save.cpp" />
     <ClCompile Include="..\common\save\saveedm.cpp" />
     <ClCompile Include="..\common\save\savemap.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="..\common\platform.h" />
     <ClInclude Include="..\common\save\compilemap.h" />
     <ClInclude Include="..\common\save\edmap.h" />
+    <ClInclude Include="..\common\save\modelholder.h" />
     <ClInclude Include="..\common\save\save.h" />
     <ClInclude Include="..\common\save\saveedm.h" />
     <ClInclude Include="..\common\save\savemap.h" />

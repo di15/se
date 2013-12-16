@@ -50,3 +50,27 @@ void VertexArray::free()
 	//delete [] tangents;
 	numverts = 0;
 }
+
+void CopyVA(VertexArray* to, const VertexArray* from)
+{
+	to->alloc(from->numverts);
+
+	for(int i=0; i<from->numverts; i++)
+	{
+		to->vertices[i] = from->vertices[i];
+		to->texcoords[i] = from->texcoords[i];
+		to->normals[i] = from->normals[i];
+	}
+}
+
+void CopyVAs(VertexArray** toframes, int* tonframes, VertexArray* const* fromframes, int fromnframes)
+{
+	*tonframes = fromnframes;
+
+	(*toframes) = new VertexArray[fromnframes];
+
+	for(int i=0; i<fromnframes; i++)
+	{
+		CopyVA(&(*toframes)[i], &(*fromframes)[i]);
+	}
+}

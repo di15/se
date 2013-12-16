@@ -161,4 +161,6 @@ public:
 	virtual Widget* getsubwidg(const char* name, int type);
 };
 
+void CenterLabel(Widget* w);
+
 #endif

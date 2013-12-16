@@ -3,6 +3,18 @@
 #include "compilemap.h"
 #include "../utils.h"
 #include "savemap.h"
+#include "../math/camera.h"
+#include "../../spriteed/segui.h"
+#include "../window.h"
+#include "../gui/gui.h"
+#include "../sim/tile.h"
+#include "../../spriteed/main.h"
+#include "../../spriteed/seviewport.h"
+#include "../math/vec4f.h"
+
+float g_renderpitch = 30;
+float g_renderyaw = 45;
+int g_1tilewidth = 64;
 
 void ToCutSide(CutBrushSide* cuts, BrushSide* eds)
 {
@@ -272,4 +284,107 @@ void CompileMap(const char* full, EdMap* map)
 	SaveMap(full, finalbs);
 
 	CleanUpMapCompile();
+}
+
+void ResetView()
+{
+	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
+
+	g_projtype = PROJ_ORTHO;
+	g_camera.position(0, 0, 1000.0f, 0, 0, 0, 0, 1, 0);
+	g_camera.rotateabout(Vec3f(0,0,0), -DEGTORAD(g_renderpitch), 1, 0, 0);
+	g_camera.rotateabout(Vec3f(0,0,0), DEGTORAD(g_renderyaw), 0, 1, 0);
+
+	g_zoom = 1;
+	
+	Vec3f topleft(-TILE_SIZE/2, 0, -TILE_SIZE/2);
+	Vec3f bottomleft(-TILE_SIZE/2, 0, TILE_SIZE/2);
+	Vec3f topright(TILE_SIZE/2, 0, -TILE_SIZE/2);
+	Vec3f bottomright(TILE_SIZE/2, 0, TILE_SIZE/2);
+	
+	int width;
+	int height;
+
+	if(g_mode == RENDERING)
+	{
+		width = g_width;
+		height = g_height;
+	}
+	//if(g_mode == EDITOR)
+	else
+	{
+		View* edview = g_GUI.getview("editor");
+		Widget* viewportsframe = edview->getwidget("viewports frame", WIDGET_FRAME);
+		Widget* toprightviewport = viewportsframe->getsubwidg("top right viewport", WIDGET_VIEWPORT);
+		width = toprightviewport->m_pos[2] - toprightviewport->m_pos[0];
+		height = toprightviewport->m_pos[3] - toprightviewport->m_pos[1];
+	}
+
+	float aspect = fabsf((float)width / (float)height);
+	Matrix projection;
+
+	bool persp = false;
+	
+	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
+	{
+		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		persp = true;
+	}
+	else
+	{
+		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+	}
+
+	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
+	//Vec3f viewvec = g_focus; //g_camera.m_view;
+	Vec3f viewvec = g_camera.m_view;
+	//Vec3f focusvec = v->focus();
+    //Vec3f posvec = g_focus + t->m_offset;
+	Vec3f posvec = g_camera.m_pos;
+	//Vec3f posvec = v->pos();
+	
+	//if(v->m_type != VIEWPORT_ANGLE45O)
+	{
+	//	posvec = g_camera.m_view + t->m_offset;
+		//viewvec = posvec + Normalize(g_camera.m_view-posvec);
+	}
+
+	//viewvec = posvec + Normalize(viewvec-posvec);
+    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+    //Vec3f upvec = t->m_up;
+    Vec3f upvec = g_camera.m_up;
+	//Vec3f upvec = v->up();
+
+	//if(v->m_type != VIEWPORT_ANGLE45O)
+	//	upvec = t->m_up;
+
+	Vec3f focusvec = viewvec;
+
+    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postMultiply(viewmat);
+
+	persp = false;
+	
+	Vec4f topleft4 = ScreenPos(&mvpmat, topleft, width, height, persp);
+	Vec4f topright4 = ScreenPos(&mvpmat, topright, width, height, persp);
+	Vec4f bottomleft4 = ScreenPos(&mvpmat, bottomleft, width, height, persp);
+	Vec4f bottomright4 = ScreenPos(&mvpmat, bottomright, width, height, persp);
+	
+	float minx = min(topleft4.x, min(topright4.x, min(bottomleft4.x, bottomright4.x)));
+	float maxx = max(topleft4.x, max(topright4.x, max(bottomleft4.x, bottomright4.x)));
+	//float miny = min(topleft4.y, min(topright4.y, min(bottomleft4.y, bottomright4.y)));
+	//float maxy = max(topleft4.y, max(topright4.y, max(bottomleft4.y, bottomright4.y)));
+
+	float xrange = (float)maxx - (float)minx;
+
+	if(xrange <= 0.0f)
+		xrange = g_1tilewidth;
+
+	float zoomscale = (float)g_1tilewidth / xrange;
+
+	g_zoom *= zoomscale;
+
+	//g_log<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<endl;
 }

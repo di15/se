@@ -406,8 +406,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			//g_log.flush();
 		}
 	}
-	
+
 	Ortho(width, height, 1, 0, 0, 1);
+	//glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
 
@@ -430,7 +431,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	{
 		g_dragS = -1;
 		g_dragV = -1;
-		g_dragB = false;
+		g_dragW = false;
 		g_dragD = -1;
 		return true;
 	}
@@ -1050,7 +1051,7 @@ void Drag(int which, int dx, int dy, int width, int height)
 	{
 		Brush* b = g_sel1b;
 
-		if(g_dragB)
+		if(g_dragW)
 		{
 			list<float> oldus;
 			list<float> oldvs;

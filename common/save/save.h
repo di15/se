@@ -10,6 +10,7 @@ public:
 	unsigned int texname;
 	unsigned int specindex;
 	unsigned int normindex;
+	unsigned int ownindex;
 };
 
 void SaveVertexArray(FILE* fp, VertexArray* va);

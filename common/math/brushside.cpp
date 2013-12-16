@@ -18,6 +18,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	m_diffusem = original.m_diffusem;
 	m_specularm = original.m_specularm;
 	m_normalm = original.m_normalm;
+	m_ownerm = original.m_ownerm;
 	m_drawva = original.m_drawva;
 
 	m_ntris = original.m_ntris;
@@ -331,6 +332,7 @@ BrushSide::BrushSide(Vec3f normal, Vec3f point)
 	CreateTexture(m_diffusem, "textures/notex.jpg", false);
 	m_specularm = m_diffusem;
 	m_normalm = m_diffusem;
+	m_ownerm = m_diffusem;
 	m_vindices = NULL;
 	//m_centroid = Vec3f(0,0,0);
 }
@@ -351,6 +353,11 @@ void BrushSide::usetex()
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_normalm].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_NORMALMAP], 2);
+	
+	glActiveTextureARB(GL_TEXTURE3);
+	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
+	glBindTexture(GL_TEXTURE_2D, g_texture[m_ownerm].texname);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
 }
 /*
 void BrushSide::usetex()

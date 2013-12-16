@@ -919,3 +919,10 @@ void NormPath(const char* basepath, char* normpath)
 	//StripExtension(normpath);
 	strcat(normpath, ".norm.jpg");
 }
+
+void OwnPath(const char* basepath, char* ownpath)
+{
+	strcpy(ownpath, basepath);
+	//StripExtension(ownpath);
+	strcat(ownpath, ".team.png");
+}

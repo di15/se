@@ -16,6 +16,8 @@
 #include "undo.h"
 #include "../common/save/compilemap.h"
 #include "../common/draw/shadow.h"
+#include "../common/sim/tile.h"
+#include "../common/save/modelholder.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -168,12 +170,12 @@ void Click_NewBrush()
 	pos.y = Snap(g_snapgrid, pos.y);
 	pos.z = Snap(g_snapgrid, pos.z);
 	Brush b;
-	BrushSide top(Vec3f(0,1,0), pos + Vec3f(0,STOREY_HEIGHT/2.0f,0));
-	BrushSide bottom(Vec3f(0,-1,0), pos + Vec3f(0,-STOREY_HEIGHT/2.0f,0));
-	BrushSide left(Vec3f(-1,0,0), pos + Vec3f(-STOREY_HEIGHT/2.0f,0,0));
-	BrushSide right(Vec3f(1,0,0), pos + Vec3f(STOREY_HEIGHT/2.0f,0,0));
-	BrushSide front(Vec3f(0,0,1), pos + Vec3f(0,0,STOREY_HEIGHT/2.0f));
-	BrushSide back(Vec3f(0,0,-1), pos + Vec3f(0,0,-STOREY_HEIGHT/2.0f));
+	BrushSide top(Vec3f(0,1,0), pos + Vec3f(0,STOREY_HEIGHT,0));
+	BrushSide bottom(Vec3f(0,-1,0), pos + Vec3f(0,0,0));
+	BrushSide left(Vec3f(-1,0,0), pos + Vec3f(-TILE_SIZE/2.0f,0,0));
+	BrushSide right(Vec3f(1,0,0), pos + Vec3f(TILE_SIZE/2.0f,0,0));
+	BrushSide front(Vec3f(0,0,1), pos + Vec3f(0,0,TILE_SIZE/2.0f));
+	BrushSide back(Vec3f(0,0,-1), pos + Vec3f(0,0,-TILE_SIZE/2.0f));
 	b.add(top);		//0
 	b.add(bottom);	//1
 	b.add(left);	//2
@@ -203,10 +205,10 @@ void Click_LoadEdMap()
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
-	FullPath("map projects\\", initdir);
+	FullPath("projects\\", initdir);
 	CorrectSlashes(initdir);
 	//strcpy(filepath, initdir);
-	FullPath("map projects\\map project", filepath);
+	FullPath("projects\\project", filepath);
 	CorrectSlashes(filepath);
 
 	ofn.lStructSize = sizeof ( ofn );
@@ -228,6 +230,7 @@ void Click_LoadEdMap()
 
 	//CorrectSlashes(filepath);
 	FreeEdMap(&g_edmap);
+
 	if(LoadEdMap(filepath, &g_edmap))
 		strcpy(g_lastsave, filepath);
 
@@ -246,10 +249,10 @@ void Click_SaveEdMap()
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
-	FullPath("map projects\\", initdir);
+	FullPath("projects\\", initdir);
 	CorrectSlashes(initdir);
 	//strcpy(filepath, initdir);
-	FullPath("map projects\\map project", filepath);
+	FullPath("projects\\project", filepath);
 	CorrectSlashes(filepath);
 
 	ofn.lStructSize = sizeof ( ofn );
@@ -513,7 +516,9 @@ void CloseSideView()
 void Click_DoorView()
 {
 	CloseSideView();
+#if 0
 	OpenAnotherView("door edit");
+#endif
 }
 
 void CopyBrush()
@@ -577,6 +582,51 @@ void Down_V()
 void Click_CutBrush()
 {
 	g_edtool = EDTOOL_CUT;
+}
+
+void Click_AddMS3D()
+{
+	OPENFILENAME ofn;
+	
+	char filepath[MAX_PATH+1];
+	
+	ZeroMemory( &ofn , sizeof( ofn));
+
+	char initdir[MAX_PATH+1];
+	FullPath("models\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("models\\model", filepath);
+	CorrectSlashes(filepath);
+
+	ofn.lStructSize = sizeof ( ofn );
+	ofn.hwndOwner = NULL;
+	ofn.lpstrInitialDir = initdir;
+	ofn.lpstrFile = filepath;
+	//ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = sizeof( filepath );
+	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex =1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = MAX_PATH;	//0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
+
+	if(!GetOpenFileName(&ofn))
+		return;
+
+	string relative = MakePathRelative(filepath);
+
+	//g_log<<"relative "<<relative<<endl;
+
+	int modelid = LoadModel(relative.c_str(), Vec3f(1,1,1), Vec3f(0,0,0), true);
+
+	if(modelid < 0)
+		return;
+
+	ModelHolder mh(modelid, Vec3f(0,0,0));
+	g_modelholder.push_back(mh);
 }
 
 void RotateBrushes(float radians, Vec3f axis)
@@ -884,6 +934,11 @@ void Click_ProjOrtho()
 	g_projtype = PROJ_ORTHO;
 }
 
+void Click_ResetView()
+{
+	ResetView();
+}
+
 void Click_SetDoor()
 {
 	if(g_selB.size() <= 0)
@@ -1051,10 +1106,513 @@ void Resize_LeftPanel(Widget* thisw)
 
 void Resize_LoadButton(Widget* thisw)
 {
-	//Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32)
+	int i = 0;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+
+#if 0
+	char msg[128];
+	sprintf(msg, "pos:%f,%f,%f,%f", thisw->m_pos[0], thisw->m_pos[1], thisw->m_pos[2], thisw->m_pos[3]);
+	MessageBox(g_hWnd, msg, "asd", NULL);
+#endif
 }
 
+void Resize_SaveButton(Widget* thisw)
+{
+	int i = 1;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
 
+void Resize_QSaveButton(Widget* thisw)
+{
+	int i = 2;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportBldgButton(Widget* thisw)
+{
+	int i = 3;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportUnitButton(Widget* thisw)
+{
+	int i = 4;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportTileButton(Widget* thisw)
+{
+	int i = 5;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportRoadButton(Widget* thisw)
+{
+	int i = 6;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportRidgeButton(Widget* thisw)
+{
+	int i = 7;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ExportWaterButton(Widget* thisw)
+{
+	int i = 8;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_UndoButton(Widget* thisw)
+{
+	int i = 9;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RedoButton(Widget* thisw)
+{
+	int i = 10;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_NewBrushButton(Widget* thisw)
+{
+	int i = 11;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_CutBrushButton(Widget* thisw)
+{
+	int i = 12;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_NewEntityButton(Widget* thisw)
+{
+	int i = 13;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotXCCWButton(Widget* thisw)
+{
+	int i = 14;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotXCWButton(Widget* thisw)
+{
+	int i = 15;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotYCCWButton(Widget* thisw)
+{
+	int i = 16;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotYCWButton(Widget* thisw)
+{
+	int i = 17;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotZCCWButton(Widget* thisw)
+{
+	int i = 18;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotZCWButton(Widget* thisw)
+{
+	int i = 19;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_ViewportsFrame(Widget* thisw)
+{
+	thisw->m_pos[0] = LEFT_PANEL_WIDTH;
+	thisw->m_pos[1] = TOP_PANEL_HEIGHT;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+}
+
+void Resize_TopLeftViewport(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = parentw->m_pos[0];
+	thisw->m_pos[1] = parentw->m_pos[1];
+	thisw->m_pos[2] = (parentw->m_pos[2]+parentw->m_pos[0])/2;
+	thisw->m_pos[3] = (parentw->m_pos[3]+parentw->m_pos[1])/2;
+}
+
+void Resize_BottomLeftViewport(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = parentw->m_pos[0];
+	thisw->m_pos[1] = (parentw->m_pos[3]+parentw->m_pos[1])/2;
+	thisw->m_pos[2] = (parentw->m_pos[2]+parentw->m_pos[0])/2;
+	thisw->m_pos[3] = parentw->m_pos[3];
+}
+
+void Resize_TopRightViewport(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = (parentw->m_pos[2]+parentw->m_pos[0])/2;
+	thisw->m_pos[1] = parentw->m_pos[1];
+	thisw->m_pos[2] = parentw->m_pos[2];
+	thisw->m_pos[3] = (parentw->m_pos[3]+parentw->m_pos[1])/2;
+}
+
+void Resize_BottomRightViewport(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = (parentw->m_pos[2]+parentw->m_pos[0])/2;
+	thisw->m_pos[1] = (parentw->m_pos[3]+parentw->m_pos[1])/2;
+	thisw->m_pos[2] = parentw->m_pos[2];
+	thisw->m_pos[3] = parentw->m_pos[3];
+}
+
+void Resize_HDivider(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = parentw->m_pos[0];
+	thisw->m_pos[1] = (parentw->m_pos[3]+parentw->m_pos[1])/2;
+	thisw->m_pos[2] = parentw->m_pos[2];
+	thisw->m_pos[3] = (parentw->m_pos[3]+parentw->m_pos[1])/2 + 1;
+}
+
+void Resize_VDivider(Widget* thisw)
+{
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = (parentw->m_pos[2]+parentw->m_pos[0])/2;
+	thisw->m_pos[1] = parentw->m_pos[1];
+	thisw->m_pos[2] = (parentw->m_pos[2]+parentw->m_pos[0])/2 + 1;
+	thisw->m_pos[3] = parentw->m_pos[3];
+}
+
+void Resize_RotDegEditBox(Widget* thisw)
+{
+	int i = 0;
+	//Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16)
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32+16;
+}
+
+void Resize_RotDegText(Widget* thisw)
+{
+	//Margin(0+32*(i-2)), Margin(32+16)
+	int i = 2;
+	thisw->m_pos[0] = 0+32*(i-2);
+	thisw->m_pos[1] = 32+16;
+}
+
+void Resize_ZoomEditBox(Widget* thisw)
+{
+	//Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16)
+	int i = 2;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32+16;
+}
+
+void Resize_ZoomText(Widget* thisw)
+{
+	//Margin(0+32*(i-2)), Margin(32+16)
+	int i = 4;
+	thisw->m_pos[0] = 0+32*(i-2);
+	thisw->m_pos[1] = 32+16;
+}
+
+void Resize_SnapGridEditBox(Widget* thisw)
+{
+	//Margin(0+32*i++), Margin(32), Margin(50+32*i++), Margin(32+16)
+	int i = 4;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 50+32*i;
+	thisw->m_pos[3] = 32+16;
+}
+
+void Resize_SnapGridText(Widget* thisw)
+{
+	//Margin(0+32*(i-2)), Margin(32+16)
+	int i = 6;
+	thisw->m_pos[0] = 0+32*(i-2);
+	thisw->m_pos[1] = 32+16;
+}
+
+void Resize_MaxElevEditBox(Widget* thisw)
+{
+	//Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16)
+	int i = 6;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32+16;
+}
+
+void Resize_MaxElevText(Widget* thisw)
+{
+	//Margin(0+32*(i-2)), Margin(32+16)
+	int i = 8;
+	thisw->m_pos[0] = 0+32*(i-2);
+	thisw->m_pos[1] = 32+16;
+}
+
+void Resize_ShowSkyCheckBox(Widget* thisw)
+{
+	//Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16)
+	int i = 8;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32+16;
+}
+
+void Resize_PerspProjButton(Widget* thisw)
+{
+	//Margin(0+32*i), Margin(32), Margin(32+32*i++), Margin(32*2)
+	int i = 10;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32*2;
+	CenterLabel(thisw);
+}
+
+void Resize_OrthoProjButton(Widget* thisw)
+{
+	//Margin(0+32*i), Margin(32), Margin(32+32*i++), Margin(32*2)
+	int i = 11;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32*2;
+	CenterLabel(thisw);
+}
+
+void Resize_ResetViewButton(Widget* thisw)
+{
+	//Margin(0+32*i), Margin(32), Margin(32+32*i++), Margin(32*2)
+	int i = 12;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32*2;
+	CenterLabel(thisw);
+}
+
+void Resize_BrushEditFrame(Widget* thisw)
+{
+	//Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = TOP_PANEL_HEIGHT;
+	thisw->m_pos[2] = LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = g_height;
+}
+
+void Resize_ChooseTexButton(Widget* thisw)
+{
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1))
+	int i=1;
+	Font* f = &g_font[thisw->m_font];
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + f->gheight*i;
+	thisw->m_pos[2] = LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*(i+1); 
+	CenterLabel(thisw);
+}
+
+void Resize_FitToFaceButton(Widget* thisw)
+{
+	//Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32)
+	int i=2;
+	int j=0;
+	Font* f = &g_font[thisw->m_font];
+	Widget* parentw = thisw->m_parent;
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + f->gheight*i;
+	thisw->m_pos[2] = 32+32*j;
+	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*i+32; 
+	CenterLabel(thisw);
+}
+
+void Resize_BrushSideEditFrame(Widget* thisw)
+{
+	int j=1;
+	//leftpanel->m_subwidg.push_back(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
+	int i=4;
+	//Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = TOP_PANEL_HEIGHT;
+	thisw->m_pos[2] = LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = g_height;
+}
+
+void Resize_RotateTexButton(Widget* thisw)
+{
+	int i = 4;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+	CenterLabel(thisw);
+}
+
+void Resize_TexEqEditBox1(Widget* thisw)
+{
+	int i = 6;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+}
+
+void Resize_TexEqEditBox2(Widget* thisw)
+{
+	int i = 7;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+}
+
+void Resize_SelComponentDropDownS(Widget* thisw)
+{
+	int i = 8;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+}
+
+void Resize_TexScaleEditBox(Widget* thisw)
+{
+	int i = 9;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH/2;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+}
+
+void Resize_ScaleTexButton(Widget* thisw)
+{
+	int i = 9;
+	//MAINFONT8, Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + LEFT_PANEL_WIDTH/2;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+	CenterLabel(thisw);
+}
+
+void Resize_TexShiftEditBox(Widget* thisw)
+{
+	int i = 10;
+	//Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + 0;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH/2;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+}
+
+void Resize_TexShiftButton(Widget* thisw)
+{
+	int i = 10;
+	//Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1))
+	Widget* parentw = thisw->m_parent;
+	Font* f = &g_font[thisw->m_font];
+	thisw->m_pos[0] = parentw->m_pos[0] + LEFT_PANEL_WIDTH/2;
+	thisw->m_pos[1] = parentw->m_pos[1] + 32+f->gheight*i;
+	thisw->m_pos[2] = parentw->m_pos[0] + LEFT_PANEL_WIDTH;
+	thisw->m_pos[3] = parentw->m_pos[1] + 32+f->gheight*(i+1);
+	CenterLabel(thisw);
+}
 
 void FillGUI()
 {
@@ -1074,7 +1632,7 @@ void FillGUI()
 	Font* f = &g_font[MAINFONT8];
 
 	View* logoview = AddView("logo");
-	logoview->widget.push_back(new Image(NULL, "logo", "gui/dmd.jpg", Resize_Logo, ALIGNMENT_CENTER, 1,1,1,0));
+	logoview->widget.push_back(new Image(NULL, "logo", "gui/dmd.jpg", Resize_Logo, 1,1,1,0));
 
 	View* loadingview = AddView("loading");
 	loadingview->widget.push_back(new Text(NULL, "status", "Loading...", MAINFONT8, Resize_LoadingText));
@@ -1090,32 +1648,36 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Image(toppanel, "top panel bg", "gui/filled.jpg", Resize_TopPanel));
 	leftpanel->m_subwidg.push_back(new Image(leftpanel, "left panel bg", "gui/filled.jpg", Resize_LeftPanel));
 	
-	int i=0;
-	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",											MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",											MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",									MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Compile",										MAINFONT8, Resize_CompileButton, Click_CompileMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",											MAINFONT8, Resize_UndoButton, Undo, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",											MAINFONT8, Resize_RedoButton, Redo, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",								MAINFONT8, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",								MAINFONT8, Resize_CutBrushButton, Click_CutBrush, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "newent", "gui/newent.png", "", "New entity",								MAINFONT8, Resize_NewEntityButton, NULL, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), NULL, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",					MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), NULL, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), NULL, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",		MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotXCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",				MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotXCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",		MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotYCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",				MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotYCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",		MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotZCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",				MAINFONT8, Margin(0+32*i), Margin(0), Margin(32+32*i++), Margin(32), Click_RotZCW, NULL, NULL));
-	i = 0;
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "rotdeg", "15",															MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_RotDeg, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "rotdegtext", "degrees",													MAINFONT8, Margin(0+32*(i-2)), Margin(32+16)));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "zoom", "1",															MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_Zoom, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "zoomtext", "zoom",														MAINFONT8, Margin(0+32*(i-2)), Margin(32+16)));
-	toppanel->m_subwidg.push_back(new DropDownS(toppanel, "snapgrid", MAINFONT8, Margin(0+32*i++), Margin(32), Margin(50+32*i++), Margin(32+16), Change_SnapGrid));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
+	//toppanel->m_subwidg.push_back(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, Resize_UndoButton, Undo, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, Resize_RedoButton, Redo, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",									MAINFONT8, Resize_CutBrushButton, Click_CutBrush, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "newent", "gui/newent.png", "", "Add milkshape3d model",							MAINFONT8, Resize_NewEntityButton, Click_AddMS3D, NULL, NULL));
+	//toppanel->m_subwidg.push_back(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, Resize_SelEntButton, NULL, NULL, NULL));
+	//toppanel->m_subwidg.push_back(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",						MAINFONT8, Resize_SelBrushButton, NULL, NULL, NULL));
+	//toppanel->m_subwidg.push_back(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, Resize_SelEntBrushButton, NULL, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",			MAINFONT8, Resize_RotXCCWButton, Click_RotXCCW, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",					MAINFONT8, Resize_RotXCWButton, Click_RotXCW, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",			MAINFONT8, Resize_RotYCCWButton, Click_RotYCCW, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",					MAINFONT8, Resize_RotYCWButton, Click_RotYCW, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",			MAINFONT8, Resize_RotZCCWButton, Click_RotZCCW, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",					MAINFONT8, Resize_RotZCWButton, Click_RotZCW, NULL, NULL));
+
+	toppanel->m_subwidg.push_back(new EditBox(toppanel, "rotdeg", "15",															MAINFONT8, Resize_RotDegEditBox, false, 6, &Change_RotDeg, 0));
+	toppanel->m_subwidg.push_back(new Text(toppanel, "rotdegtext", "degrees",													MAINFONT8, Resize_RotDegText));
+	toppanel->m_subwidg.push_back(new EditBox(toppanel, "zoom", "1",															MAINFONT8, Resize_ZoomEditBox, false, 6, &Change_Zoom, 0));
+	toppanel->m_subwidg.push_back(new Text(toppanel, "zoomtext", "zoom",														MAINFONT8, Resize_ZoomText));
+	toppanel->m_subwidg.push_back(new DropDownS(toppanel, "snapgrid",															MAINFONT8, Resize_SnapGridEditBox, Change_SnapGrid));
 	Widget* snapgs = toppanel->getsubwidg("snapgrid", WIDGET_DROPDOWNSELECTOR);
 	//snapgs->m_options.push_back("4 m");	//0
 	//snapgs->m_options.push_back("2 m");	//1
@@ -1139,82 +1701,68 @@ void FillGUI()
 	snapgs->select(6);
 
 	//toppanel->m_subwidg.push_back(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Margin(0+32*(i-2)), Margin(32+16)));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "1000",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_MaxElev, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Margin(0+32*(i-2)), Margin(32+16)));
-	toppanel->m_subwidg.push_back(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
+	toppanel->m_subwidg.push_back(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Resize_SnapGridText));
+	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "1000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
+	toppanel->m_subwidg.push_back(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
+	toppanel->m_subwidg.push_back(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
 	
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzcw", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, Margin(0+32*i), Margin(32), Margin(32+32*i++), Margin(32*2), Click_ProjPersp, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzcw", "gui/projortho.png", "", "Orthographic projection",			MAINFONT8, Margin(0+32*i), Margin(32), Margin(32+32*i++), Margin(32*2), Click_ProjOrtho, NULL, NULL));
-	
+	toppanel->m_subwidg.push_back(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, Resize_ResetViewButton, Click_ResetView, NULL, NULL));
 
 	//toppanel->m_subwidg.push_back(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
 
-	edview->widget.push_back(new Frame(NULL, "viewports frame", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1.0f)));
+	edview->widget.push_back(new Frame(NULL, "viewports frame", Resize_ViewportsFrame));
 	Widget* viewportsframe = edview->getwidget("viewports frame", WIDGET_FRAME);
 
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom left viewport", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1.0f), &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 0));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top left viewport", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.5f), &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom right viewport", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1.0f), &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top right viewport", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.5f), &DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
+	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom left viewport",	Resize_BottomLeftViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 0));
+	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
+	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
+	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
 	
 	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/2), Vec3f(0, 1, 0), "Front");
 	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 0, -1), "Top");
 	g_viewportT[VIEWPORT_LEFT] = ViewportT(Vec3f(MAX_DISTANCE/2, 0, 0), Vec3f(0, 1, 0), "Left");
 	//g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(MAX_DISTANCE/3, MAX_DISTANCE/3, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Angle");
 	g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3), Vec3f(0, 1, 0), "Angle");
-	g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
+	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
+	ResetView();
 
 	g_viewport[0] = Viewport(VIEWPORT_FRONT);
 	g_viewport[1] = Viewport(VIEWPORT_TOP);
 	g_viewport[2] = Viewport(VIEWPORT_LEFT);
 	g_viewport[3] = Viewport(VIEWPORT_ANGLE45O);
 	
-	viewportsframe->m_subwidg.push_back(new Frame(viewportsframe, "viewports right half frame", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1.0f)));
-	viewportsframe->m_subwidg.push_back(new Frame(viewportsframe, "viewports bottom half frame", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 0.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 0.5f), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1.0f), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1.0f)));
-	
-	Widget* viewportsrighthalf = viewportsframe->getsubwidg("viewports right half frame", WIDGET_FRAME);
-	Widget* viewportsbottomhalf = viewportsframe->getsubwidg("viewports bottom half frame", WIDGET_FRAME);
-	
-	viewportsrighthalf->m_subwidg.push_back(new Image(viewportsrighthalf, "h divider", "gui/filled.jpg", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 1), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1), ALIGNMENT_LESSERSIDE));
-	viewportsbottomhalf->m_subwidg.push_back(new Image(viewportsbottomhalf, "v divider", "gui/filled.jpg", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_RATIO, 1), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 1), ALIGNMENT_LESSERSIDE));
+	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "h divider", "gui/filled.jpg", Resize_HDivider));
+	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "v divider", "gui/filled.jpg", Resize_VDivider));
 
 	View* brusheditview = AddView("brush edit");
-	brusheditview->widget.push_back(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
+	brusheditview->widget.push_back(new Frame(NULL, "left panel", Resize_BrushEditFrame));
 
 	leftpanel = brusheditview->getwidget("left panel", WIDGET_FRAME);
-	i=1;
 	//leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture path", "no texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), false, 64, NULL, -1));
 	//i++;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), Click_BChooseTex, NULL, NULL));
-	int j=0;
-	i++;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_FitToFace, NULL, NULL));
-	j++;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
-	i+=2;
+	leftpanel->m_subwidg.push_back(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, Resize_ChooseTexButton, Click_BChooseTex, NULL, NULL));
+	leftpanel->m_subwidg.push_back(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, Resize_FitToFaceButton, Click_FitToFace, NULL, NULL));
+	//leftpanel->m_subwidg.push_back(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
 
 	View* brushsideeditview = AddView("brush side edit");
-	brushsideeditview->widget.push_back(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
+	brushsideeditview->widget.push_back(new Frame(NULL, "left panel", Resize_BrushSideEditFrame));
 	
 	leftpanel = brushsideeditview->getwidget("left panel", WIDGET_FRAME);
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), Click_RotateTex, NULL, NULL));
-	i+=2;
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), false, 256, Change_TexEq, 0));
-	i++;
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), false, 256, Change_TexEq, 1));
-	i++;
-	leftpanel->m_subwidg.push_back(new DropDownS(leftpanel, "select component", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), Change_SelComp));
+	leftpanel->m_subwidg.push_back(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, Resize_RotateTexButton, Click_RotateTex, NULL, NULL));
+	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, 0));
+	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Resize_TexEqEditBox2, false, 256, Change_TexEq, 1));
+	leftpanel->m_subwidg.push_back(new DropDownS(leftpanel, "select component", MAINFONT8, Resize_SelComponentDropDownS, Change_SelComp));
 	Widget* selcompwidg = leftpanel->getsubwidg("select component", WIDGET_DROPDOWNSELECTOR);
 	selcompwidg->m_options.push_back("u component");
 	selcompwidg->m_options.push_back("v component");
-	i++;
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), false, 10, NULL, 0));
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), Click_ScaleTex, NULL, NULL));
-	i++;
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), false, 10, NULL, 0));
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, Margin(LEFT_PANEL_WIDTH/2), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 32+f->gheight*(i+1)), Click_ShiftTex, NULL, NULL));
+	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, 0));
+	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL));
+	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
+	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL));
 	
+#if 0
 	View* dooreditview = AddView("door edit");
 	dooreditview->widget.push_back(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
 	
@@ -1230,7 +1778,7 @@ void FillGUI()
 	i++;
 	leftpanel->m_subwidg.push_back(new Text(leftpanel, "opendeg label", "Open degrees:", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i)));
 	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "opendeg", "90", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 70), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH-10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), false, 10, NULL, 0));
-	
+#endif
 
 	OpenSoleView("loading");
 	//OpenAnotherView("brush edit view");

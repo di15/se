@@ -10,8 +10,9 @@ vector<Brush*> g_selB;
 Brush* g_sel1b = NULL;	//drag selected brush (brush being dragged or manipulated currently)
 int g_dragV = -1;	//drag vertex of selected brush?
 int g_dragS = -1;	//drag side of selected brush?
-bool g_dragB = false;	//drag brush?
+bool g_dragW = false;	//drag whole brush or model?
 int g_dragD = -1;	// dragging DRAG_DOOR_POINT or DRAG_DOOR_AXIS ?
+int g_dragM = -1;	//dragging model holder?
 
 void DrawEdMap(EdMap* map, bool showsky)
 {

@@ -33,4 +33,6 @@ public:
 	void free();
 };
 
+void CopyVAs(VertexArray** toframes, int* tonframes, VertexArray* const* fromframes, int fromnframes);
+
 #endif

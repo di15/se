@@ -268,6 +268,9 @@
     <ClCompile Include="..\common\sim\tile.cpp">
       <Filter>source\common\sim</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\save\modelholder.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -506,6 +509,9 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\tile.h">
       <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\modelholder.h">
+      <Filter>source\common\save</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

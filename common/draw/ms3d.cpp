@@ -30,6 +30,11 @@ MS3DModel::MS3DModel()
 
 MS3DModel::~MS3DModel()
 {
+	destroy();
+}
+
+void MS3DModel::destroy()
+{
 	int i;
 	for ( i = 0; i < m_numMeshes; i++ )
 		delete[] m_pMeshes[i].m_pTriangleIndices;
@@ -72,7 +77,7 @@ MS3DModel::~MS3DModel()
 	}
 }
 
-void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& normm)
+void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
 {
 	for ( int i = 0; i < m_numMaterials; i++ )
 		if ( strlen( m_pMaterials[i].m_pTextureFilename ) > 0 )
@@ -89,18 +94,31 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 			StripExtension(basename);
 			char specfile[MAX_PATH+1];
 			char normfile[MAX_PATH+1];
+			char ownfile[MAX_PATH+1];
 			SpecPath(basename, specfile);
 			NormPath(basename, normfile);
+			OwnPath(basename, ownfile);
 
-			QueueTexture(&diffm, difffile, false);
-			QueueTexture(&specm, specfile, false);
-			QueueTexture(&normm, normfile, false);
+			if(dontqueue)
+			{
+				CreateTexture(diffm, difffile, false);
+				CreateTexture(specm, specfile, false);
+				CreateTexture(normm, normfile, false);
+				CreateTexture(ownm, ownfile, false);
+			}
+			else
+			{
+				QueueTexture(&diffm, difffile, false);
+				QueueTexture(&specm, specfile, false);
+				QueueTexture(&normm, normfile, false);
+				QueueTexture(&ownm, ownfile, false);
+			}
 		}
 		//else
 		//	m_pMaterials[i].m_diffusem = 0;
 }
 
-bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm)
+bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& specm, unsigned int& normm, unsigned int& ownm, bool dontqueue)
 {
 	char full[MAX_PATH+1];
 	FullPath(relative, full);
@@ -249,7 +267,7 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 		pPtr += sizeof( MS3DMaterial );
 	}
 
-	loadtex(diffm, specm, normm);
+	loadtex(diffm, specm, normm, ownm, dontqueue);
 
 	float animFPS = *( float* )pPtr;
 	pPtr += sizeof( float );

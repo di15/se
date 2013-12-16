@@ -23,6 +23,8 @@
 #include "../common/math/camera.h"
 #include "sesim.h"
 #include "../common/sim/entity.h"
+#include "../common/save/compilemap.h"
+#include "../common/save/modelholder.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
@@ -255,20 +257,35 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glUniform1iARB(g_shader[SHADER_OWNED].m_slot[SSLOT_TEXTURE1], 1);
 	glActiveTextureARB(GL_TEXTURE0);*/
 	
-	DrawEdMap(&g_edmap, g_showsky);
+	DrawModelHolders();
+
+	//if(g_model[0].m_on)
+	//	g_model[0].draw(0, Vec3f(0,0,0), 0);
+
+	DrawEdMap(&g_edmap, g_showsky);/*
 	for(int i=0; i<10; i++)
 		for(int j=0; j<5; j++)
-			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);
+			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
+
+	if(g_mode == EDITOR)
+	{
+
+	}
 }
 
 void DrawSceneDepth()
 {
 	//g_model[themodel].draw(0, Vec3f(0,0,0), 0);
+	
+	DrawModelHolders();
+	
+	//if(g_model[0].m_on)
+	//	g_model[0].draw(0, Vec3f(0,0,0), 0);
 
-	DrawEdMap(&g_edmap, false);
+	DrawEdMap(&g_edmap, false);/*
 	for(int i=0; i<10; i++)
 		for(int j=0; j<5; j++)
-			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);
+			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
 }
 
 void UpdateLoading()
@@ -363,6 +380,11 @@ void UpdateEditor()
 	g_camera.friction2();
 }
 
+void UpdateRender()
+{
+
+}
+
 void Update()
 {
 	if(g_mode == LOADING)
@@ -375,12 +397,16 @@ void Update()
 	//	UpdateGameState();
 	else if(g_mode == EDITOR)
 		UpdateEditor();
+	else if(g_mode == RENDERING)
+		UpdateRender();
 }
 
 void LoadConfig()
 {
 	char cfgfull[MAX_PATH+1];
 	FullPath(CONFIGFILE, cfgfull);
+
+#if 0
 	ifstream config(cfgfull);
 	
 	int fulls;
@@ -396,8 +422,127 @@ void LoadConfig()
 
 	g_width = g_selectedRes.width;
 	g_height = g_selectedRes.height;
+#endif
+	
+	ifstream f(cfgfull);
+	string line;
+	char keystr[32];
+	char actstr[32];
+
+	while(!f.eof())
+	{
+
+#if 0
+		key = -1;
+		down = NULL;
+		up = NULL;
+#endif 
+		strcpy(keystr, "");
+		strcpy(actstr, "");
+
+		getline(f, line);
+		sscanf(line.c_str(), "%s %s", keystr, actstr);
+		
+		float valuef = StrToFloat(actstr);
+		int valuei = StrToInt(actstr);
+		bool valueb = (bool)valuei;
+		
+		if(stricmp(keystr, "fullscreen") == 0)					g_fullscreen = valueb;
+		else if(stricmp(keystr, "work_width") == 0)				g_width = g_selectedRes.width = valuei;
+		else if(stricmp(keystr, "work_height") == 0)			g_height = g_selectedRes.height = valuei;
+		else if(stricmp(keystr, "work_bpp") == 0)				g_bpp = valuei;
+		else if(stricmp(keystr, "render_pitch") == 0)			g_renderpitch = valuef;
+		else if(stricmp(keystr, "render_yaw") == 0)				g_renderyaw = valuef;
+		else if(stricmp(keystr, "1_tile_pixel_width") == 0)		g_1tilewidth = valuei;
+		else if(stricmp(keystr, "sun_x") == 0)					g_lightOff.x = valuef;
+		else if(stricmp(keystr, "sun_y") == 0)					g_lightOff.y = valuef;
+		else if(stricmp(keystr, "sun_z") == 0)					g_lightOff.z = valuef;
+
+#if 0
+		if(stricmp(keystr, "VK_ESCAPE") == 0)                        key = VK_ESCAPE;
+		else if(stricmp(keystr, "VK_SHIFT") == 0)                key = VK_SHIFT;
+		else if(stricmp(keystr, "VK_CONTROL") == 0)                key = VK_CONTROL;
+		else if(stricmp(keystr, "VK_SPACE") == 0)                key = VK_SPACE;
+		else if(stricmp(keystr, "MouseLButton") == 0)        key = -2;
+		else if(stricmp(keystr, "F1") == 0)                                key = VK_F1;
+		else if(stricmp(keystr, "F2") == 0)                                key = VK_F2;
+		else if(stricmp(keystr, "F3") == 0)                                key = VK_F3;
+		else if(stricmp(keystr, "F4") == 0)                                key = VK_F4;
+		else if(stricmp(keystr, "F5") == 0)                                key = VK_F5;
+		else if(stricmp(keystr, "F6") == 0)                                key = VK_F6;
+		else if(stricmp(keystr, "F7") == 0)                                key = VK_F7;
+		else if(stricmp(keystr, "F8") == 0)                                key = VK_F8;
+		else if(stricmp(keystr, "F9") == 0)                                key = VK_F9;
+		else if(stricmp(keystr, "F10") == 0)                        key = VK_F10;
+		else if(stricmp(keystr, "F11") == 0)                        key = VK_F11;
+		else if(stricmp(keystr, "F12") == 0)                        key = VK_F12;
+		else if(stricmp(keystr, "'A'") == 0)                        key = 'A';
+		else if(stricmp(keystr, "'B'") == 0)                        key = 'B';
+		else if(stricmp(keystr, "'C'") == 0)                        key = 'C';
+		else if(stricmp(keystr, "'D'") == 0)                        key = 'D';
+		else if(stricmp(keystr, "'E'") == 0)                        key = 'E';
+		else if(stricmp(keystr, "'F'") == 0)                        key = 'F';
+		else if(stricmp(keystr, "'G'") == 0)                        key = 'G';
+		else if(stricmp(keystr, "'H'") == 0)                        key = 'H';
+		else if(stricmp(keystr, "'I'") == 0)                        key = 'I';
+		else if(stricmp(keystr, "'J'") == 0)                        key = 'J';
+		else if(stricmp(keystr, "'K'") == 0)                        key = 'K';
+		else if(stricmp(keystr, "'L'") == 0)                        key = 'L';
+		else if(stricmp(keystr, "'M'") == 0)                        key = 'M';
+		else if(stricmp(keystr, "'N'") == 0)                        key = 'N';
+		else if(stricmp(keystr, "'O'") == 0)                        key = 'O';
+		else if(stricmp(keystr, "'P'") == 0)                        key = 'P';
+		else if(stricmp(keystr, "'Q'") == 0)                        key = 'Q';
+		else if(stricmp(keystr, "'R'") == 0)                        key = 'R';
+		else if(stricmp(keystr, "'S'") == 0)                        key = 'S';
+		else if(stricmp(keystr, "'T'") == 0)                        key = 'T';
+		else if(stricmp(keystr, "'U'") == 0)                        key = 'U';
+		else if(stricmp(keystr, "'V'") == 0)                        key = 'V';
+		else if(stricmp(keystr, "'W'") == 0)                        key = 'W';
+		else if(stricmp(keystr, "'X'") == 0)                        key = 'X';
+		else if(stricmp(keystr, "'Y'") == 0)                        key = 'Y';
+		else if(stricmp(keystr, "'Z'") == 0)                        key = 'Z';
+		else if(stricmp(keystr, "'0'") == 0)                        key = '0';
+		else if(stricmp(keystr, "'1'") == 0)                        key = '1';
+		else if(stricmp(keystr, "'2'") == 0)                        key = '2';
+		else if(stricmp(keystr, "'3'") == 0)                        key = '3';
+		else if(stricmp(keystr, "'4'") == 0)                        key = '4';
+		else if(stricmp(keystr, "'5'") == 0)                        key = '5';
+		else if(stricmp(keystr, "'6'") == 0)                        key = '6';
+		else if(stricmp(keystr, "'7'") == 0)                        key = '7';
+		else if(stricmp(keystr, "'8'") == 0)                        key = '8';
+		else if(stricmp(keystr, "'9'") == 0)                        key = '9';
+
+		if(key == -1)
+		{
+			g_log<<"Unknown input: "<<keystr<<endl;
+			continue;
+		}
+
+		if(stricmp(actstr, "Escape();") == 0)                                {        down = &Escape;                        up = NULL;                        }
+		else if(stricmp(actstr, "Forward();") == 0)                        {        down = &Forward;                up = &Unforward;        }
+		else if(stricmp(actstr, "Left();") == 0)                        {        down = &Left;                        up = &Unleft;                }
+		else if(stricmp(actstr, "Right();") == 0)                        {        down = &Right;                        up = &Unright;                }
+		else if(stricmp(actstr, "Back();") == 0)                        {        down = &Back;                        up = &Unback;                }
+		else if(stricmp(actstr, "ToggleCrouch();") == 0)        {        down = &ToggleCrouch;        up = NULL;                        }
+		else if(stricmp(actstr, "Jump();") == 0)                        {        down = &Jump;                        up = &Unjump;                }
+		else if(stricmp(actstr, "Crouch();") == 0)                        {        down = &Crouch;                        up = &Uncrouch;                }
+		else if(stricmp(actstr, "Run();") == 0)                                {        down = &Run;                        up = &Unrun;                }
+		else if(stricmp(actstr, "Shoot();") == 0)                        {        down = &Shoot;                        up = &Unshoot;                }
+		else if(stricmp(actstr, "Reload();") == 0)                        {        down = &Reload;                        up = NULL;                        }
+		else if(stricmp(actstr, "Action();") == 0)                        {        down = &Action;                        up = &Unaction;                }
+		else if(stricmp(actstr, "ToggleView();") == 0)                {        down = &ToggleView;                up = NULL;                        }
+		else if(stricmp(actstr, "EquipNext();") == 0)                {        down = &EquipNext;                up = NULL;                        }
+		else if(stricmp(actstr, "EquipPrev();") == 0)                {        down = &EquipPrev;                up = NULL;                        }
+
+		if(down == NULL)                g_log<<"Unknown action: "<<actstr<<endl;
+		else if(key == -2)                AssignLButton(down, up);
+		else                                        AssignKey(key, down, up);
+#endif
+	}
 }
 
+#if 0
 void WriteConfig()
 {
 	ofstream config;
@@ -413,6 +558,7 @@ void WriteConfig()
 	config<<g_selectedRes.width<<" "<<g_selectedRes.height<<endl;
 	config<<g_bpp;
 }
+#endif
 
 /*
 void EnumerateMaps()
@@ -443,12 +589,12 @@ void EnumerateMaps()
 
 void Init()
 {
-	// Check note in Init() in game/gmain.cpp
+	// Check note in Init() in game/gmain.cpp - EDIT: removed
 	char exepath[MAX_PATH+1];
 	ExePath(exepath);
 	SetCurrentDirectory(exepath);
 
-	OpenLog("worldedlog.txt", VERSION);
+	OpenLog("log.txt", VERSION);
 
 	srand(GetTickCount());
 

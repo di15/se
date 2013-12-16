@@ -29,6 +29,7 @@ public:
 	unsigned int m_diffusem;
 	unsigned int m_specularm;
 	unsigned int m_normalm;
+	unsigned int m_ownerm;	//team colour map
 	int m_ntris;
 	Triangle2* m_tris;
 	Plane m_tceq[2];	//tex coord uv equations

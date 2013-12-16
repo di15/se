@@ -773,6 +773,19 @@ int MatchGlyphF(const char* text, int fnt, int matchx, float startx, float start
 	return lastclose+1;
 }
 
+
+int TextWidth(int fnt, const char* text)
+{
+	float length = 0;
+	int len = strlen(text);
+	for(int i=0; i<len; i++)
+	{
+		length += g_font[fnt].glyph[text[i]].origsize[0];
+	}
+
+	return length;
+}
+
 void LoadFonts()
 {
     LoadFont(FONT_CORBEL28, "fonts/corbel28");

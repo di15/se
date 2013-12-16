@@ -402,7 +402,7 @@ bool SelectDrag_Door(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f 
 		g_sel1b = b;
 		g_dragV = -1;
 		g_dragS = -1;
-		g_dragB = false;
+		g_dragW = false;
 		g_dragD = DRAG_DOOR_AXIS;
 		return true;
 	}
@@ -412,7 +412,7 @@ bool SelectDrag_Door(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f 
 		g_sel1b = b;
 		g_dragV = -1;
 		g_dragS = -1;
-		g_dragB = false;
+		g_dragW = false;
 		g_dragD = DRAG_DOOR_POINT;
 		return true;
 	}
@@ -442,7 +442,7 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 					g_sel1b = b;
 					g_dragV = j;
 					g_dragS = -1;
-					g_dragB = false;
+					g_dragW = false;
 					nearest = thisD;
 				}
 			}
@@ -464,7 +464,7 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 					g_sel1b = b;
 					g_dragV = -1;
 					g_dragS = j;
-					g_dragB = false;
+					g_dragW = false;
 					nearest = thisD;
 				}
 			}
@@ -488,7 +488,7 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 			g_sel1b = b;
 			g_dragV = -1;
 			g_dragS = -1;
-			g_dragB = true;
+			g_dragW = true;
 			nearest = thisD;
 		}
 	}
@@ -499,7 +499,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	g_sel1b = NULL;
 	g_dragV = -1;
 	g_dragS = -1;
-	g_dragB = false;
+	g_dragW = false;
 	g_dragD = -1;
 
 	if(ViewOpen("door edit"))

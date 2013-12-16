@@ -211,7 +211,7 @@ void Undo()
 
 	g_sel1b = NULL;
 	g_selB.clear();
-	g_dragB = -1;
+	g_dragW = -1;
 	g_dragS = -1;
 	g_dragV = -1;
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
@@ -272,7 +272,7 @@ void Redo()
 
 	g_sel1b = NULL;
 	g_selB.clear();
-	g_dragB = -1;
+	g_dragW = -1;
 	g_dragS = -1;
 	g_dragV = -1;
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);

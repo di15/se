@@ -18,10 +18,12 @@ public:
 	bool m_on;
 	MS3DModel m_ms3d;
 	VertexArray* m_va;
+	int m_nframes;
 	unsigned int m_diffusem;
 	unsigned int m_specularm;
 	unsigned int m_normalm;
 	unsigned int m_ownerm;
+	string m_fullpath;
 
 	Model()
 	{
@@ -31,9 +33,10 @@ public:
 
 	~Model();
 
-	void load(const char* filepath, Vec3f scale, Vec3f translate);
+	bool load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue);
 	void usetex();
 	void draw(int frame, Vec3f pos, float yaw);
+	void destroy();
 };
 
 #define MODELS	512
@@ -48,12 +51,15 @@ struct ModelToLoad
 };
 
 int NewModel();
-void QueueModel(int* id, const char* filepath, Vec3f scale, Vec3f translate);
+int FindModel(const char* relative);
+void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate);
 bool Load1Model();
 void DrawVA(VertexArray* va, Vec3f pos);
 void BeginVertexArrays();
 void EndVertexArrays();
 bool PlayAnimation(float& frame, int first, int last, bool loop, float rate);
 bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate);	//Play animation backwards
+void FreeModels();
+int LoadModel(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue);
 
 #endif
