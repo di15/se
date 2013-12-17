@@ -346,11 +346,11 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
-		DrawFilled(&g_edmap);
+		DrawFilled(&g_edmap, g_modelholder);
 		if(v->m_type != VIEWPORT_ANGLE45O)
-			DrawOutlines(&g_edmap);
+			DrawOutlines(&g_edmap, g_modelholder);
 		else
-			DrawSelOutlines(&g_edmap);
+			DrawSelOutlines(&g_edmap, g_modelholder);
 		glEnable(GL_DEPTH_TEST);
 
 		UseS(SHADER_COLOR2D);

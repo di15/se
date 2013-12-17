@@ -11,12 +11,14 @@
 #include "../common/sim/sim.h"
 #include "segui.h"
 #include "../common/sim/door.h"
+#include "../common/save/modelholder.h"
+#include "../common/save/compilemap.h"
 
 Brush g_copyB;
 int g_edtool = EDTOOL_NONE;
 
 // draw selected brushes filled bg
-void DrawFilled(EdMap* map)
+void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -41,10 +43,19 @@ void DrawFilled(EdMap* map)
 			glDrawArrays(GL_TRIANGLES, 0, side->m_drawva.numverts);
 		}
 	}
+	
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+		Model* m = &g_model[pmh->model];
+		int maxframes = m->m_ms3d.m_totalFrames;
+
+		DrawVA(&pmh->frames[ g_renderframe % maxframes ], pmh->translation);
+	}
 }
 
 // draw brush outlines
-void DrawOutlines(EdMap* map)
+void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -62,20 +73,102 @@ void DrawOutlines(EdMap* map)
 			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 
 			//glDrawArrays(GL_TRIANGLES, 0, va->numverts);
-			
+
 			float alpha = 1.0f - Magnitude2(side->m_centroid - g_camera.m_view) / (PROJ_RIGHT*2.0f/g_zoom) / (PROJ_RIGHT*2.0f/g_zoom);
 
 			glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
 
 			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_outline.m_drawoutva);
-			
+
 			glDrawArrays(GL_LINE_STRIP, 0, side->m_outline.m_edv.size());
 		}
+	}
+
+	for(auto mhiter = modelholder.begin(); mhiter != modelholder.end(); mhiter++)
+	{
+		ModelHolder* pmh = &*mhiter;
+
+		float topverts[] = 
+		{
+			//top
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//top far right
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//top near right
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//top near left
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
+		};
+
+		float bottomverts[] = 
+		{
+			//bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//bottom far right
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//bottom near right
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//bottom near left
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
+		};
+		
+		float leftverts[] = 
+		{
+			//left
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//left top far
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//left top near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//left bottom near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
+		};
+		
+		float rightverts[] = 
+		{
+			//right
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//right top far
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//right top near
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//right bottom near
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
+		};
+		
+		float nearverts[] = 
+		{
+			//near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//near left top
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//near right top
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//near right bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
+		};
+		
+		float farverts[] = 
+		{
+			//far
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//far left top
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//far right top
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//far right bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
+		};
+
+		float alpha = 1.0f - Magnitude2((pmh->absmin+pmh->absmax)/2.0f - g_camera.m_view) / (PROJ_RIGHT*2.0f/g_zoom) / (PROJ_RIGHT*2.0f/g_zoom);
+
+		glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
+
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 }
 
 // draw selected brush outlines
-void DrawSelOutlines(EdMap* map)
+void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -99,6 +192,88 @@ void DrawSelOutlines(EdMap* map)
 			
 			glDrawArrays(GL_LINE_STRIP, 0, side->m_outline.m_edv.size());
 		}
+	}
+	
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+
+		float topverts[] = 
+		{
+			//top
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//top far right
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//top near right
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//top near left
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
+		};
+
+		float bottomverts[] = 
+		{
+			//bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//bottom far right
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//bottom near right
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//bottom near left
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
+		};
+		
+		float leftverts[] = 
+		{
+			//left
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//left top far
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//left top near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//left bottom near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
+		};
+		
+		float rightverts[] = 
+		{
+			//right
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//right top far
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//right top near
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//right bottom near
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
+		};
+		
+		float nearverts[] = 
+		{
+			//near
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
+			pmh->absmin.x, pmh->absmax.y, pmh->absmax.z,	//near left top
+			pmh->absmax.x, pmh->absmax.y, pmh->absmax.z,	//near right top
+			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//near right bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
+		};
+		
+		float farverts[] = 
+		{
+			//far
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
+			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//far left top
+			pmh->absmax.x, pmh->absmax.y, pmh->absmin.z,	//far right top
+			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//far right bottom
+			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
+		};
+
+		float alpha = 1.0f - Magnitude2((pmh->absmin+pmh->absmax)/2.0f - g_camera.m_view) / (PROJ_RIGHT*2.0f/g_zoom) / (PROJ_RIGHT*2.0f/g_zoom);
+
+		glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
+
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 }
 
@@ -305,6 +480,278 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 	}
 }
 
+
+void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
+{
+	Shader* shader = &g_shader[g_curS];
+	
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+
+		// Top side
+		Vec3f topcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmax.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f topscreenpos = ScreenPos(mvp, topcentroid, w, h, persp);
+		float topverts[] = 
+		{
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
+			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
+			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Bottom side
+		Vec3f bottomcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmin.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f bottomscreenpos = ScreenPos(mvp, bottomcentroid, w, h, persp);
+		float bottomverts[] = 
+		{
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y + FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y + FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+
+		// Left side
+		Vec3f leftcentroid = Vec3f( pmh->absmin.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f leftscreenpos = ScreenPos(mvp, leftcentroid, w, h, persp);
+		float leftverts[] = 
+		{
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Right side
+		Vec3f rightcentroid = Vec3f( pmh->absmax.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f rightscreenpos = ScreenPos(mvp, rightcentroid, w, h, persp);
+		float rightverts[] = 
+		{
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Near side
+		Vec3f nearcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmax.z );
+		Vec4f nearscreenpos = ScreenPos(mvp, nearcentroid, w, h, persp);
+		float nearverts[] = 
+		{
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Far side
+		Vec3f farcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmin.z );
+		Vec4f farscreenpos = ScreenPos(mvp, farcentroid, w, h, persp);
+		float farverts[] = 
+		{
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
+			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
+			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y + FACE_DRAG_HSIZE, 0,
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y + FACE_DRAG_HSIZE, 0,
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+
+		// Top side
+		if(g_sel1m == pmh && g_dragS == DRAG_TOP)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_TOP)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+		// Bottom side
+		if(g_sel1m == pmh && g_dragS == DRAG_BOTTOM)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_BOTTOM)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+		// Left side
+		if(g_sel1m == pmh && g_dragS == DRAG_LEFT)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_LEFT)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+		// Right side
+		if(g_sel1m == pmh && g_dragS == DRAG_RIGHT)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_RIGHT)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+		// Near side
+		if(g_sel1m == pmh && g_dragS == DRAG_NEAR)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_NEAR)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+		// Far side
+		if(g_sel1m == pmh && g_dragS == DRAG_FAR)
+		{
+			float colour[] = FACE_DRAG_SFILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		else
+		{
+			float colour[] = FACE_DRAG_FILLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		glDrawArrays(GL_QUADS, 0, 4);
+		if(g_sel1m == pmh && g_dragS == DRAG_FAR)
+		{
+			float colour2[] = FACE_DRAG_SOUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		else
+		{
+			float colour2[] = FACE_DRAG_OUTLRGBA;
+			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+		}
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+
+
+	}
+
+	
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+		
+		Vec3f centroid = (pmh->absmin + pmh->absmax) / 2.0f;
+
+		Vec4f screenpos = ScreenPos(mvp, centroid, w, h, persp);
+
+		float verts[] = 
+		{
+			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
+			screenpos.x + BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
+			screenpos.x + BRUSH_DRAG_HSIZE, screenpos.y + BRUSH_DRAG_HSIZE, 0,
+			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y + BRUSH_DRAG_HSIZE, 0,
+			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0
+		};
+
+		float coluor[] = BRUSH_DRAG_FILLRGBA;
+		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, coluor);
+
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		glDrawArrays(GL_QUADS, 0, 4);
+
+		float colour2[] = BRUSH_DRAG_OUTLRGBA;
+		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+
+		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		glDrawArrays(GL_LINE_STRIP, 0, 5);
+	}
+}
+
 //draw drag handles
 void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 {
@@ -319,9 +766,13 @@ void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 
 		DrawDrag_Door(map, mvp, w, h, persp);
 	}
-	else
+	else if(g_selB.size() > 0)
 	{
 		DrawDrag_VertFaceBrush(map, mvp, w, h, persp);
+	}
+	else if(g_selM.size() > 0)
+	{
+		DrawDrag_ModelHolder(map, mvp, w, h, persp);
 	}
 }
 
@@ -334,6 +785,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 
 	//g_log<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<endl;
 	list<Brush*> selB;
+	list<ModelHolder*> selM;
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
@@ -350,7 +802,27 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			//g_selB.clear();
 			//g_selB.push_back(&*b);
 			selB.push_back(&*b);
-			OpenAnotherView("brush edit");
+			//OpenAnotherView("brush edit");
+			//return;
+		}
+	}
+
+	for(auto mh=g_modelholder.begin(); mh!=g_modelholder.end(); mh++)
+	{
+		Vec3f trace = mh->traceray(line);
+		if(trace != line[1] && trace.y <= g_maxelev 
+#if 1
+			&& 
+			trace.x >= vmin.x && trace.x <= vmax.x &&
+			trace.y >= vmin.y && trace.y <= vmax.y &&
+			trace.z >= vmin.z && trace.z <= vmax.z
+#endif
+			)
+		{
+			//g_selB.clear();
+			//g_selB.push_back(&*b);
+			selM.push_back(&*mh);
+			//OpenAnotherView("brush edit");
 			//return;
 		}
 	}
@@ -378,11 +850,44 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 		}
 	}
 	
+	int prevnB = g_selB.size();
 	g_selB.clear();
+	
+	//If we've reached the end of the selection array,
+	//(selB), select through the models, 
+	if(g_selM.size() == 1)
+	{
+		bool found = false;
+		for(auto i=selM.begin(); i!=selM.end(); i++)
+		{
+			if(found)
+			{
+				g_selM.clear();
+				g_selM.push_back(*i);
+				//OpenAnotherView("model edit");
+				return;
+			}
+			
+			auto j = g_selM.begin();
 
-	//If we've reached the end of the selection array
-	//(selB), select the one at the front.
-	if(selB.size() > 0)
+			if(*i == *j)
+				found = true;
+		}
+	}
+	
+	int prevnM = g_selM.size();
+	g_selM.clear();
+
+	//and then restart at model at the front
+	//if we previously selected a brush or if 
+	//there aren't any brushes at all
+	if(selM.size() > 0 
+		&& (prevnB > 0 || map->m_brush.size() == 0))
+	{
+		g_selM.push_back( *selM.begin() );
+	}
+	//or else the brush at the front.
+	else if(selB.size() > 0)
 	{
 		g_selB.push_back( *selB.begin() );
 		OpenAnotherView("brush edit");
@@ -494,6 +999,179 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 	}
 }
 
+void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, bool persp)
+{
+	float nearest = -1;
+	Shader* shader = &g_shader[g_curS];
+	
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+
+		// Top side
+		Vec3f topcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmax.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f topscreenpos = ScreenPos(mvp, topcentroid, w, h, persp);
+		float topverts[] = 
+		{
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
+			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
+			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
+			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Bottom side
+		Vec3f bottomcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmin.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f bottomscreenpos = ScreenPos(mvp, bottomcentroid, w, h, persp);
+		float bottomverts[] = 
+		{
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y + FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y + FACE_DRAG_HSIZE, 0,
+			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+
+		// Left side
+		Vec3f leftcentroid = Vec3f( pmh->absmin.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f leftscreenpos = ScreenPos(mvp, leftcentroid, w, h, persp);
+		float leftverts[] = 
+		{
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
+			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Right side
+		Vec3f rightcentroid = Vec3f( pmh->absmax.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
+		Vec4f rightscreenpos = ScreenPos(mvp, rightcentroid, w, h, persp);
+		float rightverts[] = 
+		{
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
+			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Near side
+		Vec3f nearcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmax.z );
+		Vec4f nearscreenpos = ScreenPos(mvp, nearcentroid, w, h, persp);
+		float nearverts[] = 
+		{
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
+			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+		
+		// Far side
+		Vec3f farcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmin.z );
+		Vec4f farscreenpos = ScreenPos(mvp, farcentroid, w, h, persp);
+		float farverts[] = 
+		{
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
+			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
+			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y + FACE_DRAG_HSIZE, 0,
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y + FACE_DRAG_HSIZE, 0,
+			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+
+		// Top side
+		if(x >= topscreenpos.x - FACE_DRAG_HSIZE && x <= topscreenpos.x + FACE_DRAG_HSIZE && y >= topscreenpos.y - FACE_DRAG_HSIZE && y <= topscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(topcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_TOP;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+		
+		// Bottom side
+		if(x >= bottomscreenpos.x - FACE_DRAG_HSIZE && x <= bottomscreenpos.x + FACE_DRAG_HSIZE && y >= bottomscreenpos.y - FACE_DRAG_HSIZE && y <= bottomscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(bottomcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_BOTTOM;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+		
+		// Left side
+		if(x >= leftscreenpos.x - FACE_DRAG_HSIZE && x <= leftscreenpos.x + FACE_DRAG_HSIZE && y >= leftscreenpos.y - FACE_DRAG_HSIZE && y <= leftscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(leftcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_LEFT;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+		
+		// Right side
+		if(x >= rightscreenpos.x - FACE_DRAG_HSIZE && x <= rightscreenpos.x + FACE_DRAG_HSIZE && y >= rightscreenpos.y - FACE_DRAG_HSIZE && y <= rightscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(rightcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_RIGHT;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+		
+		// Near side
+		if(x >= nearscreenpos.x - FACE_DRAG_HSIZE && x <= nearscreenpos.x + FACE_DRAG_HSIZE && y >= nearscreenpos.y - FACE_DRAG_HSIZE && y <= nearscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(nearcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_NEAR;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+		
+		// Far side
+		if(x >= farscreenpos.x - FACE_DRAG_HSIZE && x <= farscreenpos.x + FACE_DRAG_HSIZE && y >= farscreenpos.y - FACE_DRAG_HSIZE && y <= farscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(farcentroid - eye);
+
+			if(thisD < nearest || nearest < 0)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = DRAG_FAR;
+				g_dragW = false;
+				nearest = thisD;
+			}
+		}
+	}
+}
+
 bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, bool persp)
 {
 	g_sel1b = NULL;
@@ -535,6 +1213,8 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 
 		return true;
 	}
+	
+	SelectDrag_ModelHolder(map, mvp, w, h, x, y, eye, persp);
 
 	return false;
 }

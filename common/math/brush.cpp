@@ -1150,3 +1150,33 @@ bool LineInterHull(const Vec3f* line, Plane* planes, const int numplanes)
 
     return false;
 }
+
+// line intersects convex hull?
+bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const int numplanes)
+{
+	for(int i=0; i<numplanes; i++)
+    {
+		Vec3f inter;
+        if(LineInterPlane(line, norms[i], -ds[i], &inter))
+        {
+			bool allin = true;
+			for(int j=0; j<numplanes; j++)
+			{
+				if(i == j)
+					continue;
+
+				if(!PointOnOrBehindPlane(inter, norms[j], ds[j]))
+				{
+					allin = false;
+					break;
+				}
+			}
+			if(allin)
+			{
+				return true;
+			}
+        }
+    }
+
+    return false;
+}

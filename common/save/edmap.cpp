@@ -4,6 +4,7 @@
 #include "../draw/shader.h"
 #include "../texture.h"
 #include "../utils.h"
+#include "../save/modelholder.h"
 
 EdMap g_edmap;
 vector<Brush*> g_selB;
@@ -13,6 +14,8 @@ int g_dragS = -1;	//drag side of selected brush?
 bool g_dragW = false;	//drag whole brush or model?
 int g_dragD = -1;	// dragging DRAG_DOOR_POINT or DRAG_DOOR_AXIS ?
 int g_dragM = -1;	//dragging model holder?
+vector<ModelHolder*> g_selM;
+ModelHolder* g_sel1m = NULL;	//drag selected model (model being dragged or manipulated currently)
 
 void DrawEdMap(EdMap* map, bool showsky)
 {

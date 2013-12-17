@@ -23,6 +23,7 @@ public:
 extern float g_renderpitch;
 extern float g_renderyaw;
 extern int g_1tilewidth;
+extern int g_renderframe;
 
 void ToCutSide(CutBrushSide* cuts, BrushSide* eds);
 void CompileMap(const char* full, EdMap* map);

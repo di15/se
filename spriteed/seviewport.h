@@ -25,6 +25,13 @@
 #define DOOR_AXIS_DRAG_OUTLRGBA		{0.9f, 0.9f, 0.0f, 0.5f}
 #define DOOR_AXIS_DRAG_FILLRGBA		{0.7f, 0.7f, 0.0f, 0.5f}
 
+#define DRAG_TOP		0
+#define DRAG_BOTTOM		1
+#define DRAG_LEFT		2
+#define DRAG_RIGHT		3
+#define DRAG_NEAR		4
+#define DRAG_FAR		5
+
 #define VIEWPORT_FRONT		0
 #define VIEWPORT_LEFT		1
 #define VIEWPORT_TOP		2

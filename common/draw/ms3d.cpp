@@ -394,6 +394,11 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 	{
 		advanceanim();
 
+		for(int index = 0; index < m_numVertices; index++)
+		{
+			normalweights[index].clear();
+		}
+
 		int vert = 0;
 
 		vertices = (*vertexArrays)[f].vertices;

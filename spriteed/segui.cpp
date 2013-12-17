@@ -629,6 +629,19 @@ void Click_AddMS3D()
 	g_modelholder.push_back(mh);
 }
 
+void RotateModels(float degrees, float xaxis, float yaxis, float zaxis)
+{
+	LinkPrevUndo();
+
+	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
+	{
+		ModelHolder* pmh = *mhiter;
+
+		pmh->rotdegrees = pmh->rotdegrees + Vec3f( degrees*xaxis, degrees*yaxis, degrees*zaxis );
+		pmh->retransform();
+	}
+}
+
 void RotateBrushes(float radians, Vec3f axis)
 {
 	LinkPrevUndo();
@@ -729,37 +742,61 @@ void RotateBrushes(float radians, Vec3f axis)
 void Click_RotXCCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(degrees), Vec3f(1, 0, 0));
+
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(degrees), Vec3f(1, 0, 0));
+	else if(g_selM.size() > 0)
+		RotateModels(degrees, 1, 0, 0);
 }
 
 void Click_RotXCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(-degrees), Vec3f(1, 0, 0));
+	
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(-degrees), Vec3f(1, 0, 0));
+	else if(g_selM.size() > 0)
+		RotateModels(-degrees, 1, 0, 0);
 }
 
 void Click_RotYCCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(degrees), Vec3f(0, 1, 0));
+	
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 1, 0));
+	else if(g_selM.size() > 0)
+		RotateModels(degrees, 0, 1, 0);
 }
 
 void Click_RotYCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 1, 0));
+	
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 1, 0));
+	else if(g_selM.size() > 0)
+		RotateModels(-degrees, 0, 1, 0);
 }
 
 void Click_RotZCCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(degrees), Vec3f(0, 0, 1));
+	
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 0, 1));
+	else if(g_selM.size() > 0)
+		RotateModels(degrees, 0, 0, 1);
 }
 
 void Click_RotZCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 0, 1));
+	
+	if(g_selB.size() > 0)
+		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 0, 1));
+	else if(g_selM.size() > 0)
+		RotateModels(-degrees, 0, 0, 1);
 }
 
 void Click_RotateTex()

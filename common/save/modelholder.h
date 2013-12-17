@@ -1,5 +1,8 @@
 
 
+#ifndef MODELHOLDER_H
+#define MODELHOLDER_H
+
 #include "../draw/model.h"
 #include "../platform.h"
 
@@ -12,7 +15,7 @@ public:
 	Vec3f scale;
 	Vec3f absmin;
 	Vec3f absmax;
-	Matrix transform;
+	Matrix rotationmat;
 	VertexArray* frames;
 	int nframes;
 
@@ -23,11 +26,15 @@ public:
 	ModelHolder& operator=(const ModelHolder &original);
 
 	void retransform();
-	void regenva();
+	void regennormals();
 	void destroy();
+	
+	Vec3f traceray(Vec3f line[]);
 };
 
 extern list<ModelHolder> g_modelholder;
 
 void FreeModelHolders();
 void DrawModelHolders();
+
+#endif

@@ -32,6 +32,7 @@ bool Close(Plane a, Plane b);
 Vec3f PointOnPlane(Plane p);
 float PlaneDistance(Vec3f normal, Vec3f point);
 bool PointOnOrBehindPlane(Vec3f point, Plane plane, float epsilon=CLOSE_EPSILON);
+bool PointOnOrBehindPlane(Vec3f point, Vec3f normal, float dist, float epsilon=CLOSE_EPSILON);
 void RotatePlane(Plane& p, Vec3f about, float radians, Vec3f axis);
 void MakePlane(Vec3f* norm, float* d, Vec3f point, Vec3f setnorm);
 void ParamLine(Vec3f* line, Vec3f* change);

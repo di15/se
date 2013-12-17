@@ -103,6 +103,16 @@ bool PointOnOrBehindPlane(Vec3f point, Plane plane, float epsilon)
 	return false;
 }
 
+bool PointOnOrBehindPlane(Vec3f point, Vec3f normal, float dist, float epsilon)
+{
+	float result = point.x*normal.x + point.y*normal.y + point.z*normal.z + dist;
+
+	if(result <= epsilon)
+		return true;
+
+	return false;
+}
+
 void RotatePlane(Plane& p, Vec3f about, float radians, Vec3f axis)
 {
 	Vec3f pop = PointOnPlane(p);

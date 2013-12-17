@@ -15,6 +15,7 @@
 float g_renderpitch = 30;
 float g_renderyaw = 45;
 int g_1tilewidth = 64;
+int g_renderframe = 0;
 
 void ToCutSide(CutBrushSide* cuts, BrushSide* eds)
 {
