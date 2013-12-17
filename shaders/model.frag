@@ -1,7 +1,9 @@
 
+
 #version 150
 
 uniform vec4 color;
+uniform vec4 owncolor;
 
 uniform sampler2D texture0;
 //uniform sampler2D texture1;
@@ -29,6 +31,14 @@ void main (void)
 	if(elevy > maxelev)
 		discard;
 
+	vec4 texel0 = texture(texture0, texCoordOut0);
+	//vec4 texel1 = texture(texture1, texCoordOut0);
+	//vec4 texel2 = texture(texture2, texCoordOut0);
+	//vec4 texel3 = texture(texture3, texCoordOut0);
+
+	if(texel0.w < 0.5)
+		discard;
+
 	vec3 smcoord = lpos.xyz / lpos.w;
 	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
 	//float shadow = 1;
@@ -46,11 +56,6 @@ void main (void)
 	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
 	vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
-
-	vec4 texel0 = texture(texture0, texCoordOut0);
-	//vec4 texel1 = texture(texture1, texCoordOut0);
-	//vec4 texel2 = texture(texture2, texCoordOut0);
-	//vec4 texel3 = texture(texture3, texCoordOut0);
 
 	//float alph1 = texel1.w;
 	//float alph2 = texel2.w;
