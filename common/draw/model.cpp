@@ -26,6 +26,8 @@ void Model::destroy()
 	m_va = NULL;
 
 	m_ms3d.destroy();
+
+	m_on = false;
 }
 
 int NewModel()

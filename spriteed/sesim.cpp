@@ -15,6 +15,7 @@
 #include "../common/save/compilemap.h"
 
 Brush g_copyB;
+ModelHolder g_copyM;
 int g_edtool = EDTOOL_NONE;
 
 // draw selected brushes filled bg
@@ -59,6 +60,10 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
+
+	Matrix modelmat;
+	modelmat.loadIdentity();
+    glUniformMatrix4fv(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	//glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, 0.75f);
 
@@ -173,6 +178,10 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
 	glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, 0.75f);
+
+	Matrix modelmat;
+	modelmat.loadIdentity();
+    glUniformMatrix4fv(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	for(auto bi=g_selB.begin(); bi!=g_selB.end(); bi++)
 	{
@@ -409,8 +418,6 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 				screenpos.x - FACE_DRAG_HSIZE, screenpos.y + FACE_DRAG_HSIZE, 0,
 				screenpos.x - FACE_DRAG_HSIZE, screenpos.y - FACE_DRAG_HSIZE, 0
 			};
-
-
 
 			if(g_sel1b == b && g_dragS == j)
 			{
@@ -1008,6 +1015,18 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 	{
 		ModelHolder* pmh = *mhiter;
 
+		// Whole model centroid
+		Vec3f modelcentroid =(pmh->absmin + pmh->absmax)/2.0f;
+		Vec4f modelscreenpos = ScreenPos(mvp, modelcentroid, w, h, persp);
+		float centerverts[] = 
+		{
+			modelscreenpos.x - FACE_DRAG_HSIZE, modelscreenpos.y - FACE_DRAG_HSIZE, 0,
+			modelscreenpos.x + FACE_DRAG_HSIZE, modelscreenpos.y - FACE_DRAG_HSIZE, 0,
+			modelscreenpos.x + FACE_DRAG_HSIZE, modelscreenpos.y + FACE_DRAG_HSIZE, 0,
+			modelscreenpos.x - FACE_DRAG_HSIZE, modelscreenpos.y + FACE_DRAG_HSIZE, 0,
+			modelscreenpos.x - FACE_DRAG_HSIZE, modelscreenpos.y - FACE_DRAG_HSIZE, 0
+		};
+
 		// Top side
 		Vec3f topcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmax.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f topscreenpos = ScreenPos(mvp, topcentroid, w, h, persp);
@@ -1169,12 +1188,29 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
+
+		// Whole model drag
+		if(x >= modelscreenpos.x - FACE_DRAG_HSIZE && x <= modelscreenpos.x + FACE_DRAG_HSIZE && y >= modelscreenpos.y - FACE_DRAG_HSIZE && y <= modelscreenpos.y + FACE_DRAG_HSIZE)
+		{
+			float thisD = Magnitude(modelcentroid - eye);
+
+			// Prefer selecting the whole model drag handle over selecting a side drag handle
+			if(thisD < nearest || nearest < 0 || g_sel1m == pmh || g_sel1m == NULL)
+			{
+				g_sel1m = pmh;
+				g_dragV = -1;
+				g_dragS = -1;
+				g_dragW = true;
+				nearest = thisD;
+			}
+		}
 	}
 }
 
 bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, bool persp)
 {
 	g_sel1b = NULL;
+	g_sel1m = NULL;
 	g_dragV = -1;
 	g_dragS = -1;
 	g_dragW = false;
@@ -1215,6 +1251,12 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	}
 	
 	SelectDrag_ModelHolder(map, mvp, w, h, x, y, eye, persp);
+
+	if(g_sel1m != NULL)
+	{
+		//MessageBox(g_hWnd, "sle m", "asd", NULL);
+		return true;
+	}
 
 	return false;
 }

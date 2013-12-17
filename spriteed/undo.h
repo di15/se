@@ -3,11 +3,13 @@
 #include "../common/math/brush.h"
 #include "../common/sim/map.h"
 #include "../common/platform.h"
+#include "../common/save/modelholder.h"
 
 class UndoH	//undo history
 {
 public:
 	list<Brush> brushes;
+	list<ModelHolder> modelholders;
 
 	UndoH(){}
 	~UndoH();

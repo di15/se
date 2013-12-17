@@ -9,6 +9,7 @@
 class Brush;
 
 extern Brush g_copyB;
+extern ModelHolder g_copyM;
 
 #define EDTOOL_NONE		-1
 #define EDTOOL_CUT		0

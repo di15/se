@@ -5,6 +5,7 @@
 #include "../math/brush.h"
 #include "../math/quaternion.h"
 #include "../math/vec4f.h"
+#include "compilemap.h"
 
 list<ModelHolder> g_modelholder;
 
@@ -125,6 +126,7 @@ void ModelHolder::retransform()
 		for(int vertidx = 0; vertidx < pframe->numverts; vertidx++)
 		{
 			pframe->vertices[vertidx].transform(rotationmat);
+			pframe->vertices[vertidx] = pframe->vertices[vertidx] * scale;
 		}
 	}
 
@@ -270,6 +272,6 @@ void DrawModelHolders()
 		Model* m = &g_model[h->model];
 
 		m->usetex();
-		DrawVA(&h->frames[0], Vec3f(0,0,0));
+		DrawVA(&h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ], h->translation);
 	}
 }

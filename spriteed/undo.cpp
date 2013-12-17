@@ -29,6 +29,8 @@ void WriteH(UndoH* towrite)
 	//if we don't call clear(). Bug in list<>?
 	towrite->brushes.clear();
 	towrite->brushes = g_edmap.m_brush;
+	towrite->modelholders.clear();
+	towrite->modelholders = g_modelholder;
 
 #ifdef UNDO_DEBUG
 	g_log<<"save h "<<towrite->brushes.size()<<" brushes"<<endl;
@@ -184,6 +186,7 @@ void Undo()
 		{
 			UndoH* h = &*i;
 			g_edmap.m_brush = h->brushes;
+			g_modelholder = h->modelholders;
 
 #ifdef UNDO_DEBUG
 			g_log<<"undid now "<<g_edmap.m_brush.size()<<" brushes"<<endl;
@@ -255,6 +258,7 @@ void Redo()
 		{
 			UndoH* h = &*i;
 			g_edmap.m_brush = h->brushes;
+			g_modelholder = h->modelholders;
 
 #ifdef UNDO_DEBUG
 			g_log<<"redid to "<<g_edmap.m_brush.size()<<" brushes"<<endl;

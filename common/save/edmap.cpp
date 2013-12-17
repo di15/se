@@ -25,6 +25,10 @@ void DrawEdMap(EdMap* map, bool showsky)
 
 	Shader* shader = &g_shader[g_curS];
 
+	Matrix modelmat;
+	modelmat.loadIdentity();
+    glUniformMatrix4fv(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
 		Texture* t = &g_texture[b->m_texture];

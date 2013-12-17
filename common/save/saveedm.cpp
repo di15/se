@@ -385,6 +385,63 @@ int BrushNum(Brush* b, EdMap* map)
 	return -1;
 }
 
+void SaveModelHolder(FILE* fp, ModelHolder* pmh)
+{
+	Model* m = &g_model[pmh->model];
+
+	string relative = MakePathRelative(m->m_fullpath.c_str());
+	int nrelative = relative.size() + 1;
+
+	fwrite(&nrelative, sizeof(int), 1, fp);
+	fwrite(relative.c_str(), sizeof(char), nrelative, fp);
+
+	fwrite(&pmh->rotdegrees, sizeof(Vec3f), 1, fp);
+	fwrite(&pmh->translation, sizeof(Vec3f), 1, fp);
+	fwrite(&pmh->scale, sizeof(Vec3f), 1, fp);
+}
+
+void ReadModelHolder(FILE* fp, ModelHolder* pmh)
+{
+	int nrelative =0;
+	fread(&nrelative, sizeof(int), 1, fp);
+
+	char* relative = new char[nrelative];
+	fread(relative, sizeof(char), nrelative, fp);
+
+	pmh->model = LoadModel(relative, Vec3f(1,1,1), Vec3f(0,0,0), true);
+
+	fread(&pmh->rotdegrees, sizeof(Vec3f), 1, fp);
+	fread(&pmh->translation, sizeof(Vec3f), 1, fp);
+	fread(&pmh->scale, sizeof(Vec3f), 1, fp);
+}
+
+void SaveModelHolders(FILE* fp, list<ModelHolder>& modelholders)
+{
+	int nmh = modelholders.size();
+
+	fwrite(&nmh, sizeof(int), 1, fp);
+
+	for(auto iter = modelholders.begin(); iter != modelholders.end(); iter++)
+	{
+		SaveModelHolder(fp, &*iter);
+	}
+}
+
+void ReadModelHolders(FILE* fp, list<ModelHolder>& modelholders)
+{
+	int nmh = 0;
+
+	fread(&nmh, sizeof(int), 1, fp);
+
+	for(int i = 0; i < nmh; i++)
+	{
+		ModelHolder mh;
+		ReadModelHolder(fp, &mh);
+		mh.retransform();
+		modelholders.push_back(mh);
+	}
+}
+
 void SaveEdMap(const char* fullpath, EdMap* map)
 {
 	FILE* fp = fopen(fullpath, "wb");
@@ -398,6 +455,7 @@ void SaveEdMap(const char* fullpath, EdMap* map)
 	int texrefs[TEXTURES];
 	SaveTexs(fp, texrefs, map->m_brush);
 	SaveBrushes(fp, texrefs, map);
+	SaveModelHolders(fp, g_modelholder);
 
 	fclose(fp);
 }
@@ -496,6 +554,7 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 
 	ReadEdTexs(fp, &texrefs);
 	ReadBrushes(fp, texrefs, map);
+	ReadModelHolders(fp, g_modelholder);
 
 	if(texrefs)
 	{
@@ -548,4 +607,5 @@ void FreeEdMap(EdMap* map)
 	map->m_brush.clear();
 
 	FreeModels();
+	FreeModelHolders();
 }

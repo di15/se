@@ -54,7 +54,7 @@ Viewport::Viewport(int type)
 
 Vec3f Viewport::up()
 {
-    Vec3f upvec = g_camera.m_up;
+	Vec3f upvec = g_camera.m_up;
 	ViewportT* t = &g_viewportT[m_type];
 
 	if(m_type != VIEWPORT_ANGLE45O)
@@ -65,7 +65,7 @@ Vec3f Viewport::up()
 
 Vec3f Viewport::up2()
 {
-    Vec3f upvec = g_camera.up2();
+	Vec3f upvec = g_camera.up2();
 	ViewportT* t = &g_viewportT[m_type];
 
 	if(m_type != VIEWPORT_ANGLE45O)
@@ -103,7 +103,7 @@ Vec3f Viewport::viewdir()
 
 Vec3f Viewport::pos()
 {
-    Vec3f posvec = g_camera.m_pos;
+	Vec3f posvec = g_camera.m_pos;
 
 	if(g_projtype == PROJ_PERSP && m_type == VIEWPORT_ANGLE45O)
 	{
@@ -180,7 +180,7 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 	//if(power == 0)
 	//if(g_zoom > 1.0f)
 	{
-	//	interval = invzoom;
+		//	interval = invzoom;
 		//interval = base / pow(2, (int)g_zoom-1);
 		int power2 = log(g_zoom) / log(2);
 		interval = base / pow(2, power2);
@@ -208,28 +208,28 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
 
-	// crosses more spaced out
-	float interval2 = interval * 5.0f;
+			// crosses more spaced out
+			float interval2 = interval * 5.0f;
 
-	start = Vec3f( (int)(vmin.x/interval2)*interval2, (int)(vmin.y/interval2)*interval2, (int)(vmin.z/interval2)*interval2 );
-	end = Vec3f( (int)(vmax.x/interval2)*interval2, (int)(vmax.y/interval2)*interval2, (int)(vmax.z/interval2)*interval2 );
+			start = Vec3f( (int)(vmin.x/interval2)*interval2, (int)(vmin.y/interval2)*interval2, (int)(vmin.z/interval2)*interval2 );
+			end = Vec3f( (int)(vmax.x/interval2)*interval2, (int)(vmax.y/interval2)*interval2, (int)(vmax.z/interval2)*interval2 );
 
-	for(float x=start.x; x<=end.x; x+=interval2)
-		for(float y=start.y; y<=end.y; y+=interval2)
-			for(float z=start.z; z<=end.z; z+=interval2)
-			{
-				float xline[] = {x-interval/2.0f, y, z, x+interval/2.0f, y, z};
-				glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xline);
-				glDrawArrays(GL_LINES, 0, 2);
-				
-				float yline[] = {x, y-interval/2.0f, z, x, y+interval/2.0f, z};
-				glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yline);
-				glDrawArrays(GL_LINES, 0, 2);
-				
-				float zline[] = {x, y, z-interval/2.0f, x, y, z+interval/2.0f};
-				glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zline);
-				glDrawArrays(GL_LINES, 0, 2);
-			}
+			for(float x=start.x; x<=end.x; x+=interval2)
+				for(float y=start.y; y<=end.y; y+=interval2)
+					for(float z=start.z; z<=end.z; z+=interval2)
+					{
+						float xline[] = {x-interval/2.0f, y, z, x+interval/2.0f, y, z};
+						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xline);
+						glDrawArrays(GL_LINES, 0, 2);
+
+						float yline[] = {x, y-interval/2.0f, z, x, y+interval/2.0f, z};
+						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yline);
+						glDrawArrays(GL_LINES, 0, 2);
+
+						float zline[] = {x, y, z-interval/2.0f, x, y, z+interval/2.0f};
+						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zline);
+						glDrawArrays(GL_LINES, 0, 2);
+					}
 }
 
 void DrawViewport(int which, int x, int y, int width, int height)
@@ -239,7 +239,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
-	
+
 	float aspect = fabsf((float)width / (float)height);
 	Matrix projection;
 
@@ -258,23 +258,23 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	//Vec3f viewvec = g_focus;	//g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view;
 	Vec3f focusvec = v->focus();
-    //Vec3f posvec = g_focus + t->m_offset;
-    //Vec3f posvec = g_camera.m_pos;
+	//Vec3f posvec = g_focus + t->m_offset;
+	//Vec3f posvec = g_camera.m_pos;
 	Vec3f posvec = v->pos();
 
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	//	posvec = g_camera.m_view + t->m_offset;
 
 	//viewvec = posvec + Normalize(viewvec-posvec);
-    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
-    //Vec3f upvec = t->m_up;
-    //Vec3f upvec = g_camera.m_up;
+	//Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+	//Vec3f upvec = t->m_up;
+	//Vec3f upvec = g_camera.m_up;
 	Vec3f upvec = v->up();
 
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	//	upvec = t->m_up;
-        
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+
+	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
 	Matrix modelview;
 	Matrix modelmat;
@@ -310,7 +310,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		vmin.y = 0;
 		vmax.y = 0;
 	}
-	
+
 	if(v->m_type == VIEWPORT_ANGLE45O)
 	{
 		//RenderToShadowMap(projection, viewmat, modelmat, g_focus);
@@ -395,7 +395,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			// get xyzw vector (vec4f) for pixel coordinates of cursor pos's
 			Vec4f last4 = ScreenPos(&mvpmat, last, width, height, persp);
 			Vec4f cur4 = ScreenPos(&mvpmat, cur, width, height, persp);
-			
+
 			float line[] = {last4.x, last4.y, 0, cur4.x, cur4.y, 0};
 			glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, line);
 			glDrawArrays(GL_LINES, 0, 2);
@@ -445,7 +445,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	Matrix projection;
 
 	bool persp = false;
-	
+
 	if(v->m_type == VIEWPORT_ANGLE45O && g_projtype == PROJ_PERSP)
 	{
 		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
@@ -459,26 +459,26 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	//Vec3f viewvec = g_focus; //g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view;
 	Vec3f focusvec = v->focus();
-    //Vec3f posvec = g_focus + t->m_offset;
+	//Vec3f posvec = g_focus + t->m_offset;
 	//Vec3f posvec = g_camera.m_pos;
 	Vec3f posvec = v->pos();
-	
+
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	{
-	//	posvec = g_camera.m_view + t->m_offset;
+		//	posvec = g_camera.m_view + t->m_offset;
 		//viewvec = posvec + Normalize(g_camera.m_view-posvec);
 	}
 
 	//viewvec = posvec + Normalize(viewvec-posvec);
-    //Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
-    //Vec3f upvec = t->m_up;
-    //Vec3f upvec = g_camera.m_up;
+	//Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+	//Vec3f upvec = t->m_up;
+	//Vec3f upvec = g_camera.m_up;
 	Vec3f upvec = v->up();
 
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	//	upvec = t->m_up;
 
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postMultiply(viewmat);
@@ -515,13 +515,13 @@ void CutBrushes(Plane cuttingp)
 
 		Brush newb0 = *b;
 		Brush newb1 = *b;
-		
+
 		newb0.add(news0);
 		newb1.add(news1);
-		
+
 		newb0.collapse();
 		newb1.collapse();
-		
+
 		newb0.remaptex();
 		newb1.remaptex();
 
@@ -534,7 +534,7 @@ void CutBrushes(Plane cuttingp)
 			//g_selB.push_back( &*j );
 			newsel.push_back( &*j );
 		}
-		
+
 		g_edmap.m_brush.push_back(newb1);
 		j = map->m_brush.rbegin();
 		//PruneB(m, &*j);
@@ -674,7 +674,7 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 		frust.CalculateFrustum(proj, modl);
 	}
 #endif
-	
+
 	Vec3f line[2];
 	//g_log<<"==========="<<endl;
 	//g_log<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<endl;
@@ -712,7 +712,7 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 			g_changed = false;
 			//LinkLatestUndo();
 		}
-		
+
 		//g_log<<"vp["<<which<<"] l up = false"<<endl;
 		//g_log.flush();
 
@@ -722,7 +722,7 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 			{
 				ViewportLUp_CutBrush(which, relx, rely, width, height);
 			}
-			else if(g_sel1b == NULL && g_dragV < 0 && g_dragS < 0)
+			else if(g_sel1b == NULL && g_sel1m == NULL && g_dragV < 0 && g_dragS < 0)
 			{
 				ViewportLUp_SelectBrush(which, relx, rely, width, height);
 			}
@@ -740,7 +740,7 @@ bool ViewportRUp(int which, int relx, int rely, int width, int height)
 {
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
-	
+
 	v->m_rdown = false;
 
 	return false;
@@ -768,7 +768,7 @@ void ViewportTranslate(int which, int dx, int dy, int width, int height)
 	//Vec3f strafe = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, t->m_up));
 
 	float screenratio = (2.0f*PROJ_RIGHT)/(float)height/g_zoom;
-	
+
 	//Vec3f move = t->m_up*(float)dy*screenratio + strafe*(float)-dx*screenratio;
 
 	//Vec3f up = Normalize(Cross(strafe, Vec3f(0,0,0)-t->m_offset));
@@ -797,16 +797,16 @@ void ViewportRotate(int which, int dx, int dy)
 	Vec3f view = Normalize( Vec3f(0,0,0)-t->m_offset );
 
 	Vec3f strafe = Normalize(Cross(view, t->m_up));
-	
+
 	if(Magnitude(view - t->m_up) <= EPSILON || Magnitude(Vec3f(0,0,0) - view - t->m_up) <= EPSILON)
 	{
-		strafe = Vec3f(1,0,0);
-		t->m_offset = Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3);
+	strafe = Vec3f(1,0,0);
+	t->m_offset = Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3);
 	}*/
 
 	//t->m_offset = RotateAround(t->m_offset, g_focus, dy / 100.0f, strafe.x, strafe.y, strafe.z);
 	//t->m_offset = RotateAround(t->m_offset, g_focus, dx / 100.0f, t->m_up.x, t->m_up.y, t->m_up.z);
-	
+
 	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
 	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
 
@@ -929,7 +929,7 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		{
 			//if(i == j)
 			//	continue;
-		
+
 			//if(invalidv[i])
 			//	continue;
 
@@ -999,7 +999,7 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 			g_log.flush();
 #endif
 		}
-	
+
 		//return Normalize( Cross( m_strafe, m_view - m_pos ) );
 
 		Vec3f crossaxis = Normalize(farthestv[0] - farthestv[1]);
@@ -1021,6 +1021,204 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 	}
 }
 
+void Drag_Brush(Brush* b, Vec3f newmove)
+{
+	list<float> oldus;
+	list<float> oldvs;
+
+	for(int i=0; i<b->m_nsides; i++)
+	{
+		BrushSide* s = &b->m_sides[i];
+
+		//Vec3f sharedv = b->m_sharedv[ s->m_vindices[0] ];
+		float oldu = s->m_centroid.x*s->m_tceq[0].m_normal.x + s->m_centroid.y*s->m_tceq[0].m_normal.y + s->m_centroid.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
+		float oldv = s->m_centroid.x*s->m_tceq[1].m_normal.x + s->m_centroid.y*s->m_tceq[1].m_normal.y + s->m_centroid.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
+		//Vec3f axis = s->m_plane.m_normal;
+		//float radians = DEGTORAD(degrees);
+		//s->m_tceq[0].m_normal = Rotate(s->m_tceq[0].m_normal, radians, axis.x, axis.y, axis.z);
+		//s->m_tceq[1].m_normal = Rotate(s->m_tceq[1].m_normal, radians, axis.x, axis.y, axis.z);
+
+		oldus.push_back(oldu);
+		oldvs.push_back(oldv);
+
+		Vec3f pop = PointOnPlane(s->m_plane);
+		pop = pop - newmove;
+		s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, pop);
+
+	}
+
+	b->collapse();
+
+	auto oldu = oldus.begin();
+	auto oldv = oldvs.begin();
+
+	for(int i=0; i<b->m_nsides; i++, oldu++, oldv++)
+	{
+		BrushSide* s = &b->m_sides[i];
+
+		//Vec3f newsharedv = b->m_sharedv[ s->m_vindices[0] ];
+		float newu = s->m_centroid.x*s->m_tceq[0].m_normal.x + s->m_centroid.y*s->m_tceq[0].m_normal.y + s->m_centroid.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
+		float newv = s->m_centroid.x*s->m_tceq[1].m_normal.x + s->m_centroid.y*s->m_tceq[1].m_normal.y + s->m_centroid.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
+		float changeu = newu - *oldu;
+		float changev = newv - *oldv;
+		s->m_tceq[0].m_d -= changeu;
+		s->m_tceq[1].m_d -= changev;
+	}
+
+	b->remaptex();
+	PruneB(&g_edmap, g_sel1b);
+
+	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
+	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+}
+
+void Drag_BrushVert(Brush* b, Vec3f newmove)
+{
+	bool* invalidv = new bool[b->m_nsharedv];
+	for(int i=0; i<b->m_nsharedv; i++)
+		invalidv[i] = false;
+
+	Vec3f movev = b->m_sharedv[ g_dragV ];
+	Vec3f newv = movev - newmove;
+	bool mergedv = false;
+
+	for(int i=0; i<b->m_nsides; i++)
+	{
+		BrushSide* s = &b->m_sides[i];
+		for(int j=0; j<s->m_ntris+2; j++)
+		{
+			if(s->m_vindices[j] == g_dragV)
+			{
+				bool remove;
+				DragV(b, s, j, newv, mergedv, invalidv, remove);
+
+				//s->gentexeq();
+				s->remaptex();
+				b->prunev(invalidv);
+
+				//if(invalidv[ s->m_vindices[j] ])
+				//	g_dragV = -1;
+
+				//if(remove)
+				{
+					//	b->removeside(i);
+					//	i--;
+					//	break;
+				}
+			}
+		}
+	}
+	delete [] invalidv;
+	b->collapse();
+	b->remaptex();
+	PruneB(&g_edmap, g_sel1b);
+
+	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
+	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+}
+
+void Drag_BrushSide(Brush* b, Vec3f newmove)
+{
+	BrushSide* s = &b->m_sides[g_dragS];
+	Vec3f pop = PointOnPlane(s->m_plane);
+	pop = pop - newmove;
+	s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, pop);
+	b->collapse();
+	b->remaptex();
+	PruneB(&g_edmap, g_sel1b);
+
+	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
+	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+}
+
+void Drag_BrushDoor(Brush* b, Vec3f newmove)
+{
+	EdDoor* door = b->m_door;
+
+	if(g_dragD == DRAG_DOOR_POINT)
+	{
+		door->point = door->point - newmove;
+	}
+	else if(g_dragD == DRAG_DOOR_AXIS)
+	{
+		door->axis = door->axis - newmove;
+	}
+}
+
+void Drag_Model(ModelHolder* mh, Vec3f newmove)
+{
+	mh->translation = mh->translation + newmove;
+	mh->absmin = mh->absmin + newmove;
+	mh->absmax = mh->absmax + newmove;
+}
+
+void Drag_ModelSide(ModelHolder* mh, Vec3f newmove)
+{
+	int side = g_dragS;
+
+	if(side < 0)
+		return;
+
+	Vec3f scalechange(1,1,1);
+	Vec3f span = mh->absmax - mh->absmin;
+	
+	if(span.x <= 0.0f)
+		span.x = 1;
+	if(span.y <= 0.0f)
+		span.y = 1;
+	if(span.z <= 0.0f)
+		span.z = 1;
+
+	if(side == DRAG_TOP)
+	{
+		scalechange.y = 1 + (newmove.y / span.y);
+		mh->translation.y = mh->translation.y + newmove.y/2;
+	}
+	else if(side == DRAG_BOTTOM)
+	{
+		scalechange.y = 1 - (newmove.y / span.y);
+		mh->translation.y = mh->translation.y + newmove.y/2;
+	}
+	else if(side == DRAG_LEFT)
+	{
+		scalechange.x = 1 - (newmove.x / span.x);
+		mh->translation.x = mh->translation.x + newmove.x/2;
+	}
+	else if(side == DRAG_RIGHT)
+	{
+		scalechange.x = 1 + (newmove.x / span.x);
+		mh->translation.x = mh->translation.x + newmove.x/2;
+	}
+	else if(side == DRAG_NEAR)
+	{
+		scalechange.z = 1 + (newmove.z / span.z);
+		mh->translation.z = mh->translation.z + newmove.z/2;
+	}
+	else if(side == DRAG_FAR)
+	{
+		scalechange.z = 1 - (newmove.z / span.z);
+		mh->translation.z = mh->translation.z + newmove.z/2;
+	}
+
+	//char msg[1024];
+	//sprintf(msg, "newmove %f,%f,%f \n span %f,%f,%f \n scale cahge %f,%f,%f", newmove.x, newmove.y, newmove.z, span.x, span.y, span.z, scalechange.x, scalechange.y, scalechange.z);
+	//MessageBox(g_hWnd, msg, "asd", NULL);
+
+	mh->scale = mh->scale * scalechange;
+	
+	if(mh->scale.x <= 0.0f)
+		mh->scale.x = 1;
+	if(mh->scale.y <= 0.0f)
+		mh->scale.y = 1;
+	if(mh->scale.z <= 0.0f)
+		mh->scale.z = 1;
+	
+	mh->retransform();
+}
+
 void Drag(int which, int dx, int dy, int width, int height)
 {
 	Viewport* v = &g_viewport[which];
@@ -1038,7 +1236,7 @@ void Drag(int which, int dx, int dy, int width, int height)
 	newmove.y = Snap(g_snapgrid, move.y + accum.y);
 	newmove.z = Snap(g_snapgrid, move.z + accum.z);
 	accum = accum + move - newmove;
-	
+
 	//g_log<<"move = "<<move.x<<","<<move.y<<","<<move.z<<endl;
 	//g_log<<"newmove = "<<newmove.x<<","<<newmove.y<<","<<newmove.z<<endl;
 	//g_log<<"accum = "<<accum.x<<","<<accum.y<<","<<accum.z<<endl;
@@ -1046,134 +1244,44 @@ void Drag(int which, int dx, int dy, int width, int height)
 
 	if(newmove != Vec3f(0,0,0))
 		g_changed = true;
-	
+
 	if(g_sel1b)
 	{
 		Brush* b = g_sel1b;
 
 		if(g_dragW)
 		{
-			list<float> oldus;
-			list<float> oldvs;
-
-			for(int i=0; i<b->m_nsides; i++)
-			{
-				BrushSide* s = &b->m_sides[i];
-
-				//Vec3f sharedv = b->m_sharedv[ s->m_vindices[0] ];
-				float oldu = s->m_centroid.x*s->m_tceq[0].m_normal.x + s->m_centroid.y*s->m_tceq[0].m_normal.y + s->m_centroid.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
-				float oldv = s->m_centroid.x*s->m_tceq[1].m_normal.x + s->m_centroid.y*s->m_tceq[1].m_normal.y + s->m_centroid.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
-				//Vec3f axis = s->m_plane.m_normal;
-				//float radians = DEGTORAD(degrees);
-				//s->m_tceq[0].m_normal = Rotate(s->m_tceq[0].m_normal, radians, axis.x, axis.y, axis.z);
-				//s->m_tceq[1].m_normal = Rotate(s->m_tceq[1].m_normal, radians, axis.x, axis.y, axis.z);
-				
-				oldus.push_back(oldu);
-				oldvs.push_back(oldv);
-
-				Vec3f pop = PointOnPlane(s->m_plane);
-				pop = pop - newmove;
-				s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, pop);
-
-			}
-			
-			b->collapse();
-			
-			auto oldu = oldus.begin();
-			auto oldv = oldvs.begin();
-
-			for(int i=0; i<b->m_nsides; i++, oldu++, oldv++)
-			{
-				BrushSide* s = &b->m_sides[i];
-
-				//Vec3f newsharedv = b->m_sharedv[ s->m_vindices[0] ];
-				float newu = s->m_centroid.x*s->m_tceq[0].m_normal.x + s->m_centroid.y*s->m_tceq[0].m_normal.y + s->m_centroid.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
-				float newv = s->m_centroid.x*s->m_tceq[1].m_normal.x + s->m_centroid.y*s->m_tceq[1].m_normal.y + s->m_centroid.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
-				float changeu = newu - *oldu;
-				float changev = newv - *oldv;
-				s->m_tceq[0].m_d -= changeu;
-				s->m_tceq[1].m_d -= changev;
-			}
-			
-			b->remaptex();
-			PruneB(&g_edmap, g_sel1b);
-
-			ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
-			//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
-			SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+			Drag_Brush(b, newmove);
 		}
 		else if(g_dragV >= 0)
 		{
-			bool* invalidv = new bool[b->m_nsharedv];
-			for(int i=0; i<b->m_nsharedv; i++)
-				invalidv[i] = false;
-			
-			Vec3f movev = b->m_sharedv[ g_dragV ];
-			Vec3f newv = movev - newmove;
-			bool mergedv = false;
-
-			for(int i=0; i<b->m_nsides; i++)
-			{
-				BrushSide* s = &b->m_sides[i];
-				for(int j=0; j<s->m_ntris+2; j++)
-				{
-					if(s->m_vindices[j] == g_dragV)
-					{
-						bool remove;
-						DragV(b, s, j, newv, mergedv, invalidv, remove);
-						
-						//s->gentexeq();
-						s->remaptex();
-						b->prunev(invalidv);
-						
-						//if(invalidv[ s->m_vindices[j] ])
-						//	g_dragV = -1;
-
-						//if(remove)
-						{
-						//	b->removeside(i);
-						//	i--;
-						//	break;
-						}
-					}
-				}
-			}
-			delete [] invalidv;
-			b->collapse();
-			b->remaptex();
-			PruneB(&g_edmap, g_sel1b);
-			
-			ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
-			//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
-			SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+			Drag_BrushVert(b, newmove);
 		}
 		else if(g_dragS >= 0)
 		{
-			BrushSide* s = &b->m_sides[g_dragS];
-			Vec3f pop = PointOnPlane(s->m_plane);
-			pop = pop - newmove;
-			s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, pop);
-			b->collapse();
-			b->remaptex();
-			PruneB(&g_edmap, g_sel1b);
-
-			ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
-			//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
-			SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+			Drag_BrushSide(b, newmove);
 		}
 		else if(g_dragD >= 0)
 		{
-			Brush* b = g_sel1b;
-			EdDoor* door = b->m_door;
+			Drag_BrushDoor(b, newmove);
+		}
+	}
+	else if(g_sel1m)
+	{
+		ModelHolder* mh = g_sel1m;
 
-			if(g_dragD == DRAG_DOOR_POINT)
-			{
-				door->point = door->point - newmove;
-			}
-			else if(g_dragD == DRAG_DOOR_AXIS)
-			{
-				door->axis = door->axis - newmove;
-			}
+		//MessageBox(g_hWnd, "drag m", "asd", NULL);
+
+		Vec3f modelnewmove = Vec3f(0,0,0) - newmove;
+
+		if(g_dragW)
+		{
+			//MessageBox(g_hWnd, "drag m w", "asd", NULL);
+			Drag_Model(mh, modelnewmove);
+		}
+		else if(g_dragS >= 0)
+		{
+			Drag_ModelSide(mh, modelnewmove);
 		}
 	}
 }
@@ -1187,7 +1295,7 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		//g_log<<"vp["<<which<<"] down mouse move l"<<endl;
 		//g_log.flush();
 
-		if(g_sel1b)
+		if(g_sel1b || g_sel1m)
 		{
 			Drag(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
@@ -1195,7 +1303,7 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		{
 			ViewportTranslate(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
-		
+
 		if(g_keys[VK_CONTROL] || g_edtool != EDTOOL_CUT || !v->m_ldown)
 			v->m_lastmouse = Vec2i(relx, rely);
 		v->m_curmouse = Vec2i(relx, rely);
@@ -1211,7 +1319,7 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		v->m_curmouse = Vec2i(relx, rely);
 		return true;
 	}
-	
+
 	if(g_keys[VK_CONTROL] || g_edtool != EDTOOL_CUT || (!v->m_ldown && !v->m_rdown))
 		v->m_lastmouse = Vec2i(relx, rely);
 

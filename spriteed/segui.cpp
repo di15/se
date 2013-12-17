@@ -44,7 +44,7 @@ void Delete()
 	if(g_mode != EDITOR)
 		return;
 
-	if(g_selB.size() > 0)
+	if(g_selB.size() > 0 || g_selM.size() > 0)
 		LinkPrevUndo();
 
 	for(int i=0; i<g_selB.size(); i++)
@@ -63,6 +63,21 @@ void Delete()
 	g_sel1b = NULL;
 
 	CloseSideView();
+	
+	for(int i=0; i<g_selM.size(); i++)
+	{
+		for(auto j=g_modelholder.begin(); j!=g_modelholder.end(); j++)
+		{
+			if(g_selM[i] == &*j)
+			{
+				g_modelholder.erase(j);
+				break;
+			}
+		}
+	}
+
+	g_selM.clear();
+	g_sel1m = NULL;
 
 	//LinkLatestUndo();
 	//g_log<<"delete b"<<endl;
@@ -523,10 +538,19 @@ void Click_DoorView()
 
 void CopyBrush()
 {
-	if(g_selB.size() <= 0)
+	if(g_selB.size() <= 0 && g_selM.size() <= 0)
 		return;
 
-	g_copyB = *g_selB[0];
+	if(g_selB.size() > 0)
+	{
+		g_copyB = *g_selB[0];
+		g_copyM.model = -1;
+	}
+	else if(g_selM.size() > 0)
+	{
+		g_copyM = *g_selM[0];
+		g_copyB.m_nsides = 0;
+	}
 
 	//g_log<<"copy brush"<<endl;
 	//g_log.flush();
@@ -537,28 +561,36 @@ void PasteBrush()
 	//g_log<<"paste brush?"<<endl;
 	//g_log.flush();
 
-	if(g_copyB.m_nsides <= 0)
-		return;
-	
-	//Vec3f pos = g_focus;
-	Vec3f pos = g_camera.m_view;
-	pos.x = Snap(g_snapgrid, pos.x);
-	pos.y = Snap(g_snapgrid, pos.y);
-	pos.z = Snap(g_snapgrid, pos.z);
-	Brush b = g_copyB;
-	//b.moveto(pos);
-/*
-	for(int i=0; i<b.m_nsides; i++)
+	if(g_copyB.m_nsides > 0)
 	{
-		BrushSide* s = &b.m_sides[i];
+		LinkPrevUndo();
 
-		g_log<<"side"<<i<<" plane="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<endl;
-	}
-	*/
-	g_edmap.m_brush.push_back(b);
+		//Vec3f pos = g_focus;
+		Vec3f pos = g_camera.m_view;
+		pos.x = Snap(g_snapgrid, pos.x);
+		pos.y = Snap(g_snapgrid, pos.y);
+		pos.z = Snap(g_snapgrid, pos.z);
+		Brush b = g_copyB;
+		//b.moveto(pos);
+	/*
+		for(int i=0; i<b.m_nsides; i++)
+		{
+			BrushSide* s = &b.m_sides[i];
+
+			g_log<<"side"<<i<<" plane="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<endl;
+		}
+		*/
+		g_edmap.m_brush.push_back(b);
 	
-	//g_log<<"paste brush"<<endl;
-	//g_log.flush();
+		//g_log<<"paste brush"<<endl;
+		//g_log.flush();
+	}
+	else if(g_copyM.model >= 0)
+	{
+		LinkPrevUndo();
+
+		g_modelholder.push_back(g_copyM);
+	}
 }
 
 void Down_C()
@@ -624,6 +656,8 @@ void Click_AddMS3D()
 
 	if(modelid < 0)
 		return;
+	
+	LinkPrevUndo();
 
 	ModelHolder mh(modelid, Vec3f(0,0,0));
 	g_modelholder.push_back(mh);
