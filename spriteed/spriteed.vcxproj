@@ -86,6 +86,7 @@
     <ClCompile Include="..\common\sim\tile.cpp" />
     <ClCompile Include="..\common\sound.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
+    <ClCompile Include="..\common\tool\compilebl.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
     <ClCompile Include="..\common\window.cpp" />
     <ClCompile Include="main.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="..\common\sim\tile.h" />
     <ClInclude Include="..\common\sound.h" />
     <ClInclude Include="..\common\texture.h" />
+    <ClInclude Include="..\common\tool\compilebl.h" />
     <ClInclude Include="..\common\utils.h" />
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="main.h" />

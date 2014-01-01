@@ -1685,6 +1685,43 @@ void Resize_TexShiftButton(Widget* thisw)
 	CenterLabel(thisw);
 }
 
+void Click_CompileModel()
+{
+        OPENFILENAME ofn;
+        
+        char filepath[MAX_PATH+1];
+        
+        ZeroMemory( &ofn , sizeof( ofn));
+
+        char initdir[MAX_PATH+1];
+        FullPath("export models\\", initdir);
+        CorrectSlashes(initdir);
+        //strcpy(filepath, initdir);
+        FullPath("export models\\export", filepath);
+        CorrectSlashes(filepath);
+
+        ofn.lStructSize = sizeof ( ofn );
+        ofn.hwndOwner = NULL  ;
+        ofn.lpstrInitialDir = initdir;
+        ofn.lpstrFile = filepath;
+        //ofn.lpstrFile[0] = '\0';
+        ofn.nMaxFile = sizeof( filepath );
+        //ofn.lpstrFilter = "Save\0*.bl\0All\0*.*\0";
+        ofn.lpstrFilter = "All\0*.*\0";
+        ofn.nFilterIndex =1;
+        ofn.lpstrFileTitle = NULL;
+        ofn.nMaxFileTitle = MAX_PATH;        //0;
+        ofn.lpstrInitialDir = NULL;
+        ofn.Flags = OFN_OVERWRITEPROMPT;
+
+        if(!GetSaveFileName(&ofn))
+                return;
+        
+        //CorrectSlashes(filepath);
+        //SaveEdBuilding(filepath, &g_edbldg);
+		CompileModel(filepath, &g_edmap, &g_modelholder);
+}
+
 void FillGUI()
 {
 	DrawSceneDepthFunc = &DrawSceneDepth;

@@ -1,0 +1,42 @@
+
+
+#include "../math/vec2i.h"
+#include "../math/vec2f.h"
+#include "../platform.h"
+#include "../texture.h"
+#include "../save/edmap.h"
+#include "../save/modelholder.h"
+
+#define BUILDINGM_VERSION                1.0f
+
+#define TAG_BUILDINGM                {'D', 'M', 'D', 'M', 'L'}
+
+class TexFitInfo
+{
+public:
+	Vec2i tiletimes;
+	Vec2f newdim;
+	Vec2i bounds[2];        //duplicate of TexFitRow member, needed for accessing directly without iterating rows
+
+	TexFitInfo();
+};
+
+class TexFit
+{
+public:
+	unsigned int texindex;
+	Vec2i bounds[2];
+};
+
+class TexFitRow
+{
+public:
+	list<TexFit> fits;
+	Vec2i bounds[2];
+
+	TexFitRow();
+};
+
+class EdBuilding;
+
+void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders);

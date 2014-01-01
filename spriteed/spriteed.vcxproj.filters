@@ -31,6 +31,9 @@
     <Filter Include="source\common\net">
       <UniqueIdentifier>{7ec686b1-6925-4988-be03-7755191cb27b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\common\tool">
+      <UniqueIdentifier>{e2fa7e36-af1b-4eba-b990-611fe72fb06e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="hammer.ico">
@@ -270,6 +273,9 @@
     </ClCompile>
     <ClCompile Include="..\common\save\modelholder.cpp">
       <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tool\compilebl.cpp">
+      <Filter>source\common\tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -512,6 +518,9 @@
     </ClInclude>
     <ClInclude Include="..\common\save\modelholder.h">
       <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tool\compilebl.h">
+      <Filter>source\common\tool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
