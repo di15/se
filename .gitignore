@@ -40,8 +40,8 @@ Thumbs.db
 *.sdf
 ipch/
 obj/
-Release/
-Debug/
+# Release/
+# Debug/
 *.pdb
 *.bsc
 *.tlog

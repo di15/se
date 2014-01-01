@@ -213,8 +213,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>SpriteEd</TargetName>
-    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\opengl;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\GL;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
