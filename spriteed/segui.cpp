@@ -18,6 +18,7 @@
 #include "../common/draw/shadow.h"
 #include "../common/sim/tile.h"
 #include "../common/save/modelholder.h"
+#include "../common/tool/compilebl.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -1208,7 +1209,7 @@ void Resize_QSaveButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportBldgButton(Widget* thisw)
+void Resize_CompileMapButton(Widget* thisw)
 {
 	int i = 3;
 	thisw->m_pos[0] = 0+32*i;
@@ -1217,7 +1218,7 @@ void Resize_ExportBldgButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportUnitButton(Widget* thisw)
+void Resize_ExportBldgButton(Widget* thisw)
 {
 	int i = 4;
 	thisw->m_pos[0] = 0+32*i;
@@ -1226,7 +1227,7 @@ void Resize_ExportUnitButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportTileButton(Widget* thisw)
+void Resize_ExportUnitButton(Widget* thisw)
 {
 	int i = 5;
 	thisw->m_pos[0] = 0+32*i;
@@ -1235,7 +1236,7 @@ void Resize_ExportTileButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportRoadButton(Widget* thisw)
+void Resize_ExportTileButton(Widget* thisw)
 {
 	int i = 6;
 	thisw->m_pos[0] = 0+32*i;
@@ -1244,7 +1245,7 @@ void Resize_ExportRoadButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportRidgeButton(Widget* thisw)
+void Resize_ExportRoadButton(Widget* thisw)
 {
 	int i = 7;
 	thisw->m_pos[0] = 0+32*i;
@@ -1253,7 +1254,7 @@ void Resize_ExportRidgeButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_ExportWaterButton(Widget* thisw)
+void Resize_ExportRidgeButton(Widget* thisw)
 {
 	int i = 8;
 	thisw->m_pos[0] = 0+32*i;
@@ -1262,7 +1263,7 @@ void Resize_ExportWaterButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_UndoButton(Widget* thisw)
+void Resize_ExportWaterButton(Widget* thisw)
 {
 	int i = 9;
 	thisw->m_pos[0] = 0+32*i;
@@ -1271,7 +1272,7 @@ void Resize_UndoButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RedoButton(Widget* thisw)
+void Resize_UndoButton(Widget* thisw)
 {
 	int i = 10;
 	thisw->m_pos[0] = 0+32*i;
@@ -1280,7 +1281,7 @@ void Resize_RedoButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_NewBrushButton(Widget* thisw)
+void Resize_RedoButton(Widget* thisw)
 {
 	int i = 11;
 	thisw->m_pos[0] = 0+32*i;
@@ -1289,7 +1290,7 @@ void Resize_NewBrushButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_CutBrushButton(Widget* thisw)
+void Resize_NewBrushButton(Widget* thisw)
 {
 	int i = 12;
 	thisw->m_pos[0] = 0+32*i;
@@ -1298,7 +1299,7 @@ void Resize_CutBrushButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_NewEntityButton(Widget* thisw)
+void Resize_CutBrushButton(Widget* thisw)
 {
 	int i = 13;
 	thisw->m_pos[0] = 0+32*i;
@@ -1307,7 +1308,7 @@ void Resize_NewEntityButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotXCCWButton(Widget* thisw)
+void Resize_NewEntityButton(Widget* thisw)
 {
 	int i = 14;
 	thisw->m_pos[0] = 0+32*i;
@@ -1316,7 +1317,7 @@ void Resize_RotXCCWButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotXCWButton(Widget* thisw)
+void Resize_RotXCCWButton(Widget* thisw)
 {
 	int i = 15;
 	thisw->m_pos[0] = 0+32*i;
@@ -1325,7 +1326,7 @@ void Resize_RotXCWButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotYCCWButton(Widget* thisw)
+void Resize_RotXCWButton(Widget* thisw)
 {
 	int i = 16;
 	thisw->m_pos[0] = 0+32*i;
@@ -1334,7 +1335,7 @@ void Resize_RotYCCWButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotYCWButton(Widget* thisw)
+void Resize_RotYCCWButton(Widget* thisw)
 {
 	int i = 17;
 	thisw->m_pos[0] = 0+32*i;
@@ -1343,7 +1344,7 @@ void Resize_RotYCWButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotZCCWButton(Widget* thisw)
+void Resize_RotYCWButton(Widget* thisw)
 {
 	int i = 18;
 	thisw->m_pos[0] = 0+32*i;
@@ -1352,9 +1353,18 @@ void Resize_RotZCCWButton(Widget* thisw)
 	thisw->m_pos[3] = 32;
 }
 
-void Resize_RotZCWButton(Widget* thisw)
+void Resize_RotZCCWButton(Widget* thisw)
 {
 	int i = 19;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32;
+}
+
+void Resize_RotZCWButton(Widget* thisw)
+{
+	int i = 20;
 	thisw->m_pos[0] = 0+32*i;
 	thisw->m_pos[1] = 0;
 	thisw->m_pos[2] = 32+32*i;
@@ -1719,7 +1729,7 @@ void Click_CompileModel()
         
         //CorrectSlashes(filepath);
         //SaveEdBuilding(filepath, &g_edbldg);
-		CompileModel(filepath, &g_edmap, &g_modelholder);
+		CompileModel(filepath, &g_edmap, g_modelholder);
 }
 
 void FillGUI()
@@ -1759,6 +1769,7 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Export model",										MAINFONT8, Resize_CompileMapButton, Click_CompileModel, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));

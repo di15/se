@@ -359,54 +359,14 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 	return (1);
 }
 
-void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders)
+static bool transparency = false;
+static unsigned int notexindex;
+static int ntris = 0;
+static list<unsigned int> uniquetexs;
+static TexFitInfo texfitinfo[TEXTURES];
+
+void CountTrisModel(list<ModelHolder> &modelholders)
 {
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile "<<fullfile<<endl;
-	g_log.flush();
-#endif
-
-	char basename[MAX_PATH+1];
-	strcpy(basename, fullfile);
-	StripPath(basename);
-	StripExtension(basename);
-
-	string fullpath = StripFile(fullfile);        // + CORRECT_SLASH;
-
-#ifdef COMPILEB_DEBUG
-	g_log<<"FULLPATH STRIPPED "<<fullpath<<endl;
-	g_log.flush();
-#endif
-
-	string difffull = fullpath + string(basename) + ".jpg";
-	string difffullpng = fullpath + string(basename) + ".png";
-	string specfull = fullpath + string(basename) + ".spec.jpg";
-	string normfull = fullpath + string(basename) + ".norm.jpg";
-
-	//string diffpath = string(basename) + ".jpg";
-	//string diffpathpng = string(basename) + ".png";
-	//string specpath = string(basename) + ".spec.jpg";
-	//string normpath = string(basename) + ".norm.jpg";
-
-	unsigned int notexindex;
-	CreateTexture(notexindex, "textures/notex.jpg", false);
-
-	bool transparency = false;
-
-	// STEP 1:
-	// i. count total triangles, excluding sides with default (notex.jpg) texture (they will not be added to the final building)
-	// ii. make a list of unique textures used in the brush sides and see if there are any transparent ones
-	// iii. calculate the max x,y tile extents of the texture coordinates for each triangles
-
-	int ntris = 0;
-	list<unsigned int> uniquetexs;
-	TexFitInfo texfitinfo[TEXTURES];
-
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 1"<<endl;
-	g_log.flush();
-#endif
-
 	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
 	{
 		Model* pmodel = &g_model[mhiter->model];
@@ -414,10 +374,56 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 		VertexArray* pva = &pmodel->m_va[0];
 
 		ntris += pva->numverts / 3;
-
-
 	}
+}
 
+void ListUniqueTexsModel(list<ModelHolder> &modelholders)
+{
+	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
+	{
+		Model* pmodel = &g_model[mhiter->model];
+
+		VertexArray* pva = &pmodel->m_va[0];
+
+		bool found = false;
+
+		auto ut=uniquetexs.begin();
+		for(; ut!=uniquetexs.end(); ut++)
+		{
+			TexFitInfo* tfi = &texfitinfo[ *ut ];
+
+			if(*ut == pmodel->m_diffusem)
+			{
+				Vec2i tiletimes = TileTimes(pva);
+
+				if(tiletimes.x > tfi->tiletimes.x)
+					tfi->tiletimes.x = tiletimes.x;
+				if(tiletimes.y > tfi->tiletimes.y)
+					tfi->tiletimes.y = tiletimes.y;
+
+				found = true;
+				break;
+			}
+		}
+
+		if(!found)
+		{
+			uniquetexs.push_back(pmodel->m_diffusem);
+
+			TexFitInfo* tfi = &texfitinfo[ pmodel->m_diffusem ];
+			Vec2i tiletimes = TileTimes(pva);
+			TexFitInfo newtfi;
+			tfi->tiletimes.x = tiletimes.x;
+			tfi->tiletimes.y = tiletimes.y;
+
+			if(g_texture[ pmodel->m_diffusem ].transp)
+				transparency = true;
+		}
+	}
+}
+
+void CountTrisBrush(EdMap* map)
+{
 	for(auto br=map->m_brush.begin(); br!=map->m_brush.end(); br++)
 	{
 		for(int i=0; i<br->m_nsides; i++)
@@ -429,6 +435,22 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 
 			VertexArray* va = &s->m_drawva;
 			ntris += va->numverts / 3;
+		}
+	}
+}
+
+void ListUniqueTexsBrush(EdMap* map)
+{
+	for(auto br=map->m_brush.begin(); br!=map->m_brush.end(); br++)
+	{
+		for(int i=0; i<br->m_nsides; i++)
+		{
+			BrushSide* s = &br->m_sides[i];
+
+			if(s->m_diffusem == notexindex)
+				continue;
+
+			VertexArray* va = &s->m_drawva;
 
 			bool found = false;
 
@@ -466,18 +488,13 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 			}
 		}
 	}
+}
 
+static VertexArray fullva;
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 2"<<endl;
-	g_log.flush();
-#endif
-
-	// STEP 2.
-	// i. allocate the final array of all the vertices/texcoords/normals that will be written to file.
-	// ii. store the vertices for now and normals for now. texcoords will be calculated later when the texture images are packed together.
-
-	VertexArray fullva;
+void AllocFinalVerts(EdMap* map, list<ModelHolder> &modelholders)
+{
+	fullva.free();
 	fullva.alloc(ntris*3);
 
 	int vindex = 0;
@@ -502,18 +519,25 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 		}
 	}
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 3"<<endl;
-	g_log.flush();
-#endif
+	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
+	{
+		VertexArray* pva = &mhiter->frames[0];
 
-	// STEP 3.
-	// i. load all the diffuse, specular, and normal texture images (RGB data) from the compiled list of unique texture indices
-	// ii. save references to the texture images (RGB data) array based on the unique (diffuse) texture index
+		for(int j=0; j<pva->numverts; j++)
+		{
+			fullva.vertices[vindex] = pva->vertices[j] + mhiter->translation;
+			fullva.normals[vindex] = pva->normals[j];
+			vindex++;
+		}
+	}
+}
 
-	TexRef texref[TEXTURES];
+static TexRef texref[TEXTURES];
+static LoadedTex** images;
 
-	LoadedTex** images = new LoadedTex*[uniquetexs.size()*3];
+void LoadAllRGBData()
+{
+	images = new LoadedTex*[uniquetexs.size()*3];
 
 	int i=0;
 	for(auto ut=uniquetexs.begin(); ut!=uniquetexs.end(); ut++, i++)
@@ -565,16 +589,13 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 		g_log.flush();
 #endif
 	}
+}
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 4"<<endl;
-	g_log.flush();
-#endif
+static list<unsigned int> heightsorted;
 
-	// STEP 4.
-	// i. make a list of images sorted by height from tallest to shortest
-
-	list<unsigned int> heightsorted;
+void HeightSort()
+{
+	heightsorted.clear();
 	int nextadd;
 	int lastheight = 0;
 
@@ -625,21 +646,15 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 
 		heightsorted.push_back((unsigned int)nextadd);
 	}
+}
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 5"<<endl;
-	g_log.flush();
-#endif
+static Vec2i maxdim(0, 0);
+static list<TexFitRow> rows;
 
-	// STEP 5.
-	// i. add textures to the right side of the row until the width of the final image is twice its height
-	// ii. then increase the height and add a new row
-	// iii. for each next image, check each row if the image can be added without increasing the image width
-	// iii. repeat until all diffuse images have been fitted in
-	// iv. calculate the scaled, translated texture coordinates for the final vertex array
-
-	Vec2i maxdim(0, 0);
-	list<TexFitRow> rows;
+void FitImages()
+{
+	maxdim = Vec2i(0,0);	//Max combined image dimensions
+	rows.clear();
 
 	for(auto hs=heightsorted.begin(); hs!=heightsorted.end(); hs++)
 	{
@@ -763,27 +778,27 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 		g_log.flush();
 #endif
 	}
+}
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 6"<<endl;
-	g_log.flush();
-#endif
+static Vec2i finaldim;
+static float scalex;
+static float scaley;
+static LoadedTex* resizedimages;
 
-	// STEP 6.
-	// i. resize images so that the combined final image is a power of 2 that doesn't exceed 2048x2048
-
-	Vec2i finaldim( Max2Pow( maxdim.x ), Max2Pow( maxdim.y ) );
-	float scalex = (float)finaldim.x / (float)maxdim.x;
-	float scaley = (float)finaldim.y / (float)maxdim.y;
+void ResizeImages()
+{
+	finaldim = Vec2i( Max2Pow( maxdim.x ), Max2Pow( maxdim.y ) );
+	scalex = (float)finaldim.x / (float)maxdim.x;
+	scaley = (float)finaldim.y / (float)maxdim.y;
 
 #ifdef COMPILEB_DEBUG
 	g_log<<"dimensions = ("<<maxdim.x<<","<<maxdim.y<<")->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
 	g_log.flush();
 #endif
 
-	LoadedTex* resizedimages = new LoadedTex[ uniquetexs.size()*3 ];
+	resizedimages = new LoadedTex[ uniquetexs.size()*3 ];
 
-	for(i=0; i<uniquetexs.size()*3; i++)
+	for(int i=0; i<uniquetexs.size()*3; i++)
 		resizedimages[i].data = NULL;
 
 #ifdef COMPILEB_DEBUG
@@ -830,19 +845,14 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 #endif
 		}
 	}
+}
 
-#ifdef COMPILEB_DEBUG
-	g_log<<"compile 7"<<endl;
-	g_log.flush();
-#endif
+static LoadedTex finaldiff;
+static LoadedTex finalspec;
+static LoadedTex finalnorm;
 
-	// STEP 7.
-	// i. combine all the resized images into the final image
-
-	LoadedTex finaldiff;
-	LoadedTex finalspec;
-	LoadedTex finalnorm;
-
+void CombineImages()
+{
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7a"<<endl;
 	g_log.flush();
@@ -900,7 +910,7 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	g_log.flush();
 #endif
 
-	for(i=0; i<uniquetexs.size()*3; i++)
+	for(int i=0; i<uniquetexs.size()*3; i++)
 	{
 
 #ifdef COMPILEB_DEBUG
@@ -923,26 +933,30 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	g_log<<"compile 8"<<endl;
 	g_log.flush();
 #endif
+}
 
-	// STEP 8.
-	// i. write the JPEG's/PNG's
+static string difffull;
+static string difffullpng;
+static string specfull;
+static string normfull;
 
+void WriteImages()
+{
 	if(transparency)
 		SavePNG(difffullpng.c_str(), &finaldiff);
 	else
-		SaveJPEG(difffull.c_str(), &finaldiff, 0.5f);
-	SaveJPEG(specfull.c_str(), &finalspec, 0.5f);
-	SaveJPEG(normfull.c_str(), &finalnorm, 0.5f);
+		SaveJPEG(difffull.c_str(), &finaldiff, 0.75f);
+	SaveJPEG(specfull.c_str(), &finalspec, 0.75f);
+	SaveJPEG(normfull.c_str(), &finalnorm, 0.75f);
 
 	//SavePNG(difffullpng.c_str(), &finaldiff);
 	//SavePNG(specfull.c_str(), &finalspec);
 	//SavePNG(normfull.c_str(), &finalnorm);
+}
 
-	// STEP 9.
-	// i. calculate the new texcoords
-	// ii. write the vertex array
-
-	vindex = 0;
+void CalcTexCoords(EdMap* map, list<ModelHolder> &modelholders)
+{
+	int vindex = 0;
 
 #ifdef COMPILEB_DEBUG
 	unsigned int window3index;
@@ -981,34 +995,8 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 				float rangeu = maxu - minu;
 				float rangev = maxv - minv;
 
-				//float offu = minu - floor(minu+0.05f);
-				//float offv = minv - floor(minv+0.05f);
 				float offu = minu - floor(minu);
 				float offv = minv - floor(minv);
-
-				/*
-				double pixelsrangeu = rangeu * tfi->newdim.x;
-				double pixelsrangev = rangev * tfi->newdim.y;
-
-				int availablerangeu = tfi->newdim.x * tfi->tiletimes.x;
-				int availablerangev = tfi->newdim.y * tfi->tiletimes.y;
-
-				//float scalerangeu = pixelsrangeu / (double)availablerangeu;
-				//float scalerangev = pixelsrangev / (double)availablerangev;
-
-				float scalerangeu = rangeu * (pixelsrangeu / (double)availablerangeu) * ((float)availablerangeu / (float)finaldim.x);
-				float scalerangev = rangev * (pixelsrangev / (double)availablerangev) * ((float)availablerangev / (float)finaldim.y);
-
-				float tcleft = (float)tfi->bounds[0].x / (float)maxdim.x;
-				float tctop = (float)tfi->bounds[0].y / (float)maxdim.y;
-
-				fullva.texcoords[vindex + 0] = Vec2f( tcleft + (offu + tc0.x - minu) * scalerangeu, tctop + (offv + tc0.y - minv) * scalerangev );
-				fullva.texcoords[vindex + 1] = Vec2f( tcleft + (offu + tc1.x - minu) * scalerangeu, tctop + (offv + tc1.y - minv) * scalerangev );
-				fullva.texcoords[vindex + 2] = Vec2f( tcleft + (offu + tc2.x - minu) * scalerangeu, tctop + (offv + tc2.y - minv) * scalerangev );
-				*/
-				//fullva.texcoords[vindex + 0] = tc0;
-				//fullva.texcoords[vindex + 1] = tc1;
-				//fullva.texcoords[vindex + 2] = tc2;
 
 				for(int k=0; k<3; k++)
 				{
@@ -1025,62 +1013,59 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 
 					fullva.texcoords[vindex + k].x = uvpixel[0] / (float)maxdim.x;
 					fullva.texcoords[vindex + k].y = uvpixel[1] / (float)maxdim.y;
-
-#ifdef COMPILEB_DEBUG
-					if(s->m_diffusem == window3index)
-					{
-						g_log<<"-----window 3 face---------"<<endl;
-						g_log<<"minu,v = "<<minu<<","<<minv<<endl;
-						g_log<<"offu,v = "<<offu<<","<<offv<<endl;
-						g_log<<"uv = "<<fullva.texcoords[vindex + k].x<<","<<fullva.texcoords[vindex + k].y<<endl;
-						g_log<<"uvpixel = "<<uvpixel[0]*scalex<<","<<uvpixel[1]*scaley<<endl;
-						g_log<<"-----window 3 face---------"<<endl;
-						g_log.flush();
-					}
-#endif
 				}
-
-#ifdef COMPILEB_DEBUG
-				if(fullva.texcoords[vindex + 0].x > 1.0f || fullva.texcoords[vindex + 0].y > 1.0f
-					//||
-						//fullva.texcoords[vindex + 1].x > 1.0f || fullva.texcoords[vindex + 1].y > 1.0f ||
-							//fullva.texcoords[vindex + 2].x > 1.0f || fullva.texcoords[vindex + 2].y > 1.0f
-								)
-				{
-
-					g_log<<"------tc "<<vindex<<"-------"<<endl;
-					g_log<<"initial uv = ("<<tc[0].x<<","<<tc[0].y<<"),("<<tc[1].x<<","<<tc[1].y<<"),("<<tc[2].x<<","<<tc[2].y<<")"<<endl;
-					g_log<<"fits to region ("<<tfi->bounds[0].x<<","<<tfi->bounds[0].y<<")->("<<tfi->bounds[1].x<<","<<tfi->bounds[1].y<<") in image (0,0)->("<<maxdim.x<<","<<maxdim.y<<")"<<endl;
-					g_log<<"minu = "<<minu<<endl;
-					g_log<<"minv = "<<minv<<endl;
-					g_log<<"maxu = "<<maxu<<endl;
-					g_log<<"maxv = "<<maxv<<endl;
-					g_log<<"rangeu = "<<rangeu<<endl;
-					g_log<<"rangev = "<<rangev<<endl;
-					g_log<<"tiles times "<<tfi->tiletimes.x<<"x"<<tfi->tiletimes.y<<endl;
-					g_log<<"resized fit to region"\
-						" (pixels "<<tfi->bounds[0].x*scalex<<","<<tfi->bounds[0].y*scaley<<")->(pixels "<<tfi->bounds[1].x*scalex<<","<<tfi->bounds[1].y*scaley<<")"\
-						" i.e. (ratio "<<(float)tfi->bounds[0].x / (float)maxdim.x<<","<<(float)tfi->bounds[0].y / (float)maxdim.y<<")->(pixels "<<(tfi->newdim.x * tfi->tiletimes.x + tfi->bounds[0].x*scalex)<<","<<(tfi->newdim.y * tfi->tiletimes.y + tfi->bounds[0].y*scaley)<<")"\
-						" in image (0,0)->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
-					//g_log<<"offu,v = "<<offu<<","<<offv<<endl;
-					//g_log<<"tcleft,top = "<<tcleft<<","<<tctop<<endl;
-					//g_log<<"pixelsrangeu,v = "<<pixelsrangeu<<","<<pixelsrangev<<endl;
-					//g_log<<"scalerangeu,v = "<<scalerangeu<<","<<scalerangev<<endl;
-					//g_log<<"availablerangeu,v = "<<availablerangeu<<","<<availablerangev<<endl;
-					//g_log<<"(offu + tc0.x - minu),(offv + tc0.y - minv) = "<<(offu + tc0.x - minu)<<","<<(offv + tc0.y - minv)<<endl;
-					//g_log<<"(offu + tc0.x - minu)*scalerangeu,(offv + tc0.y - minv)*scalerangev = "<<(offu + tc0.x - minu)*scalerangeu<<","<<(offv + tc0.y - minv)*scalerangev<<endl;
-					g_log<<"final tc0 "<<fullva.texcoords[vindex + 0].x<<","<<fullva.texcoords[vindex + 0].y<<endl;
-					g_log<<"final tc1 "<<fullva.texcoords[vindex + 1].x<<","<<fullva.texcoords[vindex + 1].y<<endl;
-					g_log<<"final tc2 "<<fullva.texcoords[vindex + 2].x<<","<<fullva.texcoords[vindex + 2].y<<endl;
-					g_log<<"------tc "<<vindex<<"-------"<<endl;
-					g_log.flush();
-
-				}
-#endif
 			}
 		}
 	}
 
+	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
+	{
+		VertexArray* va = &mhiter->frames[0];
+		Model* pmodel = &g_model[mhiter->model];
+		TexRef* tr = &texref[ pmodel->m_diffusem ];
+		LoadedTex* lt = images[ tr->diffindex ];
+		TexFitInfo* tfi = &texfitinfo[ pmodel->m_diffusem ];
+
+		for(int j=0; j<va->numverts; j+=3, vindex+=3)
+		{
+			Vec2f tc[3];
+			tc[0] = va->texcoords[j + 0];
+			tc[1] = va->texcoords[j + 1];
+			tc[2] = va->texcoords[j + 2];
+
+			float minu = min(tc[0].x, min(tc[1].x, tc[2].x));
+			float minv = min(tc[0].y, min(tc[1].y, tc[2].y));
+			float maxu = max(tc[0].x, max(tc[1].x, tc[2].x));
+			float maxv = max(tc[0].y, max(tc[1].y, tc[2].y));
+
+			float rangeu = maxu - minu;
+			float rangev = maxv - minv;
+
+			float offu = minu - floor(minu);
+			float offv = minv - floor(minv);
+
+			for(int k=0; k<3; k++)
+			{
+				float uvpixel[2];
+
+				uvpixel[0] = tc[k].x * (float)lt->sizeX;
+				uvpixel[1] = tc[k].y * (float)lt->sizeY;
+
+				uvpixel[0] = uvpixel[0] - minu*(float)lt->sizeX + offu*(float)lt->sizeX;
+				uvpixel[1] = uvpixel[1] - minv*(float)lt->sizeY + offv*(float)lt->sizeY;
+
+				uvpixel[0] += tfi->bounds[0].x;
+				uvpixel[1] += tfi->bounds[0].y;
+
+				fullva.texcoords[vindex + k].x = uvpixel[0] / (float)maxdim.x;
+				fullva.texcoords[vindex + k].y = uvpixel[1] / (float)maxdim.y;
+			}
+		}
+	}
+}
+
+void SaveModel(const char* fullfile)
+{
 	FILE* fp = fopen(fullfile, "wb");
 
 	char tag[] = TAG_BUILDINGM;
@@ -1092,9 +1077,10 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	SaveVertexArray(fp, &fullva);
 
 	fclose(fp);
+}
 
-	// Free the diffuse, specular, normal map RGB data
-
+void CleanupModelCompile()
+{
 	if(finaldiff.data)
 		free(finaldiff.data);
 	if(finalspec.data)
@@ -1116,4 +1102,94 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	}
 
 	delete [] images;
+
+	fullva.free();
+}
+
+void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders)
+{
+	char basename[MAX_PATH+1];
+	strcpy(basename, fullfile);
+	StripPath(basename);
+	StripExtension(basename);
+
+	string fullpath = StripFile(fullfile);
+
+	difffull = fullpath + string(basename) + ".jpg";
+	difffullpng = fullpath + string(basename) + ".png";
+	specfull = fullpath + string(basename) + ".spec.jpg";
+	normfull = fullpath + string(basename) + ".norm.jpg";
+
+	//string diffpath = string(basename) + ".jpg";
+	//string diffpathpng = string(basename) + ".png";
+	//string specpath = string(basename) + ".spec.jpg";
+	//string normpath = string(basename) + ".norm.jpg";
+	
+	CreateTexture(notexindex, "textures/notex.jpg", false);
+
+	transparency = false;
+
+	// STEP 1:
+	// i. count total triangles, excluding sides with default (notex.jpg) texture (they will not be added to the final building)
+	// ii. make a list of unique textures used in the brush sides and see if there are any transparent ones
+	// iii. calculate the max x,y tile extents of the texture coordinates for each triangles
+
+	ntris = 0;
+	uniquetexs.clear();
+
+	CountTrisModel(modelholders);
+	ListUniqueTexsModel(modelholders);
+	CountTrisBrush(map);
+	ListUniqueTexsBrush(map);
+
+	// STEP 2.
+	// i. allocate the final array of all the vertices/texcoords/normals that will be written to file.
+	// ii. store the vertices for now and normals for now. texcoords will be calculated later when the texture images are packed together.
+
+	AllocFinalVerts(map, modelholders);
+
+	// STEP 3.
+	// i. load all the diffuse, specular, and normal texture images (RGB data) from the compiled list of unique texture indices
+	// ii. save references to the texture images (RGB data) array based on the unique (diffuse) texture index
+
+	LoadAllRGBData();
+
+	// STEP 4.
+	// i. make a list of images sorted by height from tallest to shortest
+
+	HeightSort();
+
+	// STEP 5.
+	// i. add textures to the right side of the row until the width of the final image is twice its height
+	// ii. then increase the height and add a new row
+	// iii. for each next image, check each row if the image can be added without increasing the image width
+	// iii. repeat until all diffuse images have been fitted in
+	// iv. calculate the scaled, translated texture coordinates for the final vertex array
+
+	FitImages();
+
+	// STEP 6.
+	// i. resize images so that the combined final image is a power of 2 that doesn't exceed 2048x2048
+
+	ResizeImages();
+
+	// STEP 7.
+	// i. combine all the resized images into the final image
+	CombineImages();
+
+	// STEP 8.
+	// i. write the JPEG's/PNG's
+
+	WriteImages();
+
+	// STEP 9.
+	// i. calculate the new texcoords
+	// ii. write the vertex array
+
+	CalcTexCoords(map, modelholders);
+	SaveModel(fullfile);
+
+	// Free the diffuse, specular, normal map RGB data
+
+	CleanupModelCompile();
 }
