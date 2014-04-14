@@ -1261,6 +1261,19 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	return false;
 }
 
+bool PruneB2(Brush* b, Plane* p, float epsilon)
+{
+	for(int svi=0; svi<b->m_nsharedv; svi++)
+	{
+		Vec3f sv = b->m_sharedv[svi];
+
+		if(PointOnOrBehindPlane(sv, p->m_normal, p->m_d, epsilon))
+			return false;
+	}
+
+	return true;
+}
+
 //#define PRUNEB_DEBUG
 
 bool PruneB(EdMap* map, Brush* b)
@@ -1419,6 +1432,8 @@ bool PruneB(EdMap* map, Brush* b)
 			//g_log<<"pruned brush"<<endl;
 			//g_log.flush();
 			//continue;
+
+			return true;
 		}
 	}
 

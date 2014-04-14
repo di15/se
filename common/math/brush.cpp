@@ -679,7 +679,7 @@ void Brush::collapse()
 			auto k=sideedges[i].begin();
 			while(k != sideedges[i].end())
 			{
-				if(!PointOnOrBehindPlane(k->m_vertex[0], s->m_plane) || !PointOnOrBehindPlane(k->m_vertex[1], s->m_plane))
+				if(!PointOnOrBehindPlane(k->m_vertex[0], s->m_plane, CLOSE_EPSILON*2) || !PointOnOrBehindPlane(k->m_vertex[1], s->m_plane, CLOSE_EPSILON*2))
 				{
 #ifdef DEBUG_COLLAPSE
 					g_log<<"-----------remove side["<<i<<"] edge ("<<k->m_vertex[0].x<<","<<k->m_vertex[0].y<<","<<k->m_vertex[0].z<<")->("<<k->m_vertex[1].x<<","<<k->m_vertex[1].y<<","<<k->m_vertex[1].z<<") out of plane["<<j<<"]=("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<"d="<<s->m_plane.m_d<<")--------------"<<endl;

@@ -67,7 +67,8 @@ void main (void)
 	//stexel = vec4(stexel.xyz * (1.0 - alph3) + texel3.xyz * alph3, 1.0);
 
 	//float alph = color.w * texel0.w * elevtransp;
-	float alph = color.w * texel0.w;
+	//float alph = color.w * texel0.w;
+	float alph = 1;
 
 	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);

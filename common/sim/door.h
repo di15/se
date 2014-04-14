@@ -5,6 +5,7 @@
 
 #include "../math/vec3f.h"
 #include "../math/3dmath.h"
+#include "../math/brushside.h"
 
 class EdDoor
 {

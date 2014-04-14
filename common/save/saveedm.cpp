@@ -10,6 +10,7 @@
 #include "saveedm.h"
 #include "../save/edmap.h"
 #include "savemap.h"
+#include "../../spriteed/segui.h"
 
 void SaveEdBrushSide(FILE* fp, BrushSide* s, int* texrefs)
 {
@@ -454,6 +455,10 @@ void SaveEdMap(const char* fullpath, EdMap* map)
 
 	int texrefs[TEXTURES];
 	SaveTexs(fp, texrefs, map->m_brush);
+
+	int nframes = GetNumFrames();
+	fwrite(&nframes, sizeof(int), 1, fp);
+
 	SaveBrushes(fp, texrefs, map);
 	SaveModelHolders(fp, g_modelholder);
 
@@ -553,6 +558,13 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	TexRef* texrefs = NULL;
 
 	ReadEdTexs(fp, &texrefs);
+
+#if 1
+	int nframes = 0;
+	fread(&nframes, sizeof(int), 1, fp);
+	SetNumFrames(nframes);
+#endif
+
 	ReadBrushes(fp, texrefs, map);
 	ReadModelHolders(fp, g_modelholder);
 

@@ -74,11 +74,13 @@
     <ClCompile Include="..\common\save\save.cpp" />
     <ClCompile Include="..\common\save\saveedm.cpp" />
     <ClCompile Include="..\common\save\savemap.cpp" />
+    <ClCompile Include="..\common\save\savesprite.cpp" />
     <ClCompile Include="..\common\sim\battlecomp.cpp" />
     <ClCompile Include="..\common\sim\character.cpp" />
     <ClCompile Include="..\common\sim\door.cpp" />
     <ClCompile Include="..\common\sim\entity.cpp" />
     <ClCompile Include="..\common\sim\entitytype.cpp" />
+    <ClCompile Include="..\common\sim\explocrater.cpp" />
     <ClCompile Include="..\common\sim\map.cpp" />
     <ClCompile Include="..\common\sim\selection.cpp" />
     <ClCompile Include="..\common\sim\sim.cpp" />
@@ -87,6 +89,7 @@
     <ClCompile Include="..\common\sound.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\tool\compilebl.cpp" />
+    <ClCompile Include="..\common\tool\rendersprite.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
     <ClCompile Include="..\common\window.cpp" />
     <ClCompile Include="main.cpp" />
@@ -156,11 +159,13 @@
     <ClInclude Include="..\common\save\save.h" />
     <ClInclude Include="..\common\save\saveedm.h" />
     <ClInclude Include="..\common\save\savemap.h" />
+    <ClInclude Include="..\common\save\savesprite.h" />
     <ClInclude Include="..\common\sim\battlecomp.h" />
     <ClInclude Include="..\common\sim\character.h" />
     <ClInclude Include="..\common\sim\door.h" />
     <ClInclude Include="..\common\sim\entity.h" />
     <ClInclude Include="..\common\sim\entitytype.h" />
+    <ClInclude Include="..\common\sim\explocrater.h" />
     <ClInclude Include="..\common\sim\map.h" />
     <ClInclude Include="..\common\sim\selection.h" />
     <ClInclude Include="..\common\sim\sim.h" />
@@ -169,6 +174,7 @@
     <ClInclude Include="..\common\sound.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\tool\compilebl.h" />
+    <ClInclude Include="..\common\tool\rendersprite.h" />
     <ClInclude Include="..\common\utils.h" />
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="main.h" />
@@ -177,6 +183,13 @@
     <ClInclude Include="sesim.h" />
     <ClInclude Include="seviewport.h" />
     <ClInclude Include="undo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4A4C5AB7-98D6-4BA9-8D0C-EA2C178F87D5}</ProjectGuid>
@@ -225,6 +238,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

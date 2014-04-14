@@ -21,6 +21,8 @@
 #include "../common/draw/sortb.h"
 #include "undo.h"
 #include "../common/math/frustum.h"
+#include "main.h"
+#include "../common/sim/explocrater.h"
 
 ViewportT g_viewportT[VIEWPORT_TYPES];
 Viewport g_viewport[4];
@@ -410,7 +412,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	Ortho(width, height, 1, 0, 0, 1);
 	//glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
-	DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
+
+	if(g_mode != RENDERING)
+		DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
 
 	//glFlush();
 }
@@ -620,6 +624,67 @@ void ViewportLUp_CutBrush(int which, int relx, int rely, int width, int height)
 	g_edtool = EDTOOL_NONE;
 }
 
+void ViewportLUp_Explosion(int which, int relx, int rely, int width, int height)
+{
+	Viewport* v = &g_viewport[which];
+	ViewportT* t = &g_viewportT[v->m_type];
+
+	//Vec3f viewvec = g_focus;	//g_camera.m_view;
+	//Vec3f viewvec = g_camera.m_view - g_camera.m_pos;
+	//Vec3f viewdir = v->viewdir();
+	//Vec3f posvec = g_focus + t->m_offset;
+	//Vec3f posvec = g_camera.m_pos;
+	Vec3f posvec = v->pos();
+
+	//if(v->m_type != VIEWPORT_ANGLE45O)
+	{
+		//posvec = g_camera.m_view + t->m_offset;
+		//viewvec = Normalize(Vec3f(0,0,0)-t->m_offset);
+	}
+
+	//viewvec = posvec + Normalize(viewvec-posvec);
+	//Vec3f posvec2 = g_camera.lookpos() + t->m_offset;
+	//Vec3f upvec = t->m_up;
+	//Vec3f upvec = g_camera.up2();
+	Vec3f up2vec = v->up2();
+
+	//if(v->m_type != VIEWPORT_ANGLE45O)
+	//	upvec = t->m_up;
+
+	//Vec3f sidevec = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, upvec));
+	//Vec3f sidevec = Normalize(Cross(viewdir, upv2ec));
+	Vec3f sidevec = v->strafe();
+
+	float aspect = fabsf((float)width / (float)height);
+
+	float extentx = PROJ_RIGHT*aspect/g_zoom; 
+	float extenty = PROJ_RIGHT/g_zoom; 
+	
+	Vec3f vmin = g_camera.m_view - Vec3f(extentx, extenty, extentx);
+	Vec3f vmax = g_camera.m_view + Vec3f(extentx, extenty, extentx);
+
+	Vec3f line[2];
+	//g_log<<"==========="<<endl;
+	//g_log<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<endl;
+	line[0] = OnNear(relx, rely, width, height, posvec, sidevec, up2vec);
+	line[1] = line[0] - t->m_offset*2.0f;
+
+	if(v->m_type == VIEWPORT_ANGLE45O)
+	{
+		line[1] = line[0] + Normalize(v->viewdir()) * (MAX_DISTANCE / 2.0f);
+	}
+
+	if(v->m_type == VIEWPORT_ANGLE45O && g_projtype == PROJ_PERSP)
+	{
+		line[0] = posvec;
+		line[1] = posvec + ScreenPerspRay(relx, rely, width, height, posvec, sidevec, up2vec, v->viewdir(), FIELD_OF_VIEW) * (MAX_DISTANCE / 2.0f);
+	}
+
+	ExplodeCrater(&g_edmap, line, vmin, vmax);
+
+	g_edtool = EDTOOL_NONE;
+}
+
 void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int height)
 {
 	Viewport* v = &g_viewport[which];
@@ -721,6 +786,10 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 			if(g_edtool == EDTOOL_CUT)
 			{
 				ViewportLUp_CutBrush(which, relx, rely, width, height);
+			}
+			else if(g_edtool == EDTOOL_EXPLOSION)
+			{
+				ViewportLUp_Explosion(which, relx, rely, width, height);
 			}
 			else if(g_sel1b == NULL && g_sel1m == NULL && g_dragV < 0 && g_dragS < 0)
 			{

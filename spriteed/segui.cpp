@@ -19,6 +19,8 @@
 #include "../common/sim/tile.h"
 #include "../common/save/modelholder.h"
 #include "../common/tool/compilebl.h"
+#include "../common/save/savesprite.h"
+#include "../common/tool/rendersprite.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -335,6 +337,43 @@ void Click_CompileMap()
 	
 	//CorrectSlashes(filepath);
 	CompileMap(filepath, &g_edmap);
+}
+
+void Click_ExportBuildingSprite()
+{
+	OPENFILENAME ofn;
+	
+	char filepath[MAX_PATH+1];
+	
+	ZeroMemory( &ofn , sizeof( ofn));
+
+	char initdir[MAX_PATH+1];
+	FullPath("renders\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("renders\\building", filepath);
+	CorrectSlashes(filepath);
+
+	ofn.lStructSize = sizeof ( ofn );
+	ofn.hwndOwner = NULL  ;
+	ofn.lpstrInitialDir = initdir;
+	ofn.lpstrFile = filepath;
+	//ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = sizeof( filepath );
+	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex =1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = MAX_PATH;	//0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_OVERWRITEPROMPT;
+
+	if(!GetSaveFileName(&ofn))
+		return;
+	
+	//CorrectSlashes(filepath);
+	//CompileMap(filepath, &g_edmap);
+	PrepareRender(filepath);
 }
 
 void RunMap(const char* full)
@@ -1011,6 +1050,11 @@ void Click_ResetView()
 	ResetView();
 }
 
+void Click_Explode()
+{
+	g_edtool = EDTOOL_EXPLOSION;
+}
+
 void Click_SetDoor()
 {
 	if(g_selB.size() <= 0)
@@ -1415,6 +1459,14 @@ void Resize_BottomRightViewport(Widget* thisw)
 	thisw->m_pos[3] = parentw->m_pos[3];
 }
 
+void Resize_FullViewport(Widget* thisw)
+{
+	thisw->m_pos[0] = 0;
+	thisw->m_pos[1] = 0;
+	thisw->m_pos[2] = g_width;
+	thisw->m_pos[3] = g_height;
+}
+
 void Resize_HDivider(Widget* thisw)
 {
 	Widget* parentw = thisw->m_parent;
@@ -1546,6 +1598,38 @@ void Resize_ResetViewButton(Widget* thisw)
 	thisw->m_pos[2] = 32+32*i;
 	thisw->m_pos[3] = 32*2;
 	CenterLabel(thisw);
+}
+
+void Resize_FramesText(Widget* thisw)
+{
+	int i = 13;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32 + 16;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32*2;
+}
+
+void Resize_FramesEditBox(Widget* thisw)
+{
+	int i = 13;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 16;
+}
+
+void Resize_ExplodeButton(Widget* thisw)
+{
+	int i = 14;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 32;
+	CenterLabel(thisw);
+}
+
+void Change_Frames(int dummy)
+{
 }
 
 void Resize_BrushEditFrame(Widget* thisw)
@@ -1769,8 +1853,8 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Export model",										MAINFONT8, Resize_CompileMapButton, Click_CompileModel, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, Resize_CompileMapButton, Click_CompileModel, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
@@ -1828,6 +1912,11 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, Resize_ResetViewButton, Click_ResetView, NULL, NULL));
+
+	toppanel->m_subwidg.push_back(new Text(toppanel, "frames", "frames",														MAINFONT8, Resize_FramesText));
+	toppanel->m_subwidg.push_back(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
+
+	toppanel->m_subwidg.push_back(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, Resize_ExplodeButton, Click_Explode, NULL, NULL));
 
 	//toppanel->m_subwidg.push_back(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
 
@@ -1899,8 +1988,37 @@ void FillGUI()
 	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "opendeg", "90", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 70), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH-10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), false, 10, NULL, 0));
 #endif
 
+	View* renderview = AddView("render");
+
+	renderview->widget.push_back(new ViewportW(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3));
+	
 	OpenSoleView("loading");
 	//OpenAnotherView("brush edit view");
 }
 
+int GetNumFrames()
+{
+	View* edview = g_GUI.getview("editor");
+	
+	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
 
+	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);
+
+	int nframes = StrToInt(frameseditbox->m_value.c_str());
+
+	return nframes;
+}
+
+void SetNumFrames(int nframes)
+{
+	View* edview = g_GUI.getview("editor");
+	
+	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
+
+	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);
+
+	char nframesstr[128];
+	sprintf(nframesstr, "%d", nframes);
+
+	frameseditbox->changevalue(nframesstr);
+}

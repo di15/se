@@ -29,6 +29,14 @@ void main (void)
 	if(elevy > maxelev)
 		discard;
 
+	vec4 texel0 = texture(texture0, texCoordOut0);
+	//vec4 texel1 = texture(texture1, texCoordOut0);
+	//vec4 texel2 = texture(texture2, texCoordOut0);
+	//vec4 texel3 = texture(texture3, texCoordOut0);
+
+	if(texel0.w < 0.5)
+		discard;
+
 	vec3 smcoord = lpos.xyz / lpos.w;
 	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
 	//float shadow = 1;
@@ -47,11 +55,6 @@ void main (void)
 	//vec3 vspecular = vec3(0,0,0);
 	vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
 
-	vec4 texel0 = texture(texture0, texCoordOut0);
-	//vec4 texel1 = texture(texture1, texCoordOut0);
-	//vec4 texel2 = texture(texture2, texCoordOut0);
-	//vec4 texel3 = texture(texture3, texCoordOut0);
-
 	//float alph1 = texel1.w;
 	//float alph2 = texel2.w;
 	//float alph3 = texel3.w;
@@ -62,7 +65,8 @@ void main (void)
 	//stexel = vec4(stexel.xyz * (1.0 - alph3) + texel3.xyz * alph3, 1.0);
 
 	//float alph = color.w * texel0.w * elevtransp;
-	float alph = color.w * texel0.w;
+	//float alph = color.w * texel0.w;
+	float alph = 1;
 
 	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);

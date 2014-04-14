@@ -25,5 +25,7 @@ void UpdateLogo();
 void Click_NewBrush();
 void RedoBSideGUI();
 void CloseSideView();
+int GetNumFrames();
+void SetNumFrames(int nframes);
 
 #endif

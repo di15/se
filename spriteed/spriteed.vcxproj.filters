@@ -277,6 +277,15 @@
     <ClCompile Include="..\common\tool\compilebl.cpp">
       <Filter>source\common\tool</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\save\savesprite.cpp">
+      <Filter>source\common\save</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tool\rendersprite.cpp">
+      <Filter>source\common\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\explocrater.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -521,6 +530,15 @@
     </ClInclude>
     <ClInclude Include="..\common\tool\compilebl.h">
       <Filter>source\common\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\save\savesprite.h">
+      <Filter>source\common\save</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\tool\rendersprite.h">
+      <Filter>source\common\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\explocrater.h">
+      <Filter>source\common\sim</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,6 +25,7 @@
 #include "../common/sim/entity.h"
 #include "../common/save/compilemap.h"
 #include "../common/save/modelholder.h"
+#include "../common/tool/rendersprite.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
@@ -231,15 +232,22 @@ void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
 
 void Draw()
 {
-	if(g_mode != EDITOR)
+	if(g_mode == LOADING)
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	else
+	else if(g_mode == EDITOR)
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	else if(g_mode == RENDERING)
+		glClearColor(255.0f/255.0f, 127.0f/255.0f, 255.0f/255.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	g_GUI.frameupd();
 	g_GUI.draw();
 	//DrawEdMap(&g_edmap);
+
+	Ortho(g_width, g_height, 1, 1, 1, 1);
+	char dbgstr[128];
+	sprintf(dbgstr, "b's:%d", (int)g_edmap.m_brush.size());
+	DrawShadowedText(MAINFONT8, 0, g_height-16, dbgstr);
 
 	SwapBuffers(g_hDC);
 }
@@ -384,11 +392,6 @@ void UpdateEditor()
 	
 	g_camera.frameupd();
 	g_camera.friction2();
-}
-
-void UpdateRender()
-{
-
 }
 
 void Update()
