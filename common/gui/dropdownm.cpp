@@ -31,10 +31,10 @@ DropDownM::DropDownM(Widget* parent, const char* n, int f, void (*reframef)(Widg
 	m_ldown = false;
 	changefunc = change;
 	reframefunc = reframef;
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\filled.jpg", true);
-	CreateTexture(m_uptex, "gui\\up.jpg", true);
-	CreateTexture(m_downtex, "gui\\down.jpg", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/filled.jpg", true, false);
+	CreateTexture(m_uptex, "gui/up.jpg", true, false);
+	CreateTexture(m_downtex, "gui/down.jpg", true, false);
 	reframe();
 }
 
@@ -54,7 +54,7 @@ void DropDownM::erase(int which)
 int DropDownM::rowsshown()
 {
 	int rows = MAX_OPTIONS_SHOWN;
-		
+
 	if(rows > m_options.size())
 		rows = m_options.size();
 
@@ -188,7 +188,7 @@ bool DropDownM::prelbuttondown()
 	}
 
 	// scroll bar?
-	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]+scrollspace()*topratio() && g_mouse.x <= m_pos[2] && 
+	if(g_mouse.x >= m_pos[2]-square() && g_mouse.y >= m_pos[3]+scrollspace()*topratio() && g_mouse.x <= m_pos[2] &&
 			g_mouse.y <= m_pos[3]+scrollspace()*bottomratio())
 	{
 		m_ldown = true;
@@ -235,7 +235,7 @@ bool DropDownM::prelbuttonup(bool moved)
 		m_opened = false;
 		return false;
 	}
-	
+
 	m_ldown = false;
 
 	if(m_mousescroll)
@@ -277,7 +277,7 @@ bool DropDownM::prelbuttonup(bool moved)
 
 		return true;
 	}
-	
+
 	m_opened = false;
 
 	return true;	// intercept mouse event

@@ -23,7 +23,7 @@ public:
 	unsigned int m_specularm;
 	unsigned int m_normalm;
 	unsigned int m_ownerm;
-	string m_fullpath;
+	std::string m_fullpath;
 
 	Model()
 	{

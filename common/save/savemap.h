@@ -9,6 +9,6 @@ class Map;
 class CutBrush;
 class Brush;
 
-void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes);
-void SaveMap(const char* fullpath, list<Brush>& brushes);
+void SaveTexs(FILE* fp, int* texrefs, std::list<Brush>& brushes);
+void SaveMap(const char* fullpath, std::list<Brush>& brushes);
 bool LoadMap(const char* fullpath, Map* map);

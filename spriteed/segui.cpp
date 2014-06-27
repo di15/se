@@ -67,7 +67,7 @@ void Delete()
 	g_sel1b = NULL;
 
 	CloseSideView();
-	
+
 	for(int i=0; i<g_selM.size(); i++)
 	{
 		for(auto j=g_modelholder.begin(); j!=g_modelholder.end(); j++)
@@ -217,10 +217,11 @@ void Click_NewBrush()
 
 void Click_LoadEdMap()
 {
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -257,14 +258,16 @@ void Click_LoadEdMap()
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 	ClearUndo();
+#endif
 }
 
 void Click_SaveEdMap()
 {
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -290,10 +293,11 @@ void Click_SaveEdMap()
 
 	if(!GetSaveFileName(&ofn))
 		return;
-	
+
 	//CorrectSlashes(filepath);
 	SaveEdMap(filepath, &g_edmap);
 	strcpy(g_lastsave, filepath);
+#endif
 }
 
 void Click_QSaveEdMap()
@@ -309,10 +313,11 @@ void Click_QSaveEdMap()
 
 void Click_CompileMap()
 {
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -338,9 +343,10 @@ void Click_CompileMap()
 
 	if(!GetSaveFileName(&ofn))
 		return;
-	
+
 	//CorrectSlashes(filepath);
 	CompileMap(filepath, &g_edmap);
+#endif
 }
 
 void Click_ExportBuildingSprite()
@@ -348,10 +354,11 @@ void Click_ExportBuildingSprite()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -377,10 +384,11 @@ void Click_ExportBuildingSprite()
 
 	if(!GetSaveFileName(&ofn))
 		return;
-	
+
 	//CorrectSlashes(filepath);
 	//CompileMap(filepath, &g_edmap);
 	PrepareRender(filepath, RENDER_BUILDING);
+#endif
 #endif
 }
 
@@ -389,10 +397,11 @@ void Click_ExportUnitSprites()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -418,10 +427,11 @@ void Click_ExportUnitSprites()
 
 	if(!GetSaveFileName(&ofn))
 		return;
-	
+
 	//CorrectSlashes(filepath);
 	//CompileMap(filepath, &g_edmap);
 	PrepareRender(filepath, RENDER_UNIT);
+#endif
 #endif
 }
 
@@ -445,9 +455,9 @@ void Click_CompileRunMap()
 {
 	/*
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -486,10 +496,11 @@ void Click_CompileRunMap()
 
 void Click_BChooseTex()
 {
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -517,7 +528,7 @@ void Click_BChooseTex()
 		return;
 
 	LinkPrevUndo();
-	
+
 	unsigned int diffuseindex;
 	string relativepath = MakePathRelative(filepath);
 	CreateTexture(diffuseindex, relativepath.c_str(), false);
@@ -538,7 +549,7 @@ void Click_BChooseTex()
 
 	unsigned int specindex;
 	CreateTexture(specindex, specpath, false);
-	
+
 	if(specindex == 0)
 	{
 		char msg[MAX_PATH+1];
@@ -562,7 +573,7 @@ void Click_BChooseTex()
 
 		MessageBox(g_hWnd, msg, "Error", NULL);
 	}
-	
+
 	char ownpath[MAX_PATH+1];
 	strcpy(ownpath, relativepath.c_str());
 	StripExtension(ownpath);
@@ -570,7 +581,7 @@ void Click_BChooseTex()
 
 	unsigned int ownindex;
 	CreateTexture(ownindex, ownpath, false);
-	
+
 	if(ownindex == 0)
 	{
 		char msg[MAX_PATH+1];
@@ -586,7 +597,7 @@ void Click_BChooseTex()
 			Brush* b = *i;
 
 			b->m_texture = diffuseindex;
-		
+
 			for(int j=0; j<b->m_nsides; j++)
 			{
 				BrushSide* s = &b->m_sides[j];
@@ -600,7 +611,7 @@ void Click_BChooseTex()
 	else
 	{
 		Brush* b = g_sel1b;
-		
+
 		b->m_texture = diffuseindex;
 
 		if(g_dragS >= 0)
@@ -623,6 +634,7 @@ void Click_BChooseTex()
 			}
 		}
 	}
+#endif
 }
 
 void Click_FitToFace()
@@ -649,7 +661,7 @@ void Click_FitToFace()
 				b->m_sides[i].fittex();
 		}
 	}
-	
+
 	RedoBSideGUI();
 }
 
@@ -713,7 +725,7 @@ void PasteBrush()
 		}
 		*/
 		g_edmap.m_brush.push_back(b);
-	
+
 		//g_log<<"paste brush"<<endl;
 		//g_log.flush();
 	}
@@ -730,7 +742,7 @@ void Down_C()
 	if(g_mode != EDITOR)
 		return;
 
-	//if(g_keys[VK_CONTROL])
+	//if(g_keys[SDLK_CONTROL])
 		CopyBrush();
 }
 
@@ -738,8 +750,8 @@ void Down_V()
 {
 	if(g_mode != EDITOR)
 		return;
-	
-	//if(g_keys[VK_CONTROL])
+
+	//if(g_keys[SDLK_CONTROL])
 		PasteBrush();
 }
 
@@ -750,10 +762,11 @@ void Click_CutBrush()
 
 void Click_AddMS3D()
 {
+#if 0
 	OPENFILENAME ofn;
-	
+
 	char filepath[MAX_PATH+1];
-	
+
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	char initdir[MAX_PATH+1];
@@ -800,6 +813,7 @@ void Click_AddMS3D()
 
 	ModelHolder mh(modelid, Vec3f(0,0,0));
 	g_modelholder.push_back(mh);
+#endif
 }
 
 void RotateModels(float degrees, float xaxis, float yaxis, float zaxis)
@@ -890,7 +904,7 @@ void RotateBrushes(float radians, Vec3f axis)
 		}
 
 		b->collapse();
-		
+
 		auto oldu = oldus.begin();
 		auto oldv = oldvs.begin();
 
@@ -899,7 +913,7 @@ void RotateBrushes(float radians, Vec3f axis)
 			BrushSide* s = &b->m_sides[j];
 
 			Vec3f newsharedv = b->m_sharedv[ s->m_vindices[0] ];
-			
+
 			float newu = newsharedv.x*s->m_tceq[0].m_normal.x + newsharedv.y*s->m_tceq[0].m_normal.y + newsharedv.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
 			float newv = newsharedv.x*s->m_tceq[1].m_normal.x + newsharedv.y*s->m_tceq[1].m_normal.y + newsharedv.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
 			float changeu = newu - *oldu;
@@ -907,7 +921,7 @@ void RotateBrushes(float radians, Vec3f axis)
 			s->m_tceq[0].m_d -= changeu;
 			s->m_tceq[1].m_d -= changev;
 		}
-		
+
 		b->remaptex();
 	}
 }
@@ -925,7 +939,7 @@ void Click_RotXCCW()
 void Click_RotXCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(1, 0, 0));
 	else if(g_selM.size() > 0)
@@ -935,7 +949,7 @@ void Click_RotXCW()
 void Click_RotYCCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 1, 0));
 	else if(g_selM.size() > 0)
@@ -945,7 +959,7 @@ void Click_RotYCCW()
 void Click_RotYCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 1, 0));
 	else if(g_selM.size() > 0)
@@ -955,7 +969,7 @@ void Click_RotYCW()
 void Click_RotZCCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 0, 1));
 	else if(g_selM.size() > 0)
@@ -965,7 +979,7 @@ void Click_RotZCCW()
 void Click_RotZCW()
 {
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 0, 1));
 	else if(g_selM.size() > 0)
@@ -975,7 +989,7 @@ void Click_RotZCW()
 void Click_RotateTex()
 {
 	LinkPrevUndo();
-	
+
 	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
 
 	Brush* b = g_sel1b;
@@ -996,7 +1010,7 @@ void Click_RotateTex()
 	float changev = newv - oldv;
 	s->m_tceq[0].m_d -= changeu;
 	s->m_tceq[1].m_d -= changev;
-	
+
 	s->remaptex();
 }
 
@@ -1018,7 +1032,7 @@ void RedoBSideGUI()
 	uwidg->changevalue(tceqstr);
 	sprintf(tceqstr, "%f %f %f %f", tceq[1].m_normal.x, tceq[1].m_normal.y, tceq[1].m_normal.z, tceq[1].m_d);
 	vwidg->changevalue(tceqstr);
-	
+
 	uwidg->m_scroll[0] = 0;
 	vwidg->m_scroll[0] = 0;
 }
@@ -1040,7 +1054,7 @@ void Change_TexEq(int c)
 	float D = 0;
 
 	sscanf(uwidg->m_value.c_str(), "%f %f %f %f", &A, &B, &C, &D);
-	
+
 	Plane* tceq = g_sel1b->m_sides[g_dragS].m_tceq;
 	tceq[0].m_normal.x = A;
 	tceq[0].m_normal.y = B;
@@ -1051,9 +1065,9 @@ void Change_TexEq(int c)
 	B = 0;
 	C = 0;
 	D = 0;
-	
+
 	sscanf(vwidg->m_value.c_str(), "%f %f %f %f", &A, &B, &C, &D);
-	
+
 	tceq[1].m_normal.x = A;
 	tceq[1].m_normal.y = B;
 	tceq[1].m_normal.z = C;
@@ -1084,7 +1098,7 @@ void Click_ScaleTex()
 
 	if(g_dragS < 0)
 		return;
-	
+
 	int c = GetComponent();
 
 	float scale = 1.0f/StrToFloat(g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("texture scale", WIDGET_EDITBOX)->m_value.c_str());
@@ -1099,7 +1113,7 @@ void Click_ScaleTex()
 	float newcomp = s->m_centroid.x*s->m_tceq[c].m_normal.x + s->m_centroid.y*s->m_tceq[c].m_normal.y + s->m_centroid.z*s->m_tceq[c].m_normal.z + s->m_tceq[c].m_d;
 	float changecomp = newcomp - oldcomp;
 	s->m_tceq[c].m_d -= changecomp;
-	
+
 	s->remaptex();
 
 	RedoBSideGUI();
@@ -1112,11 +1126,11 @@ void Click_ShiftTex()
 
 	if(g_dragS < 0)
 		return;
-	
+
 	int c = GetComponent();
 
 	float shift = StrToFloat(g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("texture shift", WIDGET_EDITBOX)->m_value.c_str());
-	
+
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
 
@@ -1228,14 +1242,14 @@ void Click_OpenCloseDoor()
 
 	if(!b->m_door)
 		return;
-	
+
 	LinkPrevUndo();
 
 	Brush transformed;
 	transformed.setsides(door->m_nsides, door->m_sides);
 	transformed.collapse();
 	transformed.remaptex();
-	
+
 	door->startopen = !door->startopen;
 
 	if(door->startopen)
@@ -1267,7 +1281,7 @@ void Click_OpenCloseDoor()
 		}
 
 		//transformed.collapse();
-		
+
 		auto oldu = oldus.begin();
 		auto oldv = oldvs.begin();
 
@@ -1276,7 +1290,7 @@ void Click_OpenCloseDoor()
 			BrushSide* s = &transformed.m_sides[j];
 
 			Vec3f newsharedv = transformed.m_sharedv[ s->m_vindices[0] ];
-			
+
 			float newu = newsharedv.x*s->m_tceq[0].m_normal.x + newsharedv.y*s->m_tceq[0].m_normal.y + newsharedv.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
 			float newv = newsharedv.x*s->m_tceq[1].m_normal.x + newsharedv.y*s->m_tceq[1].m_normal.y + newsharedv.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
 			float changeu = newu - *oldu;
@@ -1284,7 +1298,7 @@ void Click_OpenCloseDoor()
 			s->m_tceq[0].m_d -= changeu;
 			s->m_tceq[1].m_d -= changev;
 		}
-		
+
 		//transformed.remaptex();
 	}
 
@@ -1749,7 +1763,7 @@ void Resize_ChooseTexButton(Widget* thisw)
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = parentw->m_pos[1] + f->gheight*i;
 	thisw->m_pos[2] = LEFT_PANEL_WIDTH;
-	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*(i+1); 
+	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*(i+1);
 	CenterLabel(thisw);
 }
 
@@ -1763,7 +1777,7 @@ void Resize_FitToFaceButton(Widget* thisw)
 	thisw->m_pos[0] = 0;
 	thisw->m_pos[1] = parentw->m_pos[1] + f->gheight*i;
 	thisw->m_pos[2] = 32+32*j;
-	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*i+32; 
+	thisw->m_pos[3] = parentw->m_pos[1] + f->gheight*i+32;
 	CenterLabel(thisw);
 }
 
@@ -1883,11 +1897,11 @@ void Click_CompileModel()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-
+#if 0
         OPENFILENAME ofn;
-        
+
         char filepath[MAX_PATH+1];
-        
+
         ZeroMemory( &ofn , sizeof( ofn));
 
         char initdir[MAX_PATH+1];
@@ -1913,10 +1927,11 @@ void Click_CompileModel()
 
         if(!GetSaveFileName(&ofn))
                 return;
-        
+
         //CorrectSlashes(filepath);
         //SaveEdBuilding(filepath, &g_edbldg);
 		CompileModel(filepath, &g_edmap, g_modelholder);
+#endif
 #endif
 }
 
@@ -1926,16 +1941,16 @@ void FillGUI()
 	DrawSceneFunc = &DrawScene;
 
 	AssignAnyKey(&AnyKeyDown, &AnyKeyUp);
-	AssignKey(VK_F1, SaveScreenshot, NULL);
-	AssignKey(VK_ESCAPE, &Escape, NULL);
-	AssignKey(VK_DELETE, &Delete, NULL);
+	AssignKey(SDLK_F1, SaveScreenshot, NULL);
+	AssignKey(SDLK_ESCAPE, &Escape, NULL);
+	AssignKey(SDLK_DELETE, &Delete, NULL);
 	AssignKey('C', Down_C, NULL);
 	AssignKey('V', Down_V, NULL);
 	//AssignMouseWheel(&MouseWheel);
 	//AssignMouseMove(&MouseMove);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	//AssignRButton(NULL, &MouseRightButtonUp);
-	
+
 	Font* f = &g_font[MAINFONT8];
 
 	View* logoview = AddView("logo");
@@ -1948,13 +1963,13 @@ void FillGUI()
 
 	edview->widget.push_back(new Frame(NULL, "top panel", Resize_TopPanel));
 	edview->widget.push_back(new Frame(NULL, "left panel", Resize_LeftPanel));
-	
+
 	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
 	Widget* leftpanel = edview->getwidget("left panel", WIDGET_FRAME);
 
 	toppanel->m_subwidg.push_back(new Image(toppanel, "top panel bg", "gui/filled.jpg", Resize_TopPanel));
 	leftpanel->m_subwidg.push_back(new Image(leftpanel, "left panel bg", "gui/filled.jpg", Resize_LeftPanel));
-	
+
 	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
@@ -2017,7 +2032,7 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
 	toppanel->m_subwidg.push_back(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
 	toppanel->m_subwidg.push_back(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
-	
+
 	toppanel->m_subwidg.push_back(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, Resize_ResetViewButton, Click_ResetView, NULL, NULL));
@@ -2038,7 +2053,7 @@ void FillGUI()
 	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
 	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
 	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
-	
+
 	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/2), Vec3f(0, 1, 0), "Front");
 	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 0, -1), "Top");
 	g_viewportT[VIEWPORT_LEFT] = ViewportT(Vec3f(MAX_DISTANCE/2, 0, 0), Vec3f(0, 1, 0), "Left");
@@ -2051,7 +2066,7 @@ void FillGUI()
 	g_viewport[1] = Viewport(VIEWPORT_TOP);
 	g_viewport[2] = Viewport(VIEWPORT_LEFT);
 	g_viewport[3] = Viewport(VIEWPORT_ANGLE45O);
-	
+
 	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "h divider", "gui/filled.jpg", Resize_HDivider));
 	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "v divider", "gui/filled.jpg", Resize_VDivider));
 
@@ -2067,7 +2082,7 @@ void FillGUI()
 
 	View* brushsideeditview = AddView("brush side edit");
 	brushsideeditview->widget.push_back(new Frame(NULL, "left panel", Resize_BrushSideEditFrame));
-	
+
 	leftpanel = brushsideeditview->getwidget("left panel", WIDGET_FRAME);
 	leftpanel->m_subwidg.push_back(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, Resize_RotateTexButton, Click_RotateTex, NULL, NULL));
 	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, 0));
@@ -2080,11 +2095,11 @@ void FillGUI()
 	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL));
 	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
 	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL));
-	
+
 #if 0
 	View* dooreditview = AddView("door edit");
 	dooreditview->widget.push_back(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
-	
+
 	leftpanel = dooreditview->getwidget("left panel", WIDGET_FRAME);
 	i=1;
 	j=0;
@@ -2102,7 +2117,7 @@ void FillGUI()
 	View* renderview = AddView("render");
 
 	renderview->widget.push_back(new ViewportW(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3));
-	
+
 	OpenSoleView("loading");
 	//OpenAnotherView("brush edit view");
 }
@@ -2110,7 +2125,7 @@ void FillGUI()
 int GetNumFrames()
 {
 	View* edview = g_GUI.getview("editor");
-	
+
 	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
 
 	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);
@@ -2123,7 +2138,7 @@ int GetNumFrames()
 void SetNumFrames(int nframes)
 {
 	View* edview = g_GUI.getview("editor");
-	
+
 	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
 
 	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);

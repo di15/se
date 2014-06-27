@@ -32,15 +32,15 @@ CheckBox::CheckBox(Widget* parent, const char* n, const char* t, int f, void (*r
 	m_rgba[3] = a;
 	m_selected = sel;
 	changefunc = change;
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\accept.png", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/accept.png", true, false);
 	reframe();
 }
 
 bool CheckBox::mousemove()
 {
-	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] && 
-		g_mouse.x <= m_pos[2] && 
+	if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] &&
+		g_mouse.x <= m_pos[2] &&
 		g_mouse.y <= m_pos[3])
 	{
 		m_over = true;
@@ -97,7 +97,7 @@ bool CheckBox::lbuttonup(bool moved)
 
 		return true;
 	}
-	
+
 	m_ldown = false;
 
 	return false;

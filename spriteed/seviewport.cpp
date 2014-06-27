@@ -1,7 +1,7 @@
 //
 // weviewport.cpp
-// 
-// 
+//
+//
 
 #include "seviewport.h"
 #include "../common/draw/shader.h"
@@ -166,7 +166,7 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 	//STOREY_HEIGHT=250
 	//float baseinterval = STOREY_HEIGHT / 5.0f;
 	//float screenfit = PROJ_RIGHT*2/g_zoom;
-	//int scale = 
+	//int scale =
 
 	//-  float invzoom = 2.0f/g_zoom;
 	//-  int tenpower = log(invzoom)/log(2);
@@ -257,7 +257,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
@@ -304,7 +304,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	modelview.setTranslation(translation);
 	modelmat.setTranslation(translation);
 	modelview.postMultiply(viewmat);
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
@@ -313,8 +313,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postMultiply(viewmat);
 
-	float extentx = PROJ_RIGHT*aspect/g_zoom; 
-	float extenty = PROJ_RIGHT/g_zoom; 
+	float extentx = PROJ_RIGHT*aspect/g_zoom;
+	float extenty = PROJ_RIGHT/g_zoom;
 	//Vec3f vmin = g_focus - Vec3f(extentx, extenty, extentx);
 	//Vec3f vmax = g_focus + Vec3f(extentx, extenty, extentx);
 	Vec3f vmin = g_camera.m_view - Vec3f(extentx, extenty, extentx);
@@ -352,14 +352,14 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		RenderShadowedScene(projection, viewmat, modelmat, modelview);
 	}
 #endif
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
 	//EndS();
 	//g_log<<"sh at t p:"<<g_curS<<endl;
 	//g_log.flush();
-	
+
 #if 1
 	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
 	{
@@ -376,7 +376,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		EndS();
 	}
 #endif
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
@@ -406,7 +406,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
 		}
-		
+
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif
@@ -435,12 +435,12 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 		DrawDrag(&g_edmap, &mvpmat, width, height, persp);
 		EndS();
-		
+
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif
 
-		if(g_edtool == EDTOOL_CUT && v->m_ldown && !g_keys[VK_CONTROL])
+		if(g_edtool == EDTOOL_CUT && v->m_ldown && !g_keys[SDLK_LCTRL] && !g_keys[SDLK_RCTRL])
 		{
 			UseS(SHADER_COLOR2D);
 			glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)width);
@@ -494,21 +494,21 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #endif
 	}
 #endif
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
 	Ortho(width, height, 1, 0, 0, 1);
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	//glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
@@ -516,14 +516,14 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	if(g_mode != RENDERING)
 		DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
 	glFlush();
-	
+
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
@@ -768,9 +768,9 @@ void ViewportLUp_Explosion(int which, int relx, int rely, int width, int height)
 
 	float aspect = fabsf((float)width / (float)height);
 
-	float extentx = PROJ_RIGHT*aspect/g_zoom; 
-	float extenty = PROJ_RIGHT/g_zoom; 
-	
+	float extentx = PROJ_RIGHT*aspect/g_zoom;
+	float extenty = PROJ_RIGHT/g_zoom;
+
 	Vec3f vmin = g_camera.m_view - Vec3f(extentx, extenty, extentx);
 	Vec3f vmax = g_camera.m_view + Vec3f(extentx, extenty, extentx);
 
@@ -803,8 +803,8 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 
 	float aspect = fabsf((float)width / (float)height);
 
-	float extentx = PROJ_RIGHT*aspect/g_zoom; 
-	float extenty = PROJ_RIGHT/g_zoom; 
+	float extentx = PROJ_RIGHT*aspect/g_zoom;
+	float extenty = PROJ_RIGHT/g_zoom;
 	//Vec3f vmin = g_focus - Vec3f(extentx, extenty, extentx);
 	//Vec3f vmax = g_focus + Vec3f(extentx, extenty, extentx);
 	Vec3f vmin = g_camera.m_view - Vec3f(extentx, extenty, extentx);
@@ -892,7 +892,7 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 		//g_log<<"vp["<<which<<"] l up = false"<<endl;
 		//g_log.flush();
 
-		if(!g_keys[VK_CONTROL])
+		if(!g_keys[SDLK_LCTRL] && !g_keys[SDLK_RCTRL])
 		{
 			if(g_edtool == EDTOOL_CUT)
 			{
@@ -927,7 +927,7 @@ bool ViewportRUp(int which, int relx, int rely, int width, int height)
 }
 
 bool ViewportMousewheel(int which, int delta)
-{	
+{
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
 
@@ -1025,7 +1025,7 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 
 	//if(s->m_outline.m_edv.size() % 2 == 0)
 	//if(true)
-	if(!g_keys[VK_SHIFT])
+	if(!g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
 	{
 		Vec3f farthestv = movev;
 		float farthestD = 0;
@@ -1056,7 +1056,7 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		g_log.flush();
 #endif
 	}
-	else 
+	else
 	{
 		float farthestd[] = {0, 0};
 		Vec3f farthestv[] = {movev, movev};
@@ -1344,7 +1344,7 @@ void Drag_ModelSide(ModelHolder* mh, Vec3f newmove)
 
 	Vec3f scalechange(1,1,1);
 	Vec3f span = mh->absmax - mh->absmin;
-	
+
 	if(span.x <= 0.0f)
 		span.x = 1;
 	if(span.y <= 0.0f)
@@ -1388,14 +1388,14 @@ void Drag_ModelSide(ModelHolder* mh, Vec3f newmove)
 	//MessageBox(g_hWnd, msg, "asd", NULL);
 
 	mh->scale = mh->scale * scalechange;
-	
+
 	if(mh->scale.x <= 0.0f)
 		mh->scale.x = 1;
 	if(mh->scale.y <= 0.0f)
 		mh->scale.y = 1;
 	if(mh->scale.z <= 0.0f)
 		mh->scale.z = 1;
-	
+
 	mh->retransform();
 }
 
@@ -1467,7 +1467,7 @@ void Drag(int which, int dx, int dy, int width, int height)
 }
 
 bool ViewportMousemove(int which, int relx, int rely, int width, int height)
-{	
+{
 	Viewport* v = &g_viewport[which];
 
 	if(v->m_ldown)
@@ -1479,12 +1479,12 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		{
 			Drag(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
-		else if(g_keys[VK_CONTROL])
+		else if(g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL])
 		{
 			ViewportTranslate(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
 
-		if(g_keys[VK_CONTROL] || g_edtool != EDTOOL_CUT || !v->m_ldown)
+		if((g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL]) || g_edtool != EDTOOL_CUT || !v->m_ldown)
 			v->m_lastmouse = Vec2i(relx, rely);
 		v->m_curmouse = Vec2i(relx, rely);
 		return true;
@@ -1500,7 +1500,7 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		return true;
 	}
 
-	if(g_keys[VK_CONTROL] || g_edtool != EDTOOL_CUT || (!v->m_ldown && !v->m_rdown))
+	if((g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL]) || g_edtool != EDTOOL_CUT || (!v->m_ldown && !v->m_rdown))
 		v->m_lastmouse = Vec2i(relx, rely);
 
 	v->m_curmouse = Vec2i(relx, rely);

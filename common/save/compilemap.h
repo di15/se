@@ -11,13 +11,13 @@ public:
 	unsigned int m_specularm;
 	unsigned int m_normalm;
 	Plane m_tceq[2];
-	list<Triangle> m_frag;
+	std::list<Triangle> m_frag;
 };
 
 class CutBrush
 {
 public:
-	list<CutBrushSide> m_side;
+	std::list<CutBrushSide> m_side;
 };
 
 extern float g_renderpitch;

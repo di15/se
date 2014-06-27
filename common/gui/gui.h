@@ -29,8 +29,8 @@ class GUI
 {
 public:
 	list<View> view;
-	void (*keyupfunc[256])();
-	void (*keydownfunc[256])();
+	void (*keyupfunc[SDL_NUM_SCANCODES])();
+	void (*keydownfunc[SDL_NUM_SCANCODES])();
 	void (*anykeyupfunc)(int k);
 	void (*anykeydownfunc)(int k);
 	void (*mousemovefunc)();
@@ -44,7 +44,7 @@ public:
 
 	GUI()
 	{
-		for(int i=0; i<256; i++)
+		for(int i=0; i<SDL_NUM_SCANCODES; i++)
 		{
 			keyupfunc[i] = NULL;
 			keydownfunc[i] = NULL;
@@ -124,7 +124,7 @@ public:
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->prelbuttondown())
 				return;	// intercept mouse event
-		
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->lbuttondown())
 				return;	// intercept mouse event
@@ -137,7 +137,7 @@ public:
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->prelbuttonup(moved))
 				return;	// intercept mouse event
-		
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->lbuttonup(moved))
 				return;	// intercept mouse event
@@ -148,13 +148,13 @@ public:
 
 	void rbuttondown()
 	{
-		
+
 	//g_log<<"r down gui"<<endl;
 
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->prerbuttondown())
 				return;	// intercept mouse event
-		
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->rbuttondown())
 				return;	// intercept mouse event
@@ -167,7 +167,7 @@ public:
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->prerbuttonup(moved))
 				return;	// intercept mouse event
-		
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened && i->rbuttonup(moved))
 				return;	// intercept mouse event
@@ -201,7 +201,7 @@ public:
 		for(auto i=view.begin(); i!=view.end(); i++)
 			if(i->opened)
 				i->premousemove();
-		
+
 		for(auto i=view.begin(); i!=view.end(); i++)
 			if(i->opened)
 				if(i->mousemove())
@@ -223,14 +223,14 @@ public:
 
 		if(keyupfunc[k] != NULL)
 			keyupfunc[k]();
-			
+
 		return false;
 	}
 
 	bool keydown(int k)
 	{
 		g_keyintercepted = false;
-		
+
 		for(auto i=view.rbegin(); i!=view.rend(); i++)
 			if(i->opened)
 				if(i->keydown(k))
@@ -244,7 +244,7 @@ public:
 
 		if(keydownfunc[k] != NULL)
 			keydownfunc[k]();
-			
+
 		return false;
 	}
 

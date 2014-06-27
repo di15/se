@@ -37,19 +37,19 @@ struct Resolution
 };
 
 extern Resolution g_selectedRes;
-extern vector<Resolution> g_resolution;
-extern vector<int> g_bpps;
+extern std::vector<Resolution> g_resolution;
+extern std::vector<int> g_bpps;
 
 extern bool g_keyintercepted;
 extern bool g_keys[256];
 extern bool g_mousekeys[3];
 
 void AddRes(int w, int h);
-void CalculateFrameRate();
-bool AnimateNextFrame(int desiredFrameRate);
+void CalcDrawRate();
+bool DrawNextFrame(int desiredFrameRate);
 void EnumerateDisplay();
 void Resize(int width, int height);
 void DestroyWindow(const char* title);
-bool MakeWindow(const char* title, HICON icon, WNDPROC wndproc);
+bool MakeWindow(const char* title);
 
 #endif

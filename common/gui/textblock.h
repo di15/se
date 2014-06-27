@@ -24,9 +24,9 @@ public:
 	}
 
 	void draw();
-	bool lbuttonup(bool moved);
-	bool lbuttondown();
-	bool mousemove();
+	//bool lbuttonup(bool moved);
+	//bool lbuttondown();
+	//bool mousemove();
 	void changevalue(const char* newv);
 	int square();
 };

@@ -5,7 +5,7 @@
 
 #include "../common/platform.h"
 
-#define VERSION				2.0f
+#define VERSION				2
 #define TITLE				"DMD Sprite Editor"
 #define CONFIGFILE			"config.ini"
 

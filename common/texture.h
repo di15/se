@@ -1,6 +1,3 @@
-
-
-
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
@@ -22,9 +19,12 @@ public:
 	bool ladder;
 	bool water;
 	bool fabric;
+	bool clamp;
+	bool mipmaps;
 
 	Texture()
 	{
+		filepath[0] = '\0';
 		loaded = false;
 	}
 };
@@ -36,15 +36,17 @@ extern Texture g_texture[TEXTURES];
 #define TGA_A		 3		// This tells us it's an ALPHA file
 #define TGA_RLE		10		// This tells us that the targa is Run-Length Encoded (RLE)
 
-#define png_infopp_NULL (png_infopp)NULL
+#ifndef int_p_NULL
 #define int_p_NULL (int*)NULL
+#endif
+#define png_infopp_NULL (png_infopp)NULL
 #define png_voidp_NULL	(png_voidp)NULL
 
 #define JPEG_BUFFER_SIZE (8 << 10)
 
-typedef struct 
+typedef struct
 {
-    struct jpeg_source_mgr  pub;
+	struct jpeg_source_mgr  pub;
 } JPEGSource;
 
 class LoadedTex
@@ -67,6 +69,7 @@ struct TextureToLoad
 	char relative[MAX_PATH+1];
 	bool clamp;
 	bool reload;
+	bool mipmaps;
 };
 
 extern int g_texwidth;
@@ -81,18 +84,19 @@ LoadedTex *LoadJPG(const char *fullpath);
 LoadedTex *LoadPNG(const char *fullpath);
 bool FindTexture(unsigned int &texture, const char* relative);
 int NewTexture();
-bool TextureLoaded(unsigned int texture, const char* relative, bool transp, unsigned int& texindex);
+bool TextureLoaded(unsigned int texture, const char* relative, bool transp, bool clamp, bool mipmaps, unsigned int& texindex);
 void FindTextureExtension(char *relative);
 void FreeTextures();
 bool Load1Texture();
-void QueueTexture(unsigned int* texindex, const char* relative, bool clamp);
-void RequeueTexture(unsigned int texindex, const char* relative, bool clamp);
+void QueueTexture(unsigned int* texindex, const char* relative, bool clamp, bool mipmaps);
+void RequeueTexture(unsigned int texindex, const char* relative, bool clamp, bool mipmaps);
 LoadedTex* LoadTexture(const char* full);
-bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool reload=false);
+bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, bool mipmaps, bool reload=false);
 void ReloadTextures();
 void FreeTexture(const char* relative);
 void FreeTexture(int i);
 void DiffPath(const char* basepath, char* diffpath);
+void DiffPathPNG(const char* basepath, char* diffpath);
 void SpecPath(const char* basepath, char* specpath);
 void NormPath(const char* basepath, char* normpath);
 void OwnPath(const char* basepath, char* ownpath);
@@ -103,6 +107,6 @@ int SavePNG(const char* fullpath, LoadedTex* image);
 void FlipImage(LoadedTex* image);
 int SaveBMP(const char* fullpath, LoadedTex* image);
 bool SaveRAW(const char* fullpath, LoadedTex* image);
-
+void SaveScreenshot();
 
 #endif

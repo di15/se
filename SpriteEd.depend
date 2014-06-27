@@ -1,0 +1,1174 @@
+# depslib dependency file v1.0
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/debug.cpp
+	"debug.h"
+	"utils.h"
+
+1403839054 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/debug.h
+	"platform.h"
+
+1403839080 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/platform.h
+	"TargetConditionals.h"
+	<winsock2.h>
+	<windows.h>
+	<mmsystem.h>
+	<commdlg.h>
+	<sys/types.h>
+	<unistd.h>
+	<signal.h>
+	<string>
+	<sstream>
+	<stdio.h>
+	<stdlib.h>
+	<vector>
+	<list>
+	<deque>
+	<set>
+	<fstream>
+	<iostream>
+	<math.h>
+	<jpeglib.h>
+	<png.h>
+	<zip.h>
+	<jpeglib.h>
+	<png.h>
+	<GL/glew.h>
+	<SDL2/SDL.h>
+	<SDL2/SDL_opengl.h>
+	<SDL2/SDL_net.h>
+	<GL/xglew.h>
+	<SDL2/SDL.h>
+	<SDL2/SDL_opengl.h>
+	<SDL2/SDL_net.h>
+	<GL/wglew.h>
+	<SDL.h>
+	<SDL_opengl.h>
+	<SDL_net.h>
+	<gl/glaux.h>
+
+1403838273 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/utils.h
+	"platform.h"
+
+1403839163 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/billboard.cpp
+	"billboard.h"
+	"../platform.h"
+	"../math/3dmath.h"
+	"../texture.h"
+	"particle.h"
+	"shader.h"
+	"../utils.h"
+	"../math/vec3f.h"
+	"../math/camera.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/billboard.h
+	"../platform.h"
+	"../math/3dmath.h"
+	"../math/vec3f.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/3dmath.h
+	"../platform.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec3f.h
+
+1403838145 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/texture.h
+	"platform.h"
+	"math/vec2i.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec2i.h
+
+1403839108 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/particle.h
+	"../utils.h"
+	"../math/3dmath.h"
+	"../math/vec3f.h"
+
+1403839686 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/shader.h
+	"../platform.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/camera.h
+	"vec2f.h"
+	"vec3f.h"
+	"quaternion.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec2f.h
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/quaternion.h
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/foliage.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/model.cpp
+	"../platform.h"
+	"../math/3dmath.h"
+	"model.h"
+	"../texture.h"
+	"../utils.h"
+	"../gui/gui.h"
+	"shader.h"
+	"../debug.h"
+	"vertexarray.h"
+
+1403839179 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/model.h
+	"../platform.h"
+	"ms3d.h"
+	"../math/vec3f.h"
+	"../math/vec2f.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/ms3d.h
+	"../platform.h"
+	"../math/3dmath.h"
+	"../math/vec3f.h"
+	"../math/vec2f.h"
+	"../math/matrix.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/matrix.h
+
+1403841516 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/gui.h
+	"../platform.h"
+	"../math/3dmath.h"
+	"view.h"
+	"image.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"dropdowns.h"
+	"editbox.h"
+	"hscroller.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+	"frame.h"
+	"viewportw.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/view.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/widget.h
+	"../utils.h"
+	"../texture.h"
+	"font.h"
+	"../draw/shader.h"
+	"../window.h"
+	"draw2d.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/font.h
+	"../platform.h"
+
+1403839214 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/window.h
+	"platform.h"
+	"math/3dmath.h"
+	"math/vec2i.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/draw2d.h
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/image.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/barbutton.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/button.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/checkbox.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/dropdowns.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/editbox.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/hscroller.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/insdraw.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/link.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/listbox.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/text.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/textarea.h
+	"widget.h"
+
+1403843282 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/textblock.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/touchlistener.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/frame.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/viewportw.h
+	"widget.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/vertexarray.h
+	"../platform.h"
+	"../draw/ms3d.h"
+	"../math/vec3f.h"
+	"../math/vec2f.h"
+
+1403839387 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/ms3d.cpp
+	"ms3d.h"
+	"../texture.h"
+	"../utils.h"
+	"model.h"
+	"../platform.h"
+	"../math/vec3f.h"
+	"../math/quaternion.h"
+	"../math/matrix.h"
+	"../math/3dmath.h"
+	"../math/matrix.h"
+	"vertexarray.h"
+	"../save/saveedm.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/saveedm.h
+	"../platform.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/particle.cpp
+	"particle.h"
+	"../texture.h"
+	"../platform.h"
+	"billboard.h"
+	"../math/vec3f.h"
+
+1403839404 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/projectile.cpp
+	"projectile.h"
+	"../texture.h"
+	"../utils.h"
+	"../draw/shader.h"
+	"../platform.h"
+	"../math/camera.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/projectile.h
+	"../platform.h"
+	"../math/3dmath.h"
+	"../math/vec3f.h"
+
+1403842960 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/screenshot.cpp
+	"../platform.h"
+	"../window.h"
+	"../utils.h"
+	"../texture.h"
+
+1403839436 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/shader.cpp
+	"../utils.h"
+	"../draw/shader.h"
+	"../platform.h"
+	"../debug.h"
+	"../window.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/shadow.cpp
+	"../utils.h"
+	"shadow.h"
+	"shader.h"
+	"../math/3dmath.h"
+	"model.h"
+	"particle.h"
+	"projectile.h"
+	"../debug.h"
+	"billboard.h"
+	"../platform.h"
+	"../window.h"
+	"../math/vec3f.h"
+	"../math/matrix.h"
+	"model.h"
+	"../sim/sim.h"
+	"model.h"
+	"../sim/map.h"
+	"../math/camera.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/shadow.h
+	"../math/vec3f.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/sim.h
+
+1403839470 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/map.h
+	"../platform.h"
+	"../math/vec3f.h"
+	"../math/brush.h"
+	"../math/polygon.h"
+	"../math/triangle.h"
+	"../math/brush.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/brush.h
+	"vec3f.h"
+	"plane.h"
+	"polygon.h"
+	"triangle.h"
+	"brushside.h"
+	"../sim/door.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/plane.h
+	"vec3f.h"
+	"physics.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/physics.h
+
+1403839458 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/polygon.h
+	"../platform.h"
+	"vec3f.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/triangle.h
+	"vec3f.h"
+	"vec2f.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/brushside.h
+	"vec3f.h"
+	"plane.h"
+	"polygon.h"
+	"triangle.h"
+	"../draw/model.h"
+	"../draw/vertexarray.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/door.h
+	"../math/vec3f.h"
+	"../math/3dmath.h"
+	"../math/brushside.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/sortb.cpp
+	"sortb.h"
+	"../math/brush.h"
+	"../sim/map.h"
+	"../save/edmap.h"
+	"../math/camera.h"
+	"../math/3dmath.h"
+	"../platform.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/sortb.h
+
+1403839487 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/edmap.h
+	"../platform.h"
+	"../math/vec3f.h"
+	"../math/brush.h"
+	"../math/polygon.h"
+	"../math/triangle.h"
+	"../sim/door.h"
+	"modelholder.h"
+
+1403839479 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/modelholder.h
+	"../draw/model.h"
+	"../platform.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/vertexarray.cpp
+	"vertexarray.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/water.cpp
+	"water.h"
+	"heightmap.h"
+	"../shader.h"
+	"../math/3dmath.h"
+	"../math/vec3f.h"
+	"../math/vec2f.h"
+	"../platform.h"
+	"../shadow.h"
+	"../texture.h"
+	"../utils.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/water.h
+
+1403839543 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/barbutton.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+	"gui.h"
+
+1403839658 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/button.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403839679 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/checkbox.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/draw2d.cpp
+	"../platform.h"
+	"../draw/shader.h"
+	"draw2d.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/dropdownl.cpp
+
+1403839731 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/dropdownm.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdownm.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/dropdownm.h
+	"widget.h"
+
+1403839753 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/dropdowns.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403840021 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/editbox.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+	"gui.h"
+
+1403840045 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/font.cpp
+	"../platform.h"
+	"font.h"
+	"../texture.h"
+	"../draw/shader.h"
+	"../window.h"
+	"../utils.h"
+	"gui.h"
+	"../debug.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/frame.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+	"frame.h"
+	"../platform.h"
+
+1403840149 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/gui.cpp
+	"../draw/shader.h"
+	"gui.h"
+	"../texture.h"
+	"font.h"
+	"../math/3dmath.h"
+	"../platform.h"
+	"../window.h"
+	"draw2d.h"
+	"../draw/shadow.h"
+	"../debug.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/hscroller.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403840171 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/image.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/insdraw.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/link.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403840363 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/listbox.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/text.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403840432 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/textarea.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/textblock.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/touchlistener.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/view.cpp
+	"gui.h"
+	"../texture.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/viewportw.cpp
+	"widget.h"
+	"barbutton.h"
+	"button.h"
+	"checkbox.h"
+	"editbox.h"
+	"dropdowns.h"
+	"hscroller.h"
+	"image.h"
+	"insdraw.h"
+	"link.h"
+	"listbox.h"
+	"text.h"
+	"textarea.h"
+	"textblock.h"
+	"touchlistener.h"
+	"viewportw.h"
+	"../platform.h"
+	"../window.h"
+	"../draw/shader.h"
+	"gui.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/gui/widget.cpp
+	"widget.h"
+	"gui.h"
+	"font.h"
+	"../window.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/3dmath.cpp
+	"3dmath.h"
+	"../utils.h"
+	"physics.h"
+	"../window.h"
+	"../gui/gui.h"
+	"vec3f.h"
+	"camera.h"
+	"quaternion.h"
+	"vec4f.h"
+	"matrix.h"
+	"plane.h"
+	"../window.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec4f.h
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/brush.cpp
+	"../platform.h"
+	"brush.h"
+	"plane.h"
+	"3dmath.h"
+	"line.h"
+	"polygon.h"
+	"../utils.h"
+	"3dmath.h"
+	"../sim/map.h"
+	"../save/edmap.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/line.h
+	"vec3f.h"
+
+1403840455 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/brushside.cpp
+	"../platform.h"
+	"brushside.h"
+	"plane.h"
+	"../draw/shader.h"
+	"../texture.h"
+	"../utils.h"
+	"brush.h"
+	"../save/compilemap.h"
+
+1403840477 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/compilemap.h
+	"../platform.h"
+	"edmap.h"
+	"../math/triangle.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/camera.cpp
+	"camera.h"
+	"3dmath.h"
+	"physics.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/edge.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/frustum.cpp
+	"frustum.h"
+	"../platform.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/frustum.h
+	"../platform.h"
+	"3dmath.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/line.cpp
+	"line.h"
+
+1403843245 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/matrix.cpp
+	"matrix.h"
+	"../platform.h"
+	"quaternion.h"
+	"vec4f.h"
+	"../utils.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/physics.cpp
+	"../platform.h"
+	"physics.h"
+	"vec3f.h"
+	"triangle.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/plane.cpp
+	"vec3f.h"
+	"plane.h"
+	"physics.h"
+	"3dmath.h"
+	"../utils.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/polygon.cpp
+	"polygon.h"
+	"3dmath.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/quaternion.cpp
+	"../platform.h"
+	"quaternion.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec3f.cpp
+	"../platform.h"
+	"vec3f.h"
+	"matrix.h"
+	"physics.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/math/vec4f.cpp
+	"../platform.h"
+	"matrix.h"
+	"vec4f.h"
+	"vec3f.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/phys/collider.cpp
+
+1403837843 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/platform.cpp
+	"platform.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/compilemap.cpp
+	"compilemap.h"
+	"../utils.h"
+	"savemap.h"
+	"../math/camera.h"
+	"../../spriteed/segui.h"
+	"../window.h"
+	"../gui/gui.h"
+	"../sim/tile.h"
+	"../../spriteed/main.h"
+	"../../spriteed/seviewport.h"
+	"../math/vec4f.h"
+	"../tool/rendersprite.h"
+
+1403840591 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/savemap.h
+	"../platform.h"
+
+1403836671 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/segui.h
+	"../common/platform.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/tile.h
+
+1403843595 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/main.h
+	"../common/platform.h"
+
+1403836671 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/seviewport.h
+	"../common/math/3dmath.h"
+	"../common/math/camera.h"
+	"../common/math/vec2i.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/tool/rendersprite.h
+	"../platform.h"
+	"../math/vec2i.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/edmap.cpp
+	"edmap.h"
+	"../draw/shader.h"
+	"../texture.h"
+	"../utils.h"
+	"../save/modelholder.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/modelholder.cpp
+	"modelholder.h"
+	"../draw/vertexarray.h"
+	"../math/brush.h"
+	"../math/quaternion.h"
+	"../math/vec4f.h"
+	"compilemap.h"
+	"../platform.h"
+	"../utils.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/save.cpp
+	"../sim/map.h"
+	"save.h"
+	"../platform.h"
+	"../math/polygon.h"
+	"../texture.h"
+	"../draw/vertexarray.h"
+	"../utils.h"
+
+1403840491 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/save.h
+	"../platform.h"
+
+1403840572 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/saveedm.cpp
+	"../sim/map.h"
+	"save.h"
+	"../platform.h"
+	"../math/polygon.h"
+	"../texture.h"
+	"../draw/vertexarray.h"
+	"../utils.h"
+	"saveedm.h"
+	"../save/edmap.h"
+	"savemap.h"
+	"../../spriteed/segui.h"
+
+1403840692 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/savemap.cpp
+	"savemap.h"
+	"compilemap.h"
+	"edmap.h"
+	"../texture.h"
+	"save.h"
+	"saveedm.h"
+	"../sim/map.h"
+	"../utils.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/savesprite.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/battlecomp.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/character.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/door.cpp
+	"../save/edmap.h"
+	"door.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/entity.cpp
+	"entity.h"
+	"entitytype.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/entity.h
+	"../math/vec3f.h"
+	"../math/camera.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/entitytype.h
+	"../platform.h"
+	"../math/vec3f.h"
+	"../sound.h"
+	"../phys/collider.h"
+	"../draw/model.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sound.h
+	<vector>
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/phys/collider.h
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/entitytype.cpp
+	"entitytype.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/explocrater.cpp
+	"../draw/shader.h"
+	"../platform.h"
+	"../utils.h"
+	"../math/3dmath.h"
+	"../math/vec4f.h"
+	"../gui/gui.h"
+	"sim.h"
+	"door.h"
+	"../save/compilemap.h"
+	"../../spriteed/segui.h"
+	"../../spriteed/sesim.h"
+
+1403842655 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/sesim.h
+	"../common/sim/map.h"
+	"../common/save/edmap.h"
+	"../common/save/modelholder.h"
+	"../common/math/physics.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/map.cpp
+	"map.h"
+	"../draw/shader.h"
+	"../texture.h"
+	"../utils.h"
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/selection.cpp
+	"../draw/shader.h"
+	"../texture.h"
+	"entity.h"
+	"entitytype.h"
+	"../platform.h"
+	"../math/matrix.h"
+	"../window.h"
+	"../math/plane.h"
+
+1403840718 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/sim.cpp
+	"../draw/model.h"
+	"../math/brush.h"
+	"entitytype.h"
+	"entity.h"
+	"../texture.h"
+	"selection.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/selection.h
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/statesoldier.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/tile.cpp
+
+1403836670 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sound.cpp
+	"sound.h"
+	"utils.h"
+	"platform.h"
+
+1403842892 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/texture.cpp
+	"platform.h"
+	"texture.h"
+	"draw/model.h"
+	"gui/gui.h"
+	"utils.h"
+	"debug.h"
+
+1403840769 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/tool/compilebl.cpp
+	"compilebl.h"
+	"../save/edmap.h"
+	"../utils.h"
+	"../platform.h"
+	"../texture.h"
+	"../save/save.h"
+	"../save/saveedm.h"
+
+1403840757 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/tool/compilebl.h
+	"../math/vec2i.h"
+	"../math/vec2f.h"
+	"../platform.h"
+	"../texture.h"
+	"../save/edmap.h"
+	"../save/modelholder.h"
+
+1403840975 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/tool/rendersprite.cpp
+	"../platform.h"
+	"../save/savesprite.h"
+	"rendersprite.h"
+	"compilebl.h"
+	"../../spriteed/main.h"
+	"../gui/gui.h"
+	"../save/compilemap.h"
+	"../../spriteed/main.h"
+	"../../spriteed/segui.h"
+	"../sim/tile.h"
+	"../math/camera.h"
+	"../draw/shadow.h"
+	"../math/vec4f.h"
+	"../draw/screenshot.h"
+	"../draw/sortb.h"
+	"../../spriteed/seviewport.h"
+	"../debug.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/save/savesprite.h
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/draw/screenshot.h
+
+1403838260 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/utils.cpp
+	"utils.h"
+	"platform.h"
+	"window.h"
+	"draw/shader.h"
+
+1403843666 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/window.cpp
+	"window.h"
+	"texture.h"
+	"draw/shader.h"
+	"gui/gui.h"
+	"gui/font.h"
+	"draw/shadow.h"
+	"math/3dmath.h"
+	"debug.h"
+
+1403843469 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/main.cpp
+	"main.h"
+	"../common/gui/gui.h"
+	"../common/draw/shader.h"
+	"res.h"
+	"../common/gui/font.h"
+	"../common/texture.h"
+	"../common/draw/model.h"
+	"../common/math/frustum.h"
+	"../common/draw/billboard.h"
+	"segui.h"
+	"../common/draw/particle.h"
+	"../common/draw/shadow.h"
+	"../common/draw/particle.h"
+	"../common/platform.h"
+	"../common/utils.h"
+	"../common/window.h"
+	"../common/sim/sim.h"
+	"../common/math/matrix.h"
+	"../common/math/vec3f.h"
+	"../common/math/3dmath.h"
+	"../common/math/camera.h"
+	"sesim.h"
+	"../common/sim/entity.h"
+	"../common/save/compilemap.h"
+	"../common/save/modelholder.h"
+	"../common/tool/rendersprite.h"
+	"../common/debug.h"
+
+1403836671 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/res.h
+
+1403836671 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/render.cpp
+
+1403842637 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/segui.cpp
+	"main.h"
+	"../common/math/3dmath.h"
+	"../common/gui/gui.h"
+	"../common/texture.h"
+	"segui.h"
+	"../common/window.h"
+	"seviewport.h"
+	"sesim.h"
+	"../common/save/save.h"
+	"../common/save/saveedm.h"
+	"../common/sim/sim.h"
+	"../common/draw/sortb.h"
+	"undo.h"
+	"../common/save/compilemap.h"
+	"../common/draw/shadow.h"
+	"../common/sim/tile.h"
+	"../common/save/modelholder.h"
+	"../common/tool/compilebl.h"
+	"../common/save/savesprite.h"
+	"../common/tool/rendersprite.h"
+	"../common/draw/screenshot.h"
+
+1403842808 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/undo.h
+	"../common/math/brush.h"
+	"../common/sim/map.h"
+	"../common/platform.h"
+	"../common/save/modelholder.h"
+
+1403836671 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/sesim.cpp
+	"sesim.h"
+	"../common/draw/shader.h"
+	"../common/platform.h"
+	"../common/utils.h"
+	"../common/math/3dmath.h"
+	"../common/math/vec4f.h"
+	"seviewport.h"
+	"../common/gui/gui.h"
+	"../common/sim/sim.h"
+	"segui.h"
+	"../common/sim/door.h"
+	"../common/save/modelholder.h"
+	"../common/save/compilemap.h"
+	"../common/tool/rendersprite.h"
+
+1403842795 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/seviewport.cpp
+	"seviewport.h"
+	"../common/draw/shader.h"
+	"../common/gui/gui.h"
+	"../common/math/3dmath.h"
+	"../common/window.h"
+	"../common/platform.h"
+	"../common/gui/font.h"
+	"../common/math/camera.h"
+	"../common/math/matrix.h"
+	"../common/draw/shadow.h"
+	"../common/sim/map.h"
+	"sesim.h"
+	"../common/math/vec4f.h"
+	"segui.h"
+	"../common/math/brush.h"
+	"../common/draw/sortb.h"
+	"undo.h"
+	"../common/math/frustum.h"
+	"main.h"
+	"../common/sim/explocrater.h"
+	"../common/tool/rendersprite.h"
+	"../common/debug.h"
+
+1403836670 /home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/common/sim/explocrater.h
+
+1403836671 source:/home/polyfrag/Desktop/Projects/SpriteEditor/aaa001/spriteed/undo.cpp
+	"undo.h"
+	"../common/draw/sortb.h"
+	"../common/math/camera.h"
+	"../common/utils.h"
+	"../common/save/edmap.h"
+

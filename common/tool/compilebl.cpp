@@ -34,7 +34,7 @@ int Max2Pow(int lowerbound)
 
 	while( twopow < lowerbound
 #if 0
-		&& twopow < 2048 
+		&& twopow < 2048
 #endif
 		)
 		twopow *= 2;
@@ -48,7 +48,7 @@ int Max2Pow32(int lowerbound)
 
 	while( twopow < lowerbound
 #if 0
-		&& twopow < 2048 
+		&& twopow < 2048
 #endif
 		)
 		twopow *= 2;
@@ -677,7 +677,7 @@ void ResizeImages()
 			g_log<<"\t done compile 6 image norm"<<endl;
 			g_log.flush();
 #endif
-			
+
 			Resample(images[ tr->ownindex ], &resizedimages[ tr->ownindex ], newdim);
 		}
 	}
@@ -934,7 +934,7 @@ void CleanupModelCompile()
 	if(finalnorm.data)
 		free(finalnorm.data);
 #endif
-	
+
 	finaldiff.destroy();
 	finalspec.destroy();
 	finalnorm.destroy();
@@ -980,8 +980,8 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	//string diffpathpng = string(basename) + ".png";
 	//string specpath = string(basename) + ".spec.jpg";
 	//string normpath = string(basename) + ".norm.jpg";
-	
-	CreateTexture(notexindex, "textures/notex.jpg", false);
+
+	CreateTexture(notexindex, "textures/notex.jpg", false, true);
 
 	transparency = false;
 

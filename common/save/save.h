@@ -5,7 +5,7 @@
 class TexRef
 {
 public:
-	string filepath;
+	std::string filepath;
 	unsigned int diffindex;
 	unsigned int texname;
 	unsigned int specindex;

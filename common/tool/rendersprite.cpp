@@ -14,7 +14,7 @@
 #include "../draw/shadow.h"
 #include "../math/vec4f.h"
 #include "../draw/screenshot.h"
-#include "../common/draw/sortb.h"
+#include "../draw/sortb.h"
 #include "../../spriteed/seviewport.h"
 #include "../debug.h"
 
@@ -52,11 +52,11 @@ bool CallResize(int w, int h)
 		g_warned = true;
 		char msg[1024];
 		sprintf(msg, "The required texture size of %dx%d exceeds or approaches your system's supported maximum of %d. You might not be able to finish the render. Reduce 1_tile_pixel_width in config.ini.", w, h, maxsz[0]);
-		MessageBox(g_hWnd, msg, "Warning", NULL);
+		WarningMessage("Warning", msg);
 	}
 
 #if 1
-	
+
 	if(!g_renderbs && (g_mode == RENDERING || g_mode == PREREND_ADJFRAME))
 	{
 		g_renderbs = true;
@@ -84,7 +84,7 @@ bool CallResize(int w, int h)
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, w, h);
 		//glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 		CheckGLError(__FILE__, __LINE__);
-	
+
 		glGenFramebuffersEXT(1, &g_renderfb);
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_renderfb);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, g_rendertex, 0);
@@ -115,7 +115,7 @@ bool CallResize(int w, int h)
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_renderrb);
 		//-------------------------
 #endif
-		
+
 #ifdef DEBUG
 		g_log<<__FILE__<<":"<<__LINE__<<"create check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<endl;
 		g_log<<__FILE__<<":"<<__LINE__<<"create check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<endl;
@@ -123,6 +123,7 @@ bool CallResize(int w, int h)
 	}
 	//w=2048;
 	//h=2048;
+#if 0
 	DWORD dwExStyle;
 	DWORD dwStyle;
 	RECT WindowRect;
@@ -130,10 +131,14 @@ bool CallResize(int w, int h)
 	WindowRect.right=(long)w;
 	WindowRect.top=(long)0;
 	WindowRect.bottom=(long)h;
+#else
+    SDL_SetWindowSize(g_window, w, h);
+#endif
 
 	int startx = 0;
 	int starty = 0;
 
+#if 0
 	if(g_fullscreen)
 	{
 		dwExStyle = WS_EX_APPWINDOW;
@@ -150,14 +155,17 @@ bool CallResize(int w, int h)
 	}
 
 	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);
+#endif
 
 #ifdef DEBUG
 	g_log<<"rf"<<g_renderframe<<" desired: "<<w<<","<<h<<", g_wh: "<<g_width<<","<<g_height<<" wr.rl: "<<(WindowRect.right-WindowRect.left)<<","<<(WindowRect.bottom-WindowRect.top)<<endl;
 	g_log.flush();
 #endif
 
+#if 0
 	if(WindowRect.right-WindowRect.left == g_width
 		&& WindowRect.bottom-WindowRect.top == g_height)
+#endif
 	{
 		if(g_mode == RENDERING || g_mode == PREREND_ADJFRAME)
 		{
@@ -168,7 +176,9 @@ bool CallResize(int w, int h)
 		return false;
 	}
 
+#if 0
 	SetWindowPos(g_hWnd,0,0,0,WindowRect.right-WindowRect.left, WindowRect.bottom-WindowRect.top,SWP_NOMOVE|SWP_NOZORDER|SWP_NOACTIVATE|SWP_NOOWNERZORDER);
+#endif
 
 	if(g_mode == RENDERING || g_mode == PREREND_ADJFRAME)
 	{
@@ -195,13 +205,13 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 	//int width2 = Max2Pow(xextent*2);
 	//int height2 = Max2Pow(yextent*2);
-	
+
 	int width = xextent*2;
 	int height = yextent*2;
 
 	//g_deswidth = width;
 	//g_desheight = height;
-	
+
 	//g_spritecenter.x = xextent;
 	//g_spritecenter.y = yextent;
 
@@ -215,7 +225,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	g_deswidth = compatsz.x;
 	g_desheight = compatsz.y;
 
-	
+
 #ifdef DEBUG
 	g_log<<"rf"<<g_renderframe<<" o des wh "<<g_deswidth<<","<<g_desheight<<"  xyextn:"<<xextent<<","<<yextent<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<") gwh:"<<g_width<<","<<g_height<<" "<<endl;
 #endif
@@ -233,12 +243,12 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	g_camera.rotateabout(Vec3f(0,0,0), DEGTORAD(g_renderyaw), 0, 1, 0);
 
 	g_zoom = 1;
-	
+
 	Vec3f topleft(-TILE_SIZE/2, 0, -TILE_SIZE/2);
 	Vec3f bottomleft(-TILE_SIZE/2, 0, TILE_SIZE/2);
 	Vec3f topright(TILE_SIZE/2, 0, -TILE_SIZE/2);
 	Vec3f bottomright(TILE_SIZE/2, 0, TILE_SIZE/2);
-	
+
 	int width;
 	int height;
 
@@ -261,7 +271,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	Matrix projection;
 
 	bool persp = false;
-	
+
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
 		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
@@ -279,7 +289,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
     //Vec3f posvec = g_focus + t->m_offset;
 	Vec3f posvec = g_camera.m_pos;
 	//Vec3f posvec = v->pos();
-	
+
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	{
 	//	posvec = g_camera.m_view + t->m_offset;
@@ -303,12 +313,12 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	mvpmat.postMultiply(viewmat);
 
 	persp = false;
-	
+
 	Vec4f topleft4 = ScreenPos(&mvpmat, topleft, width, height, persp);
 	Vec4f topright4 = ScreenPos(&mvpmat, topright, width, height, persp);
 	Vec4f bottomleft4 = ScreenPos(&mvpmat, bottomleft, width, height, persp);
 	Vec4f bottomright4 = ScreenPos(&mvpmat, bottomright, width, height, persp);
-	
+
 	float minx = min(topleft4.x, min(topright4.x, min(bottomleft4.x, bottomright4.x)));
 	float maxx = max(topleft4.x, max(topright4.x, max(bottomleft4.x, bottomright4.x)));
 	//float miny = min(topleft4.y, min(topright4.y, min(bottomleft4.y, bottomright4.y)));
@@ -338,7 +348,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	Matrix projection;
 
 	bool persp = false;
-	
+
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
 		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
@@ -351,7 +361,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 #ifdef DEBUG
 	{
-		
+
 		g_log<<"rf"<<g_renderframe<<" params:"<<aspect<<","<<width<<","<<height<<","<<g_zoom<<endl;
 		g_log<<"rf"<<g_renderframe<<" pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<endl;
 		g_log<<"rf"<<g_renderframe<<" pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<endl;
@@ -366,12 +376,12 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	//Vec3f focusvec = v->focus();
     //Vec3f posvec = g_focus + t->m_offset;
 	//Vec3f posvec = g_camera.m_pos;
-	
+
 	Vec3f dir = Normalize( g_camera.m_view - g_camera.m_pos );
 	Vec3f posvec = g_camera.m_view - dir * 100000.0f / g_zoom;
 
 	//Vec3f posvec = v->pos();
-	
+
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	{
 	//	posvec = g_camera.m_view + t->m_offset;
@@ -395,7 +405,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postMultiply(viewmat);
 
-	
+
 #ifdef DEBUG
 	{
 		g_log<<"rf"<<g_renderframe<<" vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<endl;
@@ -423,7 +433,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 		if(t->sky && !showsky)
 			continue;
-		
+
 		for(int i=0; i<b->m_nsides; i++)
 		//for(int i=0; i<1; i++)
 		{
@@ -502,7 +512,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 		{
 			Vec3f v = va->vertices[i] + h->translation;
 			Vec4f v4 = ScreenPos(&mvpmat, v, width, height, persp);
-			
+
 #ifdef DEBUG
 			g_log<<"rf"<<g_renderframe<<" mdl v:"<<v.x<<","<<v.y<<","<<v.z<<endl;
 			g_log<<"rf"<<g_renderframe<<" mdl v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<endl;
@@ -542,7 +552,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 		}
 	}
 
-	
+
 #ifdef DEBUG
 	g_log<<"rf"<<g_renderframe<<" setmm:"<<setmm[0]<<","<<setmm[1]<<","<<setmm[2]<<","<<setmm[3]<<endl;
 #endif
@@ -604,14 +614,14 @@ void SaveRender()
 #if 0
 	AllocTex(&screen, g_width, g_height, 3);
 	memset(screen.data, 0, g_width * g_height * 3);
-	
+
 	// size must be multiple of 32 or else this will crash !!!!!
 	glReadPixels(0, 0, g_width, g_height, GL_RGB, GL_UNSIGNED_BYTE, screen.data);
 	FlipImage(&screen);
 #else
 	AllocTex(&screen, g_width, g_height, 4);
 	memset(screen.data, 0, g_width * g_height * 4);
-	
+
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	// size must be multiple of 32 or else this will crash !!!!!
@@ -628,10 +638,10 @@ void SaveRender()
 	Vec2i clipsz;
 	clipsz.x = g_clipmax.x - g_clipmin.x;
 	clipsz.y = g_clipmax.y - g_clipmin.y;
-	
+
 	int imagew = Max2Pow(clipsz.x);
 	int imageh = Max2Pow(clipsz.y);
-	
+
 #ifdef DEBUG
 	g_log<<"rf"<<g_renderframe<<" gwh"<<g_width<<","<<g_height<<" clipxymm "<<g_clipmin.x<<","<<g_clipmin.y<<"->"<<g_clipmax.x<<","<<g_clipmax.y<<" clipsz "<<clipsz.x<<","<<clipsz.y<<" imgwh "<<imagew<<","<<imageh<<endl;
 	g_log.flush();
@@ -647,7 +657,7 @@ void SaveRender()
 
 	int xoff = g_clipmin.x;
 	int yoff = g_clipmin.y;
-	
+
 	//if(g_deswidth != g_width)	xoff += (g_width-g_deswidth)/2;
 	//if(g_desheight != g_height)	yoff += (g_height-g_desheight)/2;
 
@@ -677,11 +687,11 @@ void SaveRender()
 			int index2 = 4 * ( (y+yoff) * g_width + (x+xoff) );
 
 #if 0
-			if(screen.data[index2+0] == transpkey[0] 
-			&& screen.data[index2+1] == transpkey[1] 
+			if(screen.data[index2+0] == transpkey[0]
+			&& screen.data[index2+1] == transpkey[1]
 			&& screen.data[index2+2] == transpkey[2])
 				continue;
-#endif		
+#endif
 			//g_log<<" access "<<(x+xoff)<<","<<(y+yoff)<<" of "<<g_width<<","<<g_height<<" "<<endl;
 			//g_log.flush();
 
@@ -698,7 +708,7 @@ void SaveRender()
 	//sprite.channels = 3;
 	//sprintf(fullpath, "%s_si%d_fr%03d-rgb.png", g_renderbasename, g_rendside, g_renderframe);
 	//SavePNG(fullpath, &sprite);
-	
+
 	sprintf(fullpath, "%s_si%d_fr%03d.txt", g_renderbasename, g_rendside, g_renderframe);
 	ofstream ofs(fullpath, ios_base::out);
 	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<endl<<imagew<<" "<<imageh<<endl<<clipsz.x<<" "<<clipsz.y;
@@ -738,7 +748,7 @@ void UpdateRender()
 	g_lightPos = Rotate(g_lightPos, g_rendside*DEGTORAD(45.0), 0, 1, 0);
 	g_camera.rotateabout(Vec3f(0,0,0), g_rendside*DEGTORAD(45.0), 0, 1, 0);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
-	
+
 	//AllScreenMinMax needs to be called again because the pixels center of rendering depends on the window width and height, influencing the clip min/max
 	AllScreenMinMax(&g_clipmin, &g_clipmax, g_width, g_height);
 	g_spritecenter.x = g_width/2 - g_clipmin.x;
@@ -780,7 +790,7 @@ void UpdateRender()
 	{
 		float aspect = fabsf((float)g_width / (float)g_height);
 		Matrix projection;
-		
+
 		Viewport* v = &g_viewport[3];
 		ViewportT* t = &g_viewportT[v->m_type];
 
@@ -849,7 +859,7 @@ void UpdateRender()
 		}
 #endif
 	}
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif

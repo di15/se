@@ -34,7 +34,7 @@ public:
 class TexFitRow
 {
 public:
-	list<TexFit> fits;
+	std::list<TexFit> fits;
 	Vec2i bounds[2];
 
 	TexFitRow();
@@ -42,7 +42,7 @@ public:
 
 class EdBuilding;
 
-void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders);
+void CompileModel(const char* fullfile, EdMap* map, std::list<ModelHolder> &modelholders);
 int Max2Pow(int lowerbound);
 int Max2Pow32(int lowerbound);
 

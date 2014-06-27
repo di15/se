@@ -31,9 +31,9 @@ Button::Button(Widget* parent, const char* n, const char* filepath, const char* 
 	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_tex, filepath, true, false);
+	CreateTexture(m_bgtex, "gui/buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true, false);
 	reframefunc = reframef;
 	clickfunc = click;
 	overfunc = overf;
@@ -56,9 +56,9 @@ Button::Button(Widget* parent, const char* filepath, const char* t, int f, void 
     //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_tex, filepath, true, false);
+	CreateTexture(m_bgtex, "gui/buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true, false);
 	reframefunc = reframef;
 	clickfunc = click;
 	overfunc = overf;
@@ -81,9 +81,9 @@ Button::Button(Widget* parent, const char* filepath, const char* t, int f, void 
     //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_tex, filepath, true, false);
+	CreateTexture(m_bgtex, "gui/buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true, false);
 	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
@@ -107,9 +107,9 @@ Button::Button(Widget* parent, const char* filepath, const char* t, int f, void 
     //m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
 	m_over = false;
 	m_ldown = false;
-	CreateTexture(m_tex, filepath, true);
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_tex, filepath, true, false);
+	CreateTexture(m_bgtex, "gui/buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true, false);
 	reframefunc = reframef;
 	clickfunc = NULL;
 	overfunc = NULL;
@@ -167,7 +167,7 @@ bool Button::mousemove()
 			overfunc();
 		if(overfunc2 != NULL)
 			overfunc2(m_param);
-			
+
 		m_over = true;
 
 		return true;
@@ -183,7 +183,7 @@ void Button::draw()
 	else
 		DrawImage(g_texture[m_bgtex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
-	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);  
+	DrawImage(g_texture[m_tex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 	DrawShadowedText(m_font, m_tpos[0], m_tpos[1], m_label.c_str());
 

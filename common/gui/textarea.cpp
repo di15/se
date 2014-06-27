@@ -34,10 +34,10 @@ TextArea::TextArea(Widget* parent, const char* n, const char* t, int f, void (*r
 	changefunc = change;
 	m_scroll[1] = 0;
 	m_caret = strlen(t);
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
-	CreateTexture(m_filledtex, "gui\\filled.jpg", true);
-	CreateTexture(m_uptex, "gui\\up.jpg", true);
-	CreateTexture(m_downtex, "gui\\down.jpg", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	CreateTexture(m_filledtex, "gui/filled.jpg", true, false);
+	CreateTexture(m_uptex, "gui/up.jpg", true, false);
+	CreateTexture(m_downtex, "gui/down.jpg", true, false);
 	reframe();
 	m_lines = CountLines(t, f, m_pos[0], m_pos[1], m_pos[2]-m_pos[0]-square(), m_pos[3]-m_pos[1]);
 }
@@ -47,7 +47,7 @@ void TextArea::draw()
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
 	DrawImage(g_texture[m_frametex].texname, m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-	
+
 	DrawImage(g_texture[m_frametex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[3]);
 	DrawImage(g_texture[m_uptex].texname, m_pos[2]-square(), m_pos[1], m_pos[2], m_pos[1]+square());
 	DrawImage(g_texture[m_downtex].texname, m_pos[2]-square(), m_pos[3]-square(), m_pos[2], m_pos[3]);
@@ -55,7 +55,7 @@ void TextArea::draw()
 
     float width = m_pos[2] - m_pos[0] - square();
     float height = m_pos[3] - m_pos[1];
-    
+
     DrawBoxShadText(m_font, m_pos[0], m_pos[1], width, height, m_value.c_str(), m_rgba, m_scroll[1], m_opened ? m_caret : -1);
 }
 
@@ -127,31 +127,31 @@ bool TextArea::keydown(int k)
 {
 	if(!m_opened)
 		return false;
-	
+
 	int len = m_value.length();
 
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == VK_LEFT)
+	if(k == SDLK_LEFT)
 	{
 		if(m_caret <= 0)
 			return true;
 
 		m_caret --;
 	}
-	else if(k == VK_RIGHT)
+	else if(k == SDLK_RIGHT)
 	{
 		int len = m_value.length();
-		
+
 		if(m_caret >= len)
 			return true;
 
 		m_caret ++;
 	}
-	else if(k == 190 && !g_keys[VK_SHIFT])
+	else if(k == 190 && !g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
 		placechar('.');/*
-	else if(k == VK_TAB)
+	else if(k == SDLK_TAB)
 	{
 		for(int i=0; i<g_GUI.view.size(); i++)
 		{
@@ -188,7 +188,7 @@ bool TextArea::keydown(int k)
 			}
 		}
 	}*/
-	
+
 	if(changefunc != NULL)
 		changefunc();
 
@@ -218,16 +218,16 @@ bool TextArea::charin(int k)
 {
 	if(!m_opened)
 		return false;
-	
+
 	int len = m_value.length();
 
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == VK_BACK)
+	if(k == SDLK_BACKSPACE)
 	{
 		int len = m_value.length();
-		
+
 		if(m_caret <= 0 || len <= 0)
 			return true;
 
@@ -238,10 +238,10 @@ bool TextArea::charin(int k)
 
 		m_caret--;
 	}
-	else if(k == VK_DELETE)
+	else if(k == SDLK_DELETE)
 	{
 		int len = m_value.length();
-		
+
 		if(m_caret >= len || len <= 0)
 			return true;
 
@@ -250,15 +250,15 @@ bool TextArea::charin(int k)
 		m_value = before;
 		m_value.append(after);
 	}
-	else if(k == VK_SHIFT)
+	else if(k == SDLK_LSHIFT && k == SDLK_RSHIFT)
 		return true;
-	else if(k == VK_CAPITAL)
+	else if(k == SDLK_CAPSLOCK)
 		return true;
-	else if(k == VK_SPACE)
+	else if(k == SDLK_SPACE)
 	{
 		placechar(' ');
 	}
-	else if(k == VK_RETURN)
+	else if(k == SDLK_RETURN)
 	{
 		placechar('\n');
 	}
@@ -269,7 +269,7 @@ bool TextArea::charin(int k)
 	{
 		placechar(k);
 	}
-	
+
 	if(changefunc != NULL)
 		changefunc();
 

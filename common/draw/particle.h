@@ -1,10 +1,10 @@
 
 
-#ifndef _PARTICLE_H
-#define _PARTICLE_H
+#ifndef PARTICLE_H
+#define PARTICLE_H
 
-#pragma warning(disable: 4018)
 
+#include "../utils.h"
 #include "../math/3dmath.h"
 #include "../math/vec3f.h"
 
@@ -35,15 +35,15 @@ public:
 	long last;
 
 	EmitterCounter() { last = GetTickCount(); }
-	bool EmitNext(int delay) 
-	{ 
-		if(GetTickCount()-last > delay) 
+	bool EmitNext(int delay)
+	{
+		if(GetTickCount()-last > delay)
 		{
 			last = GetTickCount();
 			return true;
-		} 
-		else 
-			return false; 
+		}
+		else
+			return false;
 	}
 };
 

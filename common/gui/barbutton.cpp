@@ -24,8 +24,8 @@ BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, void (*refr
 	m_over = false;
 	m_ldown = false;
 	m_tex = sprite;
-	CreateTexture(m_bgtex, "gui\\buttonbg.png", true);
-	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true);
+	CreateTexture(m_bgtex, "gui\\buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui\\buttonbgover.png", true, false);
 	reframefunc = reframef;
 	m_healthbar = bar;
 	clickfunc = click;
@@ -50,7 +50,7 @@ void BarButton::draw()
 	DrawSquare(1, 0, 0, 1, m_pos[0], m_pos[3]-5, m_pos[2], m_pos[3]);
 	float bar = (m_pos[2] - m_pos[0]) * m_healthbar;
 	DrawSquare(0, 1, 0, 1, m_pos[0], m_pos[3]-5, m_pos[0]+bar, m_pos[3]);
-	
+
 	EndS();
 	Ortho(g_currw, g_currh, 1, 1, 1, 1);
 }
@@ -61,7 +61,7 @@ bool BarButton::mousemove()
 	{
 		if(overfunc != NULL)
 			overfunc();
-			
+
 		m_over = true;
 
 		return true;

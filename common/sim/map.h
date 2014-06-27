@@ -16,9 +16,9 @@ class Map
 public:
 	int m_nbrush;
 	Brush* m_brush;
-	list<int> m_transpbrush;
-	list<int> m_opaquebrush;
-	list<int> m_skybrush;
+	std::list<int> m_transpbrush;
+	std::list<int> m_opaquebrush;
+	std::list<int> m_skybrush;
 
 	Map();
 	~Map();

@@ -101,42 +101,42 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 
 			if(dontqueue)
 			{
-				CreateTexture(diffm, difffile, false);
-				CreateTexture(specm, specfile, false);
-				CreateTexture(normm, normfile, false);
-				CreateTexture(ownm, ownfile, false);
+				CreateTexture(diffm, difffile, false, true);
+				CreateTexture(specm, specfile, false, true);
+				CreateTexture(normm, normfile, false, true);
+				CreateTexture(ownm, ownfile, false, true);
 
 				if(diffm == 0)
 				{
 					char msg[MAX_PATH+1];
 					sprintf(msg, "Couldn't load diffuse texture %s", difffile);
-					MessageBox(g_hWnd, msg, "Error", NULL);
+					ErrorMessage("Error", msg);
 				}
 				if(specm == 0)
 				{
 					char msg[MAX_PATH+1];
 					sprintf(msg, "Couldn't load specular texture %s", specfile);
-					MessageBox(g_hWnd, msg, "Error", NULL);
+					ErrorMessage("Error", msg);
 				}
 				if(normm == 0)
 				{
 					char msg[MAX_PATH+1];
 					sprintf(msg, "Couldn't load specular texture %s", normfile);
-					MessageBox(g_hWnd, msg, "Error", NULL);
+					ErrorMessage("Error", msg);
 				}
 				if(ownm == 0)
 				{
 					char msg[MAX_PATH+1];
 					sprintf(msg, "Couldn't load team color texture %s", ownfile);
-					MessageBox(g_hWnd, msg, "Error", NULL);
+					ErrorMessage("Error", msg);
 				}
 			}
 			else
 			{
-				QueueTexture(&diffm, difffile, false);
-				QueueTexture(&specm, specfile, false);
-				QueueTexture(&normm, normfile, false);
-				QueueTexture(&ownm, ownfile, false);
+				QueueTexture(&diffm, difffile, false, true);
+				QueueTexture(&specm, specfile, false, true);
+				QueueTexture(&normm, normfile, false, true);
+				QueueTexture(&ownm, ownfile, false, true);
 			}
 		}
 		//else
@@ -149,14 +149,14 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	FullPath(relative, full);
 
 	ifstream inputFile( full, ios::in | ios::binary );
-	if ( inputFile.fail()) 
+	if ( inputFile.fail())
 	{
 		g_log << "Couldn't open the model file "<< relative << endl;
 
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't open the model file %s", relative);
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 
 		return false;
 	}
@@ -171,19 +171,19 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	/*
 	char pathTemp[MAX_PATH+1];
 	int pathLength;
-	for ( pathLength = strlen( filename ); --pathLength; ) 
+	for ( pathLength = strlen( filename ); --pathLength; )
 	{
-		if ( filename[pathLength] == '/' || filename[pathLength] == '\\' ) 
+		if ( filename[pathLength] == '/' || filename[pathLength] == '\\' )
 			break;
 	}
 	strncpy( pathTemp, filename, pathLength );
-	
+
 	int i;
-	if ( pathLength > 0 ) 
+	if ( pathLength > 0 )
 	{
 		pathTemp[pathLength++] = '/';
 	}
-	
+
 	strncpy( m_filepath, filename, pathLength );
 	*/
 
@@ -199,25 +199,25 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	MS3DHeader *pHeader = ( MS3DHeader* )pPtr;
 	pPtr += sizeof( MS3DHeader );
 
-	if ( strncmp( pHeader->m_ID, "MS3D000000", 10 ) != 0 ) 
+	if ( strncmp( pHeader->m_ID, "MS3D000000", 10 ) != 0 )
 	{
 		g_log << "Not an MS3D file "<< relative << endl;
 		return false;
     }
 
-	if ( pHeader->m_version < 3 ) 
+	if ( pHeader->m_version < 3 )
 	{
 		g_log << "I know nothing about MS3D v1.2, " <<relative<< endl;
-		
+
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Incompatible MS3D v1.2 ", relative);
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 
 		return false;
 	}
 
-	int nVertices = *( word* )pPtr; 
+	int nVertices = *( word* )pPtr;
 	m_numVertices = nVertices;
 	m_pVertices = new Vertex[nVertices];
 	pPtr += sizeof( word );
@@ -446,7 +446,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 		vertices = (*vertexArrays)[f].vertices;
 		texcoords = (*vertexArrays)[f].texcoords;
 		normals = (*vertexArrays)[f].normals;
-  
+
 		for(int i = 0; i < m_numMeshes; i++)
 		{
 			for(int j = 0; j < m_pMeshes[i].m_numTriangles; j++)
@@ -500,7 +500,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						off.set(m_pVertices[index].m_location);
 						off = off * scale + translate;
 						off = vertices[vert] - off;
-						
+
 						g_log<<"\tyes tran "<<off.x<<","<<off.y<<","<<off.z<<" "<<endl;
 #endif
 					}
@@ -718,7 +718,7 @@ void MS3DModel::advanceanim()
 
 			transVec[0] = prevFrame.m_parameter[0]+( curFrame.m_parameter[0]-prevFrame.m_parameter[0] )*interpValue;
 			transVec[1] = prevFrame.m_parameter[1]+( curFrame.m_parameter[1]-prevFrame.m_parameter[1] )*interpValue;
-			transVec[2] = prevFrame.m_parameter[2]+( curFrame.m_parameter[2]-prevFrame.m_parameter[2] )*interpValue; 
+			transVec[2] = prevFrame.m_parameter[2]+( curFrame.m_parameter[2]-prevFrame.m_parameter[2] )*interpValue;
 		}
 
 		frame = pJoint->m_currentRotationKeyframe;
@@ -778,7 +778,7 @@ void MS3DModel::advanceanim()
 		Joint *pJoint = &m_pJoints[i];
 
 		float* m = pJoint->m_final.m_matrix;
-		
+
 		g_log<<endl<<endl;
 		g_log<<"joint #"<<i<<"  of "<<pJoint->m_parent<<endl;
 		g_log<<"["<<m[0]<<","<<m[1]<<","<<m[2]<<","<<m[3]<<"]"<<endl;

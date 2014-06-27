@@ -28,11 +28,11 @@ public:
 	void retransform();
 	void regennormals();
 	void destroy();
-	
+
 	Vec3f traceray(Vec3f line[]);
 };
 
-extern list<ModelHolder> g_modelholder;
+extern std::list<ModelHolder> g_modelholder;
 
 void FreeModelHolders();
 void DrawModelHolders();

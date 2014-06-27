@@ -12,7 +12,7 @@ Projectile g_projectile[PROJECTILES];
 void ProjectileType::Define(char* texpath)
 {
 	//CreateTexture(tex, texpath);
-	QueueTexture(&tex, texpath, true);
+	QueueTexture(&tex, texpath, true, true);
 }
 
 void LoadProjectiles()
@@ -45,7 +45,7 @@ void DrawProjectiles()
 	ProjectileType* t;
 	Vec3f start;
 	Vec3f end;
-	
+
 	float dist;
 	float sizeparallel = 8, sizeperpindicular = 1;
 	float ratio;
@@ -83,21 +83,21 @@ void DrawProjectiles()
 		/*
 		glBindTexture(GL_TEXTURE_2D, t->tex);
 		glBegin(GL_QUADS);
-		
+
 		glTexCoord2f(0, 0);		glVertex3f(a.x, a.y, a.z);
 		glTexCoord2f(0, 1);		glVertex3f(b.x, b.y, b.z);
 		glTexCoord2f(1, 1);		glVertex3f(c.x, c.y, c.z);
 		glTexCoord2f(1, 0);		glVertex3f(d.x, d.y, d.z);
 
 		glEnd();*/
-		
+
         float vertices[] =
         {
             //posx, posy posz   texx, texy
             a.x, a.y, a.z,          0, 0,
             b.x, b.y, b.z,          0, 1,
             c.x, c.y, c.z,          1, 1,
-            
+
             c.x, c.y, c.z,          1, 1,
             d.x, d.y, d.z,          1, 0,
             a.x, a.y, a.z,          0, 0
@@ -106,7 +106,7 @@ void DrawProjectiles()
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
-		
+
 #ifdef DEBUG
 		CheckGLError(__FILE__, __LINE__);
 #endif

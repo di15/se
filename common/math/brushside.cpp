@@ -43,7 +43,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 		if(!m_vindices) OutOfMem(__FILE__, __LINE__);
 		memcpy(m_vindices, original.m_vindices, sizeof(int)*(m_ntris+2));
 	}
-	
+
 	//g_log<<"end copy vindices"<<endl;
 	//g_log.flush();
 
@@ -55,7 +55,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 BrushSide::BrushSide(const BrushSide& original)
 {
 	//g_log<<"edbrushside copy constructor"<<endl;
-	
+
 	m_ntris = 0;
 	m_tris = NULL;
 	m_tceq[0] = Plane(0.1f,0.1f,0.1f,0);
@@ -84,7 +84,7 @@ BrushSide::BrushSide(const BrushSide& original)
 	//for(int i=0; i<m_ntris; i++)
 	//	m_tris[i] = original.m_tris[i];
 
-	
+
 	g_log<<"copy edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<endl;
 	g_log<<"\tueq=n("<<m_tceq[0].m_normal.x<<","<<m_tceq[0].m_normal.y<<","<<m_tceq[0].m_normal.z<<endl;
 	g_log<<"\tveq=n("<<m_tceq[1].m_normal.x<<","<<m_tceq[1].m_normal.y<<","<<m_tceq[1].m_normal.z<<endl;
@@ -157,10 +157,10 @@ Vec3f PlaneCrossAxis(Vec3f normal)
 }
 
 void BrushSide::gentexeq()
-{	
+{
 	Vec3f uaxis = Normalize(Cross(PlaneCrossAxis(m_plane.m_normal), m_plane.m_normal)) / STOREY_HEIGHT;
 	Vec3f vaxis = Normalize(Cross(uaxis, m_plane.m_normal)) / STOREY_HEIGHT;
-	
+
 	m_tceq[0] = Plane(uaxis.x, uaxis.y, uaxis.z, 0);
 	m_tceq[1] = Plane(vaxis.x, vaxis.y, vaxis.z, 0);
 }
@@ -171,7 +171,7 @@ void BrushSide::fittex()
 {
 	//Vec3f uaxis = Normalize(Cross(PlaneCrossAxis(m_plane.m_normal), m_plane.m_normal)) / STOREY_HEIGHT;
 	//Vec3f vaxis = Normalize(Cross(uaxis, m_plane.m_normal)) / STOREY_HEIGHT;
-	
+
 #ifdef FITTEX_DEBUG
 	g_log<<"fittex 1"<<endl;
 	g_log.flush();
@@ -199,7 +199,7 @@ void BrushSide::fittex()
 
 		Vec3f thisv = m_outline.m_drawoutva[i];
 		Vec3f nextv;
-		
+
 		if(i+1 < m_outline.m_edv.size())
 			nextv = m_outline.m_drawoutva[i+1];
 		else
@@ -228,7 +228,7 @@ void BrushSide::fittex()
 			}
 		}
 	}
-	
+
 #ifdef FITTEX_DEBUG
 	g_log<<"fittex 4"<<endl;
 	g_log.flush();
@@ -295,10 +295,10 @@ void BrushSide::remaptex()
 		{
 			Vec3f* v = &t->m_vertex[k];
 			Vec2f* tc = &t->m_texcoord[k];
-				
+
 			tc->x = un->x*v->x + un->y*v->y + un->z*v->z + ud;
 			tc->y = vn->x*v->x + vn->y*v->y + vn->z*v->z + vd;
-				
+
 			//g_log<<"-----------rebldg tex side"<<i<<" tri"<<j<<" vert"<<k<<"------------"<<endl;
 			//g_log<<"remaptex u = "<<un->x<<"*"<<v->x<<" + "<<un->y<<"*"<<v->y<<" + "<<un->z<<"*"<<v->z<<" + "<<ud<<" = "<<tc->x<<endl;
 			//g_log<<"remaptex v = "<<vn->x<<"*"<<v->x<<" + "<<vn->y<<"*"<<v->y<<" + "<<vn->z<<"*"<<v->z<<" + "<<vd<<" = "<<tc->y<<endl;
@@ -330,8 +330,8 @@ BrushSide::BrushSide(Vec3f normal, Vec3f point)
 
 	//g_log<<"new edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<endl;
 	//g_log.flush();
-	
-	CreateTexture(m_diffusem, "textures/notex.jpg", false);
+
+	CreateTexture(m_diffusem, "textures/notex.jpg", false, true);
 	m_specularm = m_diffusem;
 	m_normalm = m_diffusem;
 	m_ownerm = m_diffusem;
@@ -431,17 +431,17 @@ void BrushSide::vafromcut(CutBrushSide* cutside)
 			m_drawva.vertices[triidx*3+vertidx] = triitr->m_vertex[vertidx];
 			m_drawva.normals[triidx*3+vertidx] = m_plane.m_normal;
 
-			//Reconstruct the texture coordinate according 
+			//Reconstruct the texture coordinate according
 			//to the plane equation of the brush side
 
 			Vec3f vert = m_drawva.vertices[triidx*3+vertidx];
 
-			m_drawva.texcoords[triidx*3+vertidx].x 
+			m_drawva.texcoords[triidx*3+vertidx].x
 				= m_tceq[0].m_normal.x * vert.x
 				+ m_tceq[0].m_normal.y * vert.y
 				+ m_tceq[0].m_normal.z * vert.z
 				+ m_tceq[0].m_d;
-			
+
 			m_drawva.texcoords[triidx*3+vertidx].y
 				= m_tceq[1].m_normal.x * vert.x
 				+ m_tceq[1].m_normal.y * vert.y

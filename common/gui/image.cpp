@@ -24,7 +24,7 @@ Image::Image(Widget* parent, const char* nm, const char* filepath, void (*refram
 	m_type = WIDGET_IMAGE;
 	m_name = nm;
 	//CreateTexture(tex, filepath, true);
-	CreateTexture(m_tex, filepath, false);
+	CreateTexture(m_tex, filepath, false, false);
 	//CreateTexture(tex, filepath, clamp);
 	reframefunc = reframef;
 	m_texc[0] = texleft;
@@ -44,7 +44,7 @@ Image::Image(Widget* parent, const char* filepath, void (*reframef)(Widget* this
 	m_parent = parent;
 	m_type = WIDGET_IMAGE;
 	//CreateTexture(tex, filepath, true);
-	CreateTexture(m_tex, filepath, false);
+	CreateTexture(m_tex, filepath, false, false);
 	//CreateTexture(tex, filepath, clamp);
 	reframefunc = reframef;
 	m_texc[0] = texleft;

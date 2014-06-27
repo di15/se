@@ -8,8 +8,8 @@
 class UndoH	//undo history
 {
 public:
-	list<Brush> brushes;
-	list<ModelHolder> modelholders;
+	std::list<Brush> brushes;
+	std::list<ModelHolder> modelholders;
 
 	UndoH(){}
 	~UndoH();

@@ -32,7 +32,7 @@ EditBox::EditBox(Widget* parent, const char* n, const char* t, int f, void (*ref
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
-	CreateTexture(m_frametex, "gui\\frame.jpg", true);
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
 	m_param = parm;
 	changefunc2 = change2;
 	reframe();
@@ -87,7 +87,7 @@ bool EditBox::mousemove()
 	{
 		string val = drawvalue();
 		int newcaret = MatchGlyphF(val.c_str(), m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-		
+
 		if(newcaret > m_caret)
 		{
 			m_highl[0] = m_caret;
@@ -140,11 +140,11 @@ void EditBox::frameupd()
 
 		if(g_mouse.x >= m_pos[2]-5)
 		{
-			m_scroll[0] -= max(1, g_font[m_font].gheight/4.0f);
+			m_scroll[0] -= std::max(1.0f, g_font[m_font].gheight/4.0f);
 
 			string val = drawvalue();
 			int vallen = val.length();
-			
+
 			int endx = EndX(val.c_str(), vallen, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 			if(endx < m_pos[2])
@@ -157,7 +157,7 @@ void EditBox::frameupd()
 		}
 		else if(g_mouse.x <= m_pos[0]+5)
 		{
-			m_scroll[0] += max(1, g_font[m_font].gheight/4.0f);
+			m_scroll[0] += std::max(1.0f, g_font[m_font].gheight/4.0f);
 
 			if(m_scroll[0] > 0.0f)
 				m_scroll[0] = 0.0f;
@@ -169,7 +169,7 @@ void EditBox::frameupd()
 		{
 			string val = drawvalue();
 			int newcaret = MatchGlyphF(val.c_str(), m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
-		
+
 			if(newcaret > m_caret)
 			{
 				m_highl[0] = m_caret;
@@ -247,16 +247,16 @@ bool EditBox::keydown(int k)
 {
 	if(!m_opened)
 		return false;
-	
+
 	int len = m_value.length();
 
 	if(m_caret > len)
 		m_caret = len;
 /*
-	if(k == VK_BACK)
+	if(k == SDLK_BACK)
 	{
 		int len = value.length();
-		
+
 		if(caret <= 0 || len <= 0)
 			return true;
 
@@ -267,10 +267,10 @@ bool EditBox::keydown(int k)
 
 		caret--;
 	}
-	else if(k == VK_DELETE)
+	else if(k == SDLK_DELETE)
 	{
 		int len = value.length();
-		
+
 		if(caret >= len || len <= 0)
 			return true;
 
@@ -279,8 +279,8 @@ bool EditBox::keydown(int k)
 		value = before;
 		value.append(after);
 	}
-	else*/ if(k == VK_LEFT)
-	{	
+	else*/ if(k == SDLK_LEFT)
+	{
 		if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 		{
 			m_caret = m_highl[0];
@@ -290,7 +290,7 @@ bool EditBox::keydown(int k)
 			return true;
 		else
 			m_caret --;
-		
+
 		string val = drawvalue();
 		int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -300,7 +300,7 @@ bool EditBox::keydown(int k)
 		if(endx <= m_pos[0])
 			m_scroll[0] += m_pos[0] - endx + 1;
 	}
-	else if(k == VK_RIGHT)
+	else if(k == SDLK_RIGHT)
 	{
 		int len = m_value.length();
 
@@ -313,21 +313,21 @@ bool EditBox::keydown(int k)
 			return true;
 		else
 			m_caret ++;
-		
+
 		string val = drawvalue();
 		int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 		if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == 190 && !g_keys[VK_SHIFT])
+	else if(k == 190 && !g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
 		placechar('.');
 	/*
-	else if(k == VK_SHIFT)
+	else if(k == SDLK_SHIFT)
 		return true;
-	else if(k == VK_CAPITAL)
+	else if(k == SDLK_CAPITAL)
 		return true;
-	else if(k == VK_SPACE)
+	else if(k == SDLK_SPACE)
 	{
 		int len = value.length();
 
@@ -349,7 +349,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(!g_keys[VK_SHIFT] && !g_keys[VK_CAPITAL])
+		if(!g_keys[SDLK_SHIFT] && !g_keys[SDLK_CAPITAL])
 			addchar += 32;
 
 		string before = value.substr(0, caret);
@@ -366,7 +366,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(g_keys[VK_SHIFT])
+		if(g_keys[SDLK_SHIFT])
 		{
 			if(k == 190)
 				addchar = '>';
@@ -380,7 +380,7 @@ bool EditBox::keydown(int k)
 			else if(k == 188)
 				addchar = ',';
 		}
-		
+
 		string before = value.substr(0, caret);
 		string after = value.substr(caret, len-caret);
 		value = before + addchar + after;
@@ -395,7 +395,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(g_keys[VK_SHIFT])
+		if(g_keys[SDLK_SHIFT])
 		{
 			if(k == '0')
 				addchar = ')';
@@ -427,7 +427,7 @@ bool EditBox::keydown(int k)
 		caret ++;
 	}*/
 	/*
-	else if(k == VK_TAB)
+	else if(k == SDLK_TAB)
 	{
 		for(int i=0; i<g_GUI.view.size(); i++)
 		{
@@ -464,7 +464,7 @@ bool EditBox::keydown(int k)
 			}
 		}
 	}*/
-	
+
 	if(changefunc2 != NULL)
 		changefunc2(m_param);
 
@@ -509,7 +509,7 @@ void EditBox::placechar(int k)
 		m_value = before + addchar + after;
 		m_caret ++;
 	}
-	
+
 	string val = drawvalue();
 	int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -531,7 +531,7 @@ void EditBox::placestr(const char* str)
 		addlen = m_maxlen - len;
 
 	char* addstr = new char[addlen+1];
-	
+
 	if(addlen > 0)
 	{
 		for(int i=0; i<addlen; i++)
@@ -566,7 +566,7 @@ void EditBox::placestr(const char* str)
 		m_value = before + addstr + after;
 		m_caret += addlen;
 	}
-	
+
 	string val = drawvalue();
 	int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -588,7 +588,7 @@ void EditBox::changevalue(const char* str)
 		setlen = m_maxlen;
 
 	char* setstr = new char[setlen+1];
-	
+
 	for(int i=0; i<setlen; i++)
 		setstr[i] = str[i];
 	setstr[setlen] = '\0';
@@ -606,13 +606,13 @@ bool EditBox::charin(int k)
 {
 	if(!m_opened)
 		return false;
-	
+
 	int len = m_value.length();
 
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == VK_BACK)
+	if(k == SDLK_BACKSPACE)
 	{
 		int len = m_value.length();
 
@@ -636,7 +636,7 @@ bool EditBox::charin(int k)
 
 			m_caret--;
 		}
-		
+
 		string val = drawvalue();
 		int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -645,10 +645,10 @@ bool EditBox::charin(int k)
 		else if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == VK_DELETE)
+	else if(k == SDLK_DELETE)
 	{
 		int len = m_value.length();
-		
+
 		if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 		{
 			string before = m_value.substr(0, m_highl[0]);
@@ -667,7 +667,7 @@ bool EditBox::charin(int k)
 			m_value = before;
 			m_value.append(after);
 		}
-		
+
 		string val = drawvalue();
 		int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -676,25 +676,25 @@ bool EditBox::charin(int k)
 		else if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == VK_SHIFT)
+	else if(k == SDLK_LSHIFT || k == SDLK_RSHIFT)
 		return true;
-	else if(k == VK_CAPITAL)
+	else if(k == SDLK_CAPSLOCK)
 		return true;
-	else if(k == VK_RETURN)
+	else if(k == SDLK_RETURN)
 		return true;
-	else if(k == VK_SPACE)
+	else if(k == SDLK_SPACE)
 	{
 		placechar(' ');
 	}
-	else 
+	else
 	{
-		
+
 #ifdef PASTE_DEBUG
 		g_log<<"charin "<<(char)k<<" ("<<k<<")"<<endl;
 		g_log.flush();
 #endif
 
-		//if(k == 'C' && g_keys[VK_CONTROL])
+		//if(k == 'C' && g_keys[SDLK_CONTROL])
 		if(k == 3)	//copy
 		{
 #ifdef PASTE_DEBUG
@@ -702,6 +702,7 @@ bool EditBox::charin(int k)
 			g_log.flush();
 #endif
 
+#ifdef PLATFORM_WIN
 			if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 			{
 				string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
@@ -726,20 +727,22 @@ bool EditBox::charin(int k)
 				SetClipboardData(CF_TEXT, hMem);
 				CloseClipboard();
 			}
+#endif
 		}
-		//else if(k == 'V' && g_keys[VK_CONTROL])
+		//else if(k == 'V' && g_keys[SDLK_CONTROL])
 		else if(k == 22)	//paste
 		{
+#ifdef PLATFORM_WIN32
 #ifdef PASTE_DEBUG
 			g_log<<"paste"<<endl;
 #endif
 			OpenClipboard(NULL);
-			
+
 #ifdef PASTE_DEBUG
 			g_log<<"paste1"<<endl;
 #endif
 			HANDLE clip0 = GetClipboardData(CF_TEXT);
-			
+
 #ifdef PASTE_DEBUG
 			g_log<<"paste2"<<endl;
 #endif
@@ -759,14 +762,15 @@ bool EditBox::charin(int k)
 			g_log.flush();
 			GlobalUnlock(clip0);
 			CloseClipboard();
+#endif
 		}
-		//else if(k == 'A' && g_keys[VK_CONTROL])
+		//else if(k == 'A' && g_keys[SDLK_CONTROL])
 		else if(k == 1)	//select all
 		{
 			m_highl[0] = 0;
 			m_highl[1] = m_value.length()+1;
 			m_caret = -1;
-			
+
 			string val = drawvalue();
 			int endx = EndX(val.c_str(), m_value.length(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
@@ -779,7 +783,7 @@ bool EditBox::charin(int k)
 		else
 			placechar(k);
 	}
-	
+
 	if(changefunc != NULL)
 		changefunc();
 

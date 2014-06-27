@@ -9,7 +9,7 @@
 class Polyg	//name shortened due to naming conflict on Windows
 {
 public:
-	list<Vec3f> m_edv;	//used for constructing the polygon on-the-fly
+	std::list<Vec3f> m_edv;	//used for constructing the polygon on-the-fly
 	Vec3f* m_drawoutva;		//used for drawing outline
 
 	Polyg();

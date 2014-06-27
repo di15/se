@@ -27,7 +27,7 @@ void InitOnce()
 	{
 		g_entity[i] = NULL;
 	}
-		
+
 	themodel = 0;
 
 	Vec3f charMax = Vec3f(10.0f, 3.4f, 10.0f) * 2.57f;
@@ -47,5 +47,5 @@ void Queue()
 	// 73 units to 188 cm (2.57 ratio)
 	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(2.57f,2.57f,2.57f), Vec3f(0,188,0));
 
-	QueueTexture(&g_circle, "gui/circle.png", true);
+	QueueTexture(&g_circle, "gui/circle.png", true, true);
 }

@@ -18,9 +18,9 @@ extern ModelHolder g_copyM;
 
 extern int g_edtool;
 
-void DrawFilled(EdMap* map, list<ModelHolder>& modelholder);
-void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder);
-void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder);
+void DrawFilled(EdMap* map, std::list<ModelHolder>& modelholder);
+void DrawOutlines(EdMap* map, std::list<ModelHolder>& modelholder);
+void DrawSelOutlines(EdMap* map, std::list<ModelHolder>& modelholder);
 void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp);
 bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, bool persp);
 void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax);

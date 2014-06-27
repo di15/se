@@ -160,7 +160,7 @@ void SaveEdDoor(FILE* fp, EdDoor* door, int* texrefs)
 	Vec3f axis;
 	Vec3f point;
 	float opendeg;	//open degrees
-	bool startopen; 
+	bool startopen;
 	Brush* brushp;
 	Brush closedstate;*/
 
@@ -168,7 +168,7 @@ void SaveEdDoor(FILE* fp, EdDoor* door, int* texrefs)
 	fwrite(&door->point, sizeof(Vec3f), 1, fp);
 	fwrite(&door->opendeg, sizeof(float), 1, fp);
 	fwrite(&door->startopen, sizeof(bool), 1, fp);
-	
+
 	fwrite(&door->m_nsides, sizeof(int), 1, fp);
 	for(int i=0; i<door->m_nsides; i++)
 		SaveEdBrushSide(fp, &door->m_sides[i], texrefs);
@@ -191,7 +191,7 @@ void ReadEdDoor(FILE* fp, EdDoor* door, TexRef* texrefs)
 	Vec3f axis;
 	Vec3f point;
 	float opendeg;	//open degrees
-	bool startopen; 
+	bool startopen;
 	Brush* brushp;
 	Brush closedstate;*/
 
@@ -206,7 +206,7 @@ void ReadEdDoor(FILE* fp, EdDoor* door, TexRef* texrefs)
 
 	fread(&door->m_nsides, sizeof(int), 1, fp);
 
-	
+
 #if 0
 	char msg[128];
 	sprintf(msg, "door sides %d", door->m_nsides);
@@ -328,7 +328,7 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 {
 	int nrefs;
 	fread(&nrefs, sizeof(int), 1, fp);
-	
+
 #ifdef LOADMAP_DEBUG
 	g_log<<"nrefs = "<<nrefs<<endl;
 	g_log.flush();
@@ -350,7 +350,7 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 #endif
 		tr->filepath = filepath;
 		delete [] filepath;
-		CreateTexture(tr->diffindex, tr->filepath.c_str(), false);
+		CreateTexture(tr->diffindex, tr->filepath.c_str(), false, true);
 		tr->texname = g_texture[tr->diffindex].texname;
 
 		char basepath[MAX_PATH+1];
@@ -360,17 +360,17 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 		char specpath[MAX_PATH+1];
 		SpecPath(basepath, specpath);
 
-		CreateTexture(tr->specindex, specpath, false);
+		CreateTexture(tr->specindex, specpath, false, true);
 
 		char normpath[MAX_PATH+1];
 		NormPath(basepath, normpath);
 
-		CreateTexture(tr->normindex, normpath, false);
-		
+		CreateTexture(tr->normindex, normpath, false, true);
+
 		char ownpath[MAX_PATH+1];
 		OwnPath(basepath, ownpath);
 
-		CreateTexture(tr->ownindex, ownpath, false);
+		CreateTexture(tr->ownindex, ownpath, false, true);
 	}
 }
 
@@ -491,7 +491,7 @@ void ScaleAll(float factor)
 		}
 
 		b->collapse();
-		
+
 		auto oldu = oldus.begin();
 		auto oldv = oldvs.begin();
 
@@ -500,7 +500,7 @@ void ScaleAll(float factor)
 			BrushSide* s = &b->m_sides[i];
 
 			Vec3f newsharedv = b->m_sharedv[ s->m_vindices[0] ];
-			
+
 			float newu = newsharedv.x*s->m_tceq[0].m_normal.x + newsharedv.y*s->m_tceq[0].m_normal.y + newsharedv.z*s->m_tceq[0].m_normal.z + s->m_tceq[0].m_d;
 			float newv = newsharedv.x*s->m_tceq[1].m_normal.x + newsharedv.y*s->m_tceq[1].m_normal.y + newsharedv.z*s->m_tceq[1].m_normal.z + s->m_tceq[1].m_d;
 			float changeu = newu - *oldu;
@@ -508,13 +508,13 @@ void ScaleAll(float factor)
 			s->m_tceq[0].m_d -= changeu;
 			s->m_tceq[1].m_d -= changev;
 		}
-		
+
 		b->remaptex();
 	}
 
 	char msg[128];
 	sprintf(msg, "scaled %f", factor);
-	MessageBox(g_hWnd, msg, "asdasd", NULL);
+	InfoMessage("asd", msg);
 }
 
 bool LoadEdMap(const char* fullpath, EdMap* map)
@@ -528,16 +528,16 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 
 	char tag[5];
 	fread(tag, sizeof(char), 5, fp);
-	
+
 	char realtag[] = TAG_EDMAP;
 	//if(false)
 	if(tag[0] != realtag[0] ||  tag[1] != realtag[1] || tag[2] != realtag[2] || tag[3] != realtag[3] || tag[4] != realtag[4])
 	{
 		fclose(fp);
-		MessageBox(g_hWnd, "Not a project file (invalid header tag).", "Error", NULL);
+		ErrorMessage("Error", "Not a project file (invalid header tag).");
 		return false;
 	}
-	
+
 	float version;
 	fread(&version, sizeof(float), 1, fp);
 
@@ -545,11 +545,10 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	{
 		fclose(fp);
 		char msg[128];
-		sprintf(msg, "Map project's version (%f) doesn't match %f.", version, EDMAP_VERSION);
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 		return false;
 	}
-	
+
 #ifdef LOADMAP_DEBUG
 	g_log<<"load map 1"<<endl;
 	g_log.flush();
@@ -580,7 +579,7 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 #endif
 
 	fclose(fp);
-	
+
 #ifdef LOADMAP_DEBUG
 	g_log<<"load map 3"<<endl;
 	g_log.flush();

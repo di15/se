@@ -20,10 +20,10 @@ void BrushAttribTex(Brush* brush)
 		BrushSide* side = &brush->m_sides[sideidx];
 
 		int sidetex = side->m_diffusem;
-		
+
 		if(g_texture[sidetex].transp)
 			finaltex = sidetex;
-		
+
 		if(g_texture[sidetex].grate)
 			finaltex = sidetex;
 
@@ -32,7 +32,7 @@ void BrushAttribTex(Brush* brush)
 
 		if(g_texture[sidetex].passthru)
 			finaltex = sidetex;
-		
+
 		if(g_texture[sidetex].fabric)
 			finaltex = sidetex;
 	}
@@ -41,10 +41,10 @@ void BrushAttribTex(Brush* brush)
 }
 
 // Compile a list of textures used by map brushes
-// and save that table to file. Also, a list of 
+// and save that table to file. Also, a list of
 // texture references is set (texrefs) that
 // indexes into the written texture table based
-// on the diffuse texture index (which indexes into 
+// on the diffuse texture index (which indexes into
 // g_texture, the global texture array).
 void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 {
@@ -119,11 +119,11 @@ void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 			compilation.push_back(tr);
 		}
 	}
-	
+
 	//Write the texture table to file.
 	int nrefs = compilation.size();
 	fwrite(&nrefs, sizeof(int), 1, fp);
-	
+
 #if 0
 	g_log<<"writing "<<nrefs<<" tex refs"<<endl;
 	g_log.flush();
@@ -135,7 +135,7 @@ void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 		texrefs[ i->diffindex ] = j;
 		int strl = i->filepath.length()+1;
 		fwrite(&strl, sizeof(int), 1, fp);
-		
+
 #if 0
 		g_log<<"writing "<<strl<<"-long tex ref"<<endl;
 		g_log.flush();
@@ -149,7 +149,7 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 {
 	int nrefs;
 	fread(&nrefs, sizeof(int), 1, fp);
-	
+
 #if 0
 	g_log<<"reading "<<nrefs<<" tex refs"<<endl;
 	g_log.flush();
@@ -167,7 +167,7 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 		TexRef* tr = &(*texrefs)[i];
 		int strl;
 		fread(&strl, sizeof(int), 1, fp);
-		
+
 #if 0
 		g_log<<"reading "<<strl<<"-long tex ref"<<endl;
 		g_log.flush();
@@ -181,7 +181,7 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 #endif
 		tr->filepath = filepath;
 		delete [] filepath;
-		CreateTexture(tr->diffindex, tr->filepath.c_str(), false);
+		CreateTexture(tr->diffindex, tr->filepath.c_str(), false, true);
 		tr->texname = g_texture[tr->diffindex].texname;
 
 		char basepath[MAX_PATH+1];
@@ -191,12 +191,17 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 		char specpath[MAX_PATH+1];
 		SpecPath(basepath, specpath);
 
-		CreateTexture(tr->specindex, specpath, false);
+		CreateTexture(tr->specindex, specpath, false, true);
 
 		char normpath[MAX_PATH+1];
 		NormPath(basepath, normpath);
 
-		CreateTexture(tr->normindex, normpath, false);
+		CreateTexture(tr->normindex, normpath, false, true);
+
+		char ownpath[MAX_PATH+1];
+		OwnPath(basepath, ownpath);
+
+		CreateTexture(tr->ownindex, ownpath, false, true);
 	}
 }
 
@@ -204,18 +209,18 @@ void SaveBrushes(FILE* fp, int* texrefs, list<Brush>& brushes)
 {
 	int nbrush = brushes.size();
 	fwrite(&nbrush, sizeof(int), 1, fp);
-	
+
 #if 0
 	g_log<<"writing "<<nbrush<<" brushes at "<<ftell(fp)<<endl;
 	g_log.flush();
-	
+
 	int i=0;
 #endif
 
 	for(auto b=brushes.begin(); b!=brushes.end(); b++)
 	{
 		SaveBrush(fp, texrefs, &*b);
-		
+
 #if 0
 		g_log<<"wrote brush "<<i<<" end at "<<ftell(fp)<<endl;
 		i++;
@@ -286,7 +291,7 @@ void SaveBrushRefs(FILE* fp, list<Brush>& brushes)
 	{
 		fwrite(&*refitr, sizeof(int), 1, fp);
 	}
-	
+
 	// Transparent brushes
 	nbrushrefs = transpbrushrefs.size();
 	fwrite(&nbrushrefs, sizeof(int), 1, fp);
@@ -295,7 +300,7 @@ void SaveBrushRefs(FILE* fp, list<Brush>& brushes)
 	{
 		fwrite(&*refitr, sizeof(int), 1, fp);
 	}
-	
+
 	// Sky brushes
 	nbrushrefs = skybrushrefs.size();
 	fwrite(&nbrushrefs, sizeof(int), 1, fp);
@@ -318,7 +323,7 @@ void ReadBrushRefs(FILE* fp, Map* map)
 		fread(&ref, sizeof(int), 1, fp);
 		map->m_opaquebrush.push_back(ref);
 	}
-	
+
 	// Transparent brushes
 	nbrushrefs = 0;
 	fread(&nbrushrefs, sizeof(int), 1, fp);
@@ -328,7 +333,7 @@ void ReadBrushRefs(FILE* fp, Map* map)
 		fread(&ref, sizeof(int), 1, fp);
 		map->m_transpbrush.push_back(ref);
 	}
-	
+
 	// Sky brushes
 	nbrushrefs = 0;
 	fread(&nbrushrefs, sizeof(int), 1, fp);
@@ -341,7 +346,7 @@ void ReadBrushRefs(FILE* fp, Map* map)
 }
 
 void SaveMap(const char* fullpath, list<Brush>& brushes)
-{	
+{
 	FILE* fp = fopen(fullpath, "wb");
 
 	char tag[] = TAG_MAP;
@@ -356,7 +361,7 @@ void SaveMap(const char* fullpath, list<Brush>& brushes)
 
 	int texrefs[TEXTURES];
 	SaveTexs(fp, texrefs, brushes);
-	
+
 #if 0
 	g_log<<"write brushes at "<<ftell(fp)<<endl;
 	g_log.flush();
@@ -408,16 +413,16 @@ bool LoadMap(const char* fullpath, Map* map)
 
 	char tag[5];
 	fread(tag, sizeof(char), 5, fp);
-	
+
 	char realtag[] = TAG_MAP;
 	//if(false)
 	if(tag[0] != realtag[0] ||  tag[1] != realtag[1] || tag[2] != realtag[2] || tag[3] != realtag[3] || tag[4] != realtag[4])
 	{
 		fclose(fp);
-		MessageBox(g_hWnd, "Not a map file (invalid header tag).", "Error", NULL);
+		ErrorMessage("Error", "Not a map file (invalid header tag).");
 		return false;
 	}
-	
+
 	float version;
 	fread(&version, sizeof(float), 1, fp);
 
@@ -426,10 +431,10 @@ bool LoadMap(const char* fullpath, Map* map)
 		fclose(fp);
 		char msg[128];
 		sprintf(msg, "Map's version (%f) doesn't match %f.", version, MAP_VERSION);
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 		return false;
 	}
-	
+
 #ifdef LOADMAP_DEBUG
 	g_log<<"load map 1"<<endl;
 	g_log.flush();
@@ -459,7 +464,7 @@ bool LoadMap(const char* fullpath, Map* map)
 #endif
 
 	fclose(fp);
-	
+
 #ifdef LOADMAP_DEBUG
 	g_log<<"load map 3"<<endl;
 	g_log.flush();

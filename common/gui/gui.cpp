@@ -26,7 +26,7 @@ void GUI::draw()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	Ortho(g_width, g_height, 1, 1, 1, 1);
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 	LastNum(__FILE__, __LINE__);
@@ -45,7 +45,7 @@ void GUI::draw()
 			i->draw();
 		}
 	}
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 	LastNum(__FILE__, __LINE__);
@@ -63,7 +63,7 @@ void GUI::draw()
 		}
 
 	//DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
-	
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 	LastNum(__FILE__, __LINE__);
@@ -193,7 +193,7 @@ void Status(const char* status, bool logthis)
 		upper[i] = toupper(status[i]);
 	}
 	upper[i] = '\0';*/
-	
+
 	//g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = upper;
 	g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = status;
 }
@@ -201,28 +201,19 @@ void Status(const char* status, bool logthis)
 bool MousePosition()
 {
 	Vec2i old = g_mouse;
-	POINT mouse;
-	GetCursorPos(&mouse);
-	ScreenToClient(g_hWnd, &mouse);
+	SDL_GetMouseState(&g_mouse.x, &g_mouse.y);
 
-	if(mouse.x == old.x && mouse.y == old.y)
+	if(g_mouse.x == old.x && g_mouse.y == old.y)
 		return false;
-
-	g_mouse.x = mouse.x;
-	g_mouse.y = mouse.y;
 
 	return true;
 }
 
-void CenterMoUseS()
+void CenterMouse()
 {
 	g_mouse.x = g_width/2;
 	g_mouse.y = g_height/2;
-	POINT temp;
-	temp.x = g_mouse.x;
-	temp.y = g_mouse.y;
-	ClientToScreen(g_hWnd, &temp);
-	SetCursorPos(temp.x, temp.y);
+	SDL_WarpMouseInWindow(g_window, g_mouse.x, g_mouse.y);
 }
 
 void Ortho(int width, int height, float r, float g, float b, float a)
