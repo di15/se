@@ -10,6 +10,7 @@
 #include "../window.h"
 #include "../utils.h"
 #include "gui.h"
+#include "../debug.h"
 
 Font g_font[FONTS];
 
@@ -151,6 +152,9 @@ void AdvanceGlyph()
 {
     Font* f = &g_font[font];
     Glyph* g = &f->glyph[str[i]];
+	
+	//g_log<<"Adv Glyph: "<<(char)str[i]<<endl;
+
     x += g->origsize[0];
 }
 
@@ -331,10 +335,26 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
     glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
     glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
-    
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
+
     glDrawArrays(GL_TRIANGLES, 0, 6);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 }
 
 void DrawGlyphF(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
@@ -453,7 +473,7 @@ void HighlGlyphF(float left, float top, float right, float bottom)
         newleft, newtop,0,
     };
 	
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+    glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
     
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -500,31 +520,69 @@ void DrawLine(int fnt, float startx, float starty, const char* text, const float
 
 void DrawShadowedText(int fnt, float startx, float starty, const char* text, const float* color, int caret)
 {
+	//g_log<<"text dst: "<<text<<endl;
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
+
     //glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
     glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.0f, 0.0f, 0.0f, color != NULL ? color[3] : 1);
 	//glColor4f(0, 0, 0, 1);
-
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	StartText(text, fnt, g_currw*2, g_currh*2, 0, startx);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	UseFontTex();
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	TextLayer(startx+1, starty);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
     DrawLine(caret);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	TextLayer(startx, starty+1);
     DrawLine(caret);
 	TextLayer(startx+1, starty+1);
     DrawLine(caret);
     
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
     if(color == NULL)
         glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 		//glColor4f(1, 1, 1, 1);
     else
         glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
 		//glColor4f(color[0], color[1], color[2], color[3]);
-
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	TextLayer(startx, starty);
     DrawLine(caret);
     
     glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	//glColor4f(1, 1, 1, 1);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 }
 
 
@@ -556,6 +614,7 @@ void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float
 
 void HighlightF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const char* text, int starti, int endi)
 {
+	EndS();
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
@@ -788,11 +847,6 @@ int TextWidth(int fnt, const char* text)
 
 void LoadFonts()
 {
-    LoadFont(FONT_CORBEL28, "fonts/corbel28");
-    LoadFont(FONT_EUROSTILE16, "fonts/eurostile16");
-    LoadFont(FONT_EUROSTILE32, "fonts/eurostile32");
-    LoadFont(FONT_GULIM10, "fonts/gulim10");
-    LoadFont(FONT_GULIM16, "fonts/gulim16");
     LoadFont(FONT_GULIM32, "fonts/gulim32");
     LoadFont(FONT_MSUIGOTHIC10, "fonts/msuigothic10");
     LoadFont(FONT_MSUIGOTHIC16, "fonts/msuigothic16");

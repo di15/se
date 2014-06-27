@@ -84,25 +84,60 @@ void DrawVA(VertexArray* va, Vec3f pos)
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-    glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+    if(s->m_slot[SSLOT_TEXCOORD0] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    if(s->m_slot[SSLOT_NORMAL] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+	
+	//if(s->m_slot[SSLOT_TEXCOORD0] == -1) g_log<<"s->m_slot[SSLOT_TEXCOORD0] = -1"<<endl;
+	//if(s->m_slot[SSLOT_NORMAL] == -1) g_log<<"s->m_slot[SSLOT_NORMAL] = -1"<<endl;
+	g_log.flush();
+
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
 
-void Model::usetex()
+void DrawVADepth(VertexArray* va, Vec3f pos)
+{	
+	Shader* s = &g_shader[g_curS];
+
+	Matrix modelmat;
+    modelmat.setTranslation((const float*)&pos);
+    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    //glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+}
+
+void Model::usedifftex()
 {	
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_diffusem ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
+}
 
+
+void Model::usespectex()
+{
 	glActiveTextureARB(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_specularm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SPECULARMAP], 1);
+}
 
+void Model::usenormtex()
+{
 	glActiveTextureARB(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_normalm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_NORMALMAP], 2);
+}
 
+void Model::useteamtex()
+{
 	glActiveTextureARB(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_ownerm ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
@@ -122,13 +157,45 @@ void Model::draw(int frame, Vec3f pos, float yaw)
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m_va[frame];
-
-	usetex();
+	
+	usedifftex();
+	usespectex();
+	usenormtex();
+	useteamtex();
     
     glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
     glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
     glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+}
 
+void Model::drawdepth(int frame, Vec3f pos, float yaw)
+{
+	Shader* s = &g_shader[g_curS];
+
+	float pitch = 0;
+	Matrix modelmat;
+    float radians[] = {DEGTORAD(pitch), DEGTORAD(yaw), 0};
+    modelmat.setTranslation((const float*)&pos);
+    Matrix rotation;
+    rotation.setRotationRadians(radians);
+    modelmat.postMultiply(rotation);
+    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	VertexArray* va = &m_va[frame];
+
+	usedifftex();
+    
+    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 }
 

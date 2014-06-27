@@ -217,7 +217,10 @@ void DrawBillboards()
 		glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[0]);
 		glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, &vertices[3]);
 		//glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, va->normals);
-
+		
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 

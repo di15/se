@@ -6,6 +6,8 @@
 #include "../math/quaternion.h"
 #include "../math/vec4f.h"
 #include "compilemap.h"
+#include "../platform.h"
+#include "../utils.h"
 
 list<ModelHolder> g_modelholder;
 
@@ -251,6 +253,13 @@ Vec3f ModelHolder::traceray(Vec3f line[])
 	float planedists[6];
 	MakeHull(planenorms, planedists, Vec3f(0,0,0), absmin, absmax);
 
+#if 0
+	for(int i=0; i<6; i++)
+	{
+		g_log<<"mh pl ("<<planenorms[i].x<<","<<planenorms[i].y<<","<<planenorms[i].z<<"),"<<planedists[i]<<endl;
+	}
+#endif
+
 	if(LineInterHull(line, planenorms, planedists, 6))
 	{
 		return (absmin+absmax)/2.0f;
@@ -270,8 +279,43 @@ void DrawModelHolders()
 	{
 		ModelHolder* h = &*iter;
 		Model* m = &g_model[h->model];
-
-		m->usetex();
+		
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		m->usedifftex();
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		m->usespectex();
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		m->usenormtex();
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		m->useteamtex();
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		//DrawVA(&m->m_va[rand()%10], h->translation);
 		DrawVA(&h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ], h->translation);
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+	}
+}
+
+void DrawModelHoldersDepth()
+{
+	for(auto iter = g_modelholder.begin(); iter != g_modelholder.end(); iter++)
+	{
+		ModelHolder* h = &*iter;
+		Model* m = &g_model[h->model];
+
+		m->usedifftex();
+		//DrawVA(&m->m_va[rand()%10], h->translation);
+		DrawVADepth(&h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ], h->translation);
 	}
 }

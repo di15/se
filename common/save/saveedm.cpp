@@ -408,8 +408,8 @@ void ReadModelHolder(FILE* fp, ModelHolder* pmh)
 
 	char* relative = new char[nrelative];
 	fread(relative, sizeof(char), nrelative, fp);
-
 	pmh->model = LoadModel(relative, Vec3f(1,1,1), Vec3f(0,0,0), true);
+	delete [] relative;
 
 	fread(&pmh->rotdegrees, sizeof(Vec3f), 1, fp);
 	fread(&pmh->translation, sizeof(Vec3f), 1, fp);
@@ -600,6 +600,7 @@ void FreeEdMap(EdMap* map)
 	g_dragD = -1;
 	g_dragW = false;
 	g_dragM = -1;
+	g_selM.clear();
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
@@ -613,6 +614,8 @@ void FreeEdMap(EdMap* map)
 				FreeTexture(s->m_specularm);
 			if(s->m_normalm != 0)
 				FreeTexture(s->m_normalm);
+			if(s->m_ownerm != 0)
+				FreeTexture(s->m_ownerm);
 		}
 	}
 

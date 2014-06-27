@@ -92,6 +92,26 @@ extern PFNGLUNIFORM4FPROC glUniform4f;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
+extern PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers;
+extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLSHADERSOURCEPROC glShaderSource;
+extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+extern PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
+
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int* attribList);
 
 #define SSLOT_SHADOWMAP			0
 #define SSLOT_LIGHTMATRIX		1
@@ -185,11 +205,13 @@ extern Shader g_shader[SHADERS];
 extern int g_curS;
 
 void UseS(int shader);
+void EndS();
 void InitGLSL();
 void TurnOffShader();
 void ReleaseShaders();
 string LoadTextFile(char* strFile);
 void LoadShader(int shader, char* strVertex, char* strFragment);
+void GetGLVersion(int* major, int* minor);
 
 #endif
 

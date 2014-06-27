@@ -88,4 +88,8 @@ extern HWND g_hWnd;
 extern HINSTANCE g_hInstance;
 #endif
 
+//#define DEMO
+//#define DEBUG
+//#define FAST
+
 #endif

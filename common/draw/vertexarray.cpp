@@ -12,6 +12,7 @@ VertexArray::VertexArray(const VertexArray& original)
 	memcpy(texcoords, original.texcoords, sizeof(Vec2f)*numverts);
 	memcpy(normals, original.normals, sizeof(Vec3f)*numverts);*/
 
+	numverts = 0;
 	*this = original;
 }
 

@@ -396,6 +396,7 @@ void Brush::add(BrushSide b)
 #endif
 
 	BrushSide* newsides = new BrushSide[m_nsides + 1];
+	if(!newsides) OutOfMem(__FILE__, __LINE__);
 	
 	if(m_nsides > 0)
 	{
@@ -459,6 +460,7 @@ void Brush::getsides(int* nsides, BrushSide** sides)
 void Brush::removeside(int i)
 {
 	BrushSide* newsides = new BrushSide[m_nsides-1];
+	if(!newsides) OutOfMem(__FILE__, __LINE__);
 
 	memcpy(&newsides[0], &m_sides[0], sizeof(BrushSide)*i);
 	memcpy(&newsides[i], &m_sides[i+1], sizeof(BrushSide)*(m_nsides-i-1));
@@ -542,6 +544,7 @@ void Brush::collapse()
 #endif
 	
 	list<Line>* sideedges = new list<Line>[m_nsides];	// a line along a plane intersecting two other planes. both vertices form the edge of a polygon.
+	if(!sideedges) OutOfMem(__FILE__, __LINE__);
 
 	for(int i=0; i<m_nsides; i++)
 	{
@@ -968,7 +971,8 @@ void Brush::collapse()
 	
 	//delete [] sidepolys;
 	bool* removes = new bool[m_nsides];	//degenerate sides to remove
-	
+	if(!removes) OutOfMem(__FILE__, __LINE__);
+
 	//remove bounding planes outside of the brush.
 	//if brush side has no side edges, remove it.
 	for(int i=0; i<m_nsides; i++)
@@ -1159,11 +1163,20 @@ bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const
 		Vec3f inter;
         if(LineInterPlane(line, norms[i], -ds[i], &inter))
         {
+#if 0
+			g_log<<"inter"<<i<<" at "<<inter.x<<","<<inter.y<<","<<inter.z<<endl;
+#endif
+
 			bool allin = true;
 			for(int j=0; j<numplanes; j++)
 			{
 				if(i == j)
 					continue;
+
+#if 0
+				float result = inter.x*norms[j].x + inter.y*norms[j].y + inter.z*norms[j].z + ds[j];
+				g_log<<"pldot"<<j<<" = "<<result<<endl;
+#endif
 
 				if(!PointOnOrBehindPlane(inter, norms[j], ds[j]))
 				{

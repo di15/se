@@ -8,7 +8,7 @@
 #include "selection.h"
 
 int themodel;
-float g_maxelev = 1000;
+float g_maxelev = 10000;
 
 #if 0
 class Kilobyte

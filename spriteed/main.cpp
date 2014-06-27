@@ -26,6 +26,7 @@
 #include "../common/save/compilemap.h"
 #include "../common/save/modelholder.h"
 #include "../common/tool/rendersprite.h"
+#include "../common/debug.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
@@ -161,10 +162,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case WM_SIZE:
 		{
-			Resize(LOWORD(lParam), HIWORD(lParam)); 
+ 
 			//g_selectedRes.width = g_width;
 			//g_selectedRes.height = g_height;
 			//WriteConfig();
+
+			if(g_mode == PREREND_ADJFRAME)
+			{
+#ifdef DEBUG
+				g_log<<"to r"<<endl;
+				g_log<<"rf"<<g_renderframe<<" rsz "<<g_deswidth<<","<<g_desheight<<endl;
+#endif
+				Resize(g_deswidth, g_desheight);
+				g_mode = RENDERING;
+			}
+			else
+			{
+#ifdef DEBUG
+				g_log<<"rf"<<g_renderframe<<" rsz "<<(LOWORD(lParam))<<","<<(HIWORD(lParam))<<endl;
+#endif
+				Resize(LOWORD(lParam), HIWORD(lParam));
+			}
+
 			return 0;
 		}
 	}
@@ -172,90 +191,87 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-void AfterDraw(Matrix projection, Matrix viewmat, Matrix modelmat)
-{
-	//g_log<<"sizeof(g_scenery) = "<<sizeof(g_scenery)<<endl;
-
-	Matrix mvp = projection;
-	mvp.postMultiply(viewmat);
-	mvp.postMultiply(modelmat);
-	
-	//DrawSelection(projection, viewmat, modelmat);
-	
-	UseS(SHADER_COLOR3D);
-    glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_COLOR3D].m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
-	glEnableVertexAttribArray(g_shader[SHADER_COLOR3D].m_slot[SSLOT_POSITION]);
-	glUniform4f(g_shader[SHADER_COLOR3D].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	//DrawGrid();
-	//DrawUnitSquares();
-	//DrawPaths();
-	//DrawVelocities();
-
-	UseS(SHADER_BILLBOARD);
-    glUniformMatrix4fv(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_PROJECTION], 1, 0, projection.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
-	glUniformMatrix4fv(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_VIEWMAT], 1, 0, viewmat.m_matrix);
-	glUniform4f(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_TEXCOORD0]);
-	//glEnableVertexAttribArray(g_shader[SHADER_BILLBOARD].m_slot[SSLOT_NORMAL]);
-    glActiveTextureARB(GL_TEXTURE0);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//DrawOrders();
-	//DrawProjectiles();
-	//SortParticles();
-	//DrawParticles();
-	//BeginVertexArrays();
-	SortBillboards();
-	DrawBillboards();
-	//EndVertexArrays();
-	
-	Ortho(g_width, g_height, 1, 1, 1, 1);
-	
-	//DrawUnitStatus(mvp);
-	//DrawBStatus(mvp);
-	//DrawTransactions(mvp);
-	
-	UseS(SHADER_COLOR2D);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
-    glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, STATUS_ALPHA);
-    glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION]);
-
-	//DrawUnitStats(mvp);
-	//DrawBStats(mvp);
-}
-
 void Draw()
 {
+	CheckGLError(__FILE__, __LINE__);
+
 	if(g_mode == LOADING)
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	else if(g_mode == EDITOR)
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	else if(g_mode == RENDERING)
-		glClearColor(255.0f/255.0f, 127.0f/255.0f, 255.0f/255.0f, 1.0f);
+		glClearColor(g_transpkey[0], g_transpkey[1], g_transpkey[2], 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	g_GUI.frameupd();
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
+
 	g_GUI.draw();
 	//DrawEdMap(&g_edmap);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
-	Ortho(g_width, g_height, 1, 1, 1, 1);
-	char dbgstr[128];
-	sprintf(dbgstr, "b's:%d", (int)g_edmap.m_brush.size());
-	DrawShadowedText(MAINFONT8, 0, g_height-16, dbgstr);
-
+	if(g_mode == EDITOR)
+	{
+#ifdef DEBUG
+		LastNum(__FILE__, __LINE__);
+#endif
+		Ortho(g_width, g_height, 1, 1, 1, 1);
+		char dbgstr[128];
+		sprintf(dbgstr, "b's:%d", (int)g_edmap.m_brush.size());
+		DrawShadowedText(MAINFONT8, 0, g_height-16, dbgstr);
+		EndS();
+	}
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+	
 	SwapBuffers(g_hDC);
 }
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
-	UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+#if 0
+	if(g_mode == RENDERING)
+	{
+		//SwapBuffers(g_hDC);
+
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_renderfb);
+		g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
+		CheckGLError(__FILE__, __LINE__);
+		glViewport(0, 0, g_width, g_height);
+		CheckGLError(__FILE__, __LINE__);
+		glClearColor(1.0, 1.0, 1.0, 0.0);
+		CheckGLError(__FILE__, __LINE__);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		CheckGLError(__FILE__, __LINE__);
+		g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
+		g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<endl;
+	}
+#endif
 	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+	UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	glActiveTextureARB(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
@@ -266,6 +282,10 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glActiveTextureARB(GL_TEXTURE0);*/
 	
 	DrawModelHolders();
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	EndS();
 	
 	UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 	
@@ -273,33 +293,55 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 
-	//if(g_model[0].m_on)
-	//	g_model[0].draw(0, Vec3f(0,0,0), 0);
-
-	DrawEdMap(&g_edmap, g_showsky);/*
-	for(int i=0; i<10; i++)
-		for(int j=0; j<5; j++)
-			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
+	DrawEdMap(&g_edmap, g_showsky);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	EndS();
 
 	if(g_mode == EDITOR)
 	{
 
 	}
+
+#if 0
+	if(g_mode == RENDERING)
+	{
+		CheckGLError(__FILE__, __LINE__);
+		glFlush();
+		CheckGLError(__FILE__, __LINE__);
+		//glFinish();
+		CheckGLError(__FILE__, __LINE__);
+		SaveRender();
+		CheckGLError(__FILE__, __LINE__);
+	}
+#endif
 }
 
 void DrawSceneDepth()
 {
 	//g_model[themodel].draw(0, Vec3f(0,0,0), 0);
 	
-	DrawModelHolders();
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+	DrawModelHoldersDepth();
 	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	//if(g_model[0].m_on)
 	//	g_model[0].draw(0, Vec3f(0,0,0), 0);
 
-	DrawEdMap(&g_edmap, false);/*
+	DrawEdMapDepth(&g_edmap, false);/*
 	for(int i=0; i<10; i++)
 		for(int j=0; j<5; j++)
 			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 }
 
 void UpdateLoading()
@@ -579,6 +621,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	
 	Queue();
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 	FillGUI();
 	//Click_NewBrush();
 
@@ -598,10 +643,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			if(g_mode == LOADING || g_mode == RENDERING || AnimateNextFrame(FRAME_RATE))
 			{
+#ifdef DEBUG
+				CheckGLError(__FILE__, __LINE__);
+#endif
 				CalculateFrameRate();
+#ifdef DEBUG
+				CheckGLError(__FILE__, __LINE__);
+#endif
 				ScoreFPS();
+#ifdef DEBUG
+				LastNum(__FILE__, __LINE__);
+				CheckGLError(__FILE__, __LINE__);
+#endif
 				Update();
+#ifdef DEBUG
+				LastNum(__FILE__, __LINE__);
+				CheckGLError(__FILE__, __LINE__);
+#endif
 				Draw();
+#ifdef DEBUG
+				LastNum(__FILE__, __LINE__);
+#endif
 			}
 			else
 			{

@@ -1,5 +1,8 @@
 
 
+#ifndef COMPILEBL_H
+#define COMPILEBL_H
+
 #include "../math/vec2i.h"
 #include "../math/vec2f.h"
 #include "../platform.h"
@@ -40,3 +43,7 @@ public:
 class EdBuilding;
 
 void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders);
+int Max2Pow(int lowerbound);
+int Max2Pow32(int lowerbound);
+
+#endif

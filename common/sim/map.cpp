@@ -36,6 +36,8 @@ void Map::destroy()
 				FreeTexture(s->m_specularm);
 			if(s->m_normalm != 0)
 				FreeTexture(s->m_normalm);
+			if(s->m_ownerm != 0)
+				FreeTexture(s->m_ownerm);
 		}
 	}
 
@@ -117,7 +119,10 @@ void DrawMap(Map* map)
 			/*
 			CreateTexture(side->m_diffusem, "gui/frame.jpg", false);
 			side->m_diffusem = g_texindex;*/
-			pside->usetex();
+			pside->usedifftex();
+			pside->usespectex();
+			pside->usenormtex();
+			pside->useteamtex();
 			/*
 			unsigned int atex;
 			CreateTexture(atex, "gui/dmd.jpg", false);
@@ -132,7 +137,10 @@ void DrawMap(Map* map)
 			glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-
+			
+#ifdef DEBUG
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 			
 #if 0
@@ -188,7 +196,10 @@ void DrawMap2(Map* map)
 			/*
 			CreateTexture(side->m_diffusem, "gui/frame.jpg", false);
 			side->m_diffusem = g_texindex;*/
-			pside->usetex();
+			pside->usedifftex();
+			pside->usespectex();
+			pside->usenormtex();
+			pside->useteamtex();
 			/*
 			unsigned int atex;
 			CreateTexture(atex, "gui/dmd.jpg", false);
@@ -203,7 +214,77 @@ void DrawMap2(Map* map)
 			glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			
+#ifdef DEBUG
+			CheckGLError(__FILE__, __LINE__);
+#endif
+			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
+			
+#if 0
+			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
+			{
+				g_log<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<endl;
+			}
 
+			g_log<<"\tdrew triangles: "<<(va->numverts/3)<<endl;
+#endif
+		}
+	}
+}
+
+//Draw opaque brushes first
+void DrawMapDepth(Map* map)
+{
+	
+	//return;
+	//glDisable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
+
+	Shader* shader = &g_shader[g_curS];
+
+	for(auto brushiterator = map->m_opaquebrush.begin(); brushiterator != map->m_opaquebrush.end(); brushiterator++)
+	{
+		int brushindex = *brushiterator;
+#if 0
+		g_log<<"draw brush "<<brushidx<<endl;
+#endif
+
+		Brush* b = &map->m_brush[brushindex];
+		Texture* t = &g_texture[b->m_texture];
+
+		//TO DO: Replace with index table look-ups
+		if(t->sky)
+			continue;
+
+		for(int sideindex = 0; sideindex < b->m_nsides; sideindex++)
+		{
+#if 0
+			g_log<<"\tdraw side "<<sideindex<<endl;
+#endif
+
+			BrushSide* pside = &b->m_sides[sideindex];
+			/*
+			CreateTexture(side->m_diffusem, "gui/frame.jpg", false);
+			side->m_diffusem = g_texindex;*/
+			pside->usedifftex();
+			/*
+			unsigned int atex;
+			CreateTexture(atex, "gui/dmd.jpg", false);
+	glActiveTextureARB(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, atex);
+	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
+	*/
+			VertexArray* va = &pside->m_drawva;
+
+			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			
+#ifdef DEBUG
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 			
 #if 0

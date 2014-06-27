@@ -105,6 +105,31 @@ void MS3DModel::loadtex(unsigned int& diffm, unsigned int& specm, unsigned int& 
 				CreateTexture(specm, specfile, false);
 				CreateTexture(normm, normfile, false);
 				CreateTexture(ownm, ownfile, false);
+
+				if(diffm == 0)
+				{
+					char msg[MAX_PATH+1];
+					sprintf(msg, "Couldn't load diffuse texture %s", difffile);
+					MessageBox(g_hWnd, msg, "Error", NULL);
+				}
+				if(specm == 0)
+				{
+					char msg[MAX_PATH+1];
+					sprintf(msg, "Couldn't load specular texture %s", specfile);
+					MessageBox(g_hWnd, msg, "Error", NULL);
+				}
+				if(normm == 0)
+				{
+					char msg[MAX_PATH+1];
+					sprintf(msg, "Couldn't load specular texture %s", normfile);
+					MessageBox(g_hWnd, msg, "Error", NULL);
+				}
+				if(ownm == 0)
+				{
+					char msg[MAX_PATH+1];
+					sprintf(msg, "Couldn't load team color texture %s", ownfile);
+					MessageBox(g_hWnd, msg, "Error", NULL);
+				}
 			}
 			else
 			{
@@ -127,6 +152,12 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	if ( inputFile.fail()) 
 	{
 		g_log << "Couldn't open the model file "<< relative << endl;
+
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't open the model file %s", relative);
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+
 		return false;
 	}
 
@@ -177,6 +208,12 @@ bool MS3DModel::load(const char *relative, unsigned int& diffm, unsigned int& sp
 	if ( pHeader->m_version < 3 ) 
 	{
 		g_log << "I know nothing about MS3D v1.2, " <<relative<< endl;
+		
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Incompatible MS3D v1.2 ", relative);
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+
 		return false;
 	}
 
@@ -394,6 +431,11 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 	{
 		advanceanim();
 
+#if 0
+		g_log<<endl<<endl;
+		g_log<<"frame #"<<f<<endl;
+#endif
+
 		for(int index = 0; index < m_numVertices; index++)
 		{
 			normalweights[index].clear();
@@ -418,6 +460,8 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 
 					if(m_pVertices[index].m_boneID == -1)
 					{
+						g_log<<"\tno tran"<<endl;
+
 						texcoords[vert].x = pTri->m_s[k];
 						texcoords[vert].y = 1.0f - pTri->m_t[k];
 
@@ -431,6 +475,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 					}
 					else
 					{
+
 						// rotate according to transformation matrix
 						const Matrix& final = m_pJoints[m_pVertices[index].m_boneID].m_final;
 
@@ -449,6 +494,15 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 						vertices[vert].x = newVertex.x * scale.x + translate.x;
 						vertices[vert].y = newVertex.y * scale.y + translate.y;
 						vertices[vert].z = newVertex.z * scale.z + translate.z;
+
+#if 0
+						Vec3f off;
+						off.set(m_pVertices[index].m_location);
+						off = off * scale + translate;
+						off = vertices[vert] - off;
+						
+						g_log<<"\tyes tran "<<off.x<<","<<off.y<<","<<off.z<<" "<<endl;
+#endif
 					}
 
 					//vert ++;
@@ -625,7 +679,19 @@ void MS3DModel::advanceanim()
 
 		if(pJoint->m_numRotationKeyframes == 0 && pJoint->m_numTranslationKeyframes == 0)
 		{
+#if 0
 			pJoint->m_final.set( pJoint->m_absolute.m_matrix);
+#else
+			Matrix relativeFinal( pJoint->m_relative );
+
+			if ( pJoint->m_parent == -1 )
+				pJoint->m_final.set( relativeFinal.m_matrix );
+			else
+			{
+				pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
+				pJoint->m_final.postMultiply( relativeFinal );
+			}
+#endif
 			continue;
 		}
 
@@ -702,4 +768,24 @@ void MS3DModel::advanceanim()
 			pJoint->m_final.postMultiply( relativeFinal );
 		}
 	}
+
+#if 0
+	for(int i = 0; i < m_numJoints; i++)
+	{
+		float transVec[3];
+		Matrix transform;
+		int frame;
+		Joint *pJoint = &m_pJoints[i];
+
+		float* m = pJoint->m_final.m_matrix;
+		
+		g_log<<endl<<endl;
+		g_log<<"joint #"<<i<<"  of "<<pJoint->m_parent<<endl;
+		g_log<<"["<<m[0]<<","<<m[1]<<","<<m[2]<<","<<m[3]<<"]"<<endl;
+		g_log<<"["<<m[4]<<","<<m[5]<<","<<m[6]<<","<<m[7]<<"]"<<endl;
+		g_log<<"["<<m[8]<<","<<m[9]<<","<<m[10]<<","<<m[11]<<"]"<<endl;
+		g_log<<"["<<m[12]<<","<<m[13]<<","<<m[14]<<","<<m[15]<<"]"<<endl;
+		g_log<<endl<<endl;
+	}
+#endif
 }

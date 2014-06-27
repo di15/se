@@ -11,6 +11,7 @@
 #include "../../spriteed/main.h"
 #include "../../spriteed/seviewport.h"
 #include "../math/vec4f.h"
+#include "../tool/rendersprite.h"
 
 float g_renderpitch = 30;
 float g_renderyaw = 45;
@@ -292,7 +293,7 @@ void ResetView()
 	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
 
 	g_projtype = PROJ_ORTHO;
-	g_camera.position(0, 0, 1000.0f, 0, 0, 0, 0, 1, 0);
+	g_camera.position(0, 0, 10000.0f, 0, 0, 0, 0, 1, 0);
 	g_camera.rotateabout(Vec3f(0,0,0), -DEGTORAD(g_renderpitch), 1, 0, 0);
 	g_camera.rotateabout(Vec3f(0,0,0), DEGTORAD(g_renderyaw), 0, 1, 0);
 
@@ -306,7 +307,7 @@ void ResetView()
 	int width;
 	int height;
 
-	if(g_mode == RENDERING)
+	if(g_mode == RENDERING || g_mode == PREREND_ADJFRAME)
 	{
 		width = g_width;
 		height = g_height;
@@ -323,6 +324,12 @@ void ResetView()
 
 	float aspect = fabsf((float)width / (float)height);
 	Matrix projection;
+	
+#ifdef DEBUG
+	{
+		g_log<<"rv"<<aspect<<","<<width<<","<<height<<" r-l:"<<(PROJ_RIGHT*aspect/g_zoom)<<","<<(-PROJ_RIGHT*aspect/g_zoom)<<" gwh:"<<g_width<<","<<g_height<<endl;
+	}
+#endif
 
 	bool persp = false;
 	
@@ -335,6 +342,15 @@ void ResetView()
 	{
 		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
+
+#ifdef DEBUG
+	{
+		g_log<<"rf"<<g_renderframe<<" rv pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv pmat2:"<<projection.m_matrix[8]<<","<<projection.m_matrix[9]<<","<<projection.m_matrix[10]<<","<<projection.m_matrix[11]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv pmat3:"<<projection.m_matrix[12]<<","<<projection.m_matrix[13]<<","<<projection.m_matrix[14]<<","<<projection.m_matrix[15]<<endl;
+	}
+#endif
 
 	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
 	//Vec3f viewvec = g_focus; //g_camera.m_view;
@@ -366,6 +382,15 @@ void ResetView()
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postMultiply(viewmat);
 
+#ifdef DEBUG
+	{
+		g_log<<"rf"<<g_renderframe<<" rv vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv vmat1:"<<viewmat.m_matrix[4]<<","<<viewmat.m_matrix[5]<<","<<viewmat.m_matrix[6]<<","<<viewmat.m_matrix[7]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv vmat2:"<<viewmat.m_matrix[8]<<","<<viewmat.m_matrix[9]<<","<<viewmat.m_matrix[10]<<","<<viewmat.m_matrix[11]<<endl;
+		g_log<<"rf"<<g_renderframe<<" rv vmat3:"<<viewmat.m_matrix[12]<<","<<viewmat.m_matrix[13]<<","<<viewmat.m_matrix[14]<<","<<viewmat.m_matrix[15]<<endl;
+	}
+#endif
+
 	persp = false;
 	
 	Vec4f topleft4 = ScreenPos(&mvpmat, topleft, width, height, persp);
@@ -387,5 +412,7 @@ void ResetView()
 
 	g_zoom *= zoomscale;
 
-	//g_log<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<endl;
+#ifdef DEBUG
+	g_log<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<endl;
+#endif
 }

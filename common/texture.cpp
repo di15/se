@@ -18,6 +18,26 @@ FILE* g_src;
 //CFile g_src;
 int srcLen;
 
+
+LoadedTex::LoadedTex()
+{
+	data = NULL;
+}
+
+void LoadedTex::destroy()
+{
+	if(data)
+	{
+		free(data);
+		data = NULL;
+	}
+}
+
+LoadedTex::~LoadedTex()
+{
+	destroy();
+}
+
 LoadedTex *LoadBMP(const char *fullpath)
 {
 	AUX_RGBImageRec *pBitbldg = NULL;
@@ -32,7 +52,8 @@ LoadedTex *LoadBMP(const char *fullpath)
 	// Load the bitbldg using the aux function stored in glaux.lib
 	pBitbldg = auxDIBImageLoad(fullpath);				
 
-	LoadedTex *pImage = (LoadedTex *)malloc(sizeof(LoadedTex));
+	LoadedTex *pImage = new LoadedTex;
+	if(!pImage) OutOfMem(__FILE__, __LINE__);
 
 	pImage->channels = 3;
 	pImage->sizeX = pBitbldg->sizeX;
@@ -49,27 +70,27 @@ LoadedTex *LoadBMP(const char *fullpath)
 
 	for(int y = 0; y < pImage->sizeY/2; y++)
 	{
-		y2 = pImage->sizeY - y;
-		// Store a pointer to the current line of pixels
-		unsigned char *pLine = &(pImage->data[stride * y]);
-		unsigned char *pLine2 = &(pImage->data[stride * y2]);
-			
-		// Go through all of the pixels and swap the B and R values since TGA
-		// files are stored as BGR instead of RGB (or use GL_BGR_EXT verses GL_RGB)
-		for(i = 0; i < stride; i += pImage->channels)
-		{
-			temp = pLine[i];
-			pLine[i] = pLine2[i];
-			pLine2[i] = temp;
-			
-			temp = pLine[i+1];
-			pLine[i+1] = pLine2[i+1];
-			pLine2[i+1] = temp;
-			
-			temp = pLine[i+2];
-			pLine[i+2] = pLine2[i+2];
-			pLine2[i+2] = temp;
-		}
+	y2 = pImage->sizeY - y;
+	// Store a pointer to the current line of pixels
+	unsigned char *pLine = &(pImage->data[stride * y]);
+	unsigned char *pLine2 = &(pImage->data[stride * y2]);
+
+	// Go through all of the pixels and swap the B and R values since TGA
+	// files are stored as BGR instead of RGB (or use GL_BGR_EXT verses GL_RGB)
+	for(i = 0; i < stride; i += pImage->channels)
+	{
+	temp = pLine[i];
+	pLine[i] = pLine2[i];
+	pLine2[i] = temp;
+
+	temp = pLine[i+1];
+	pLine[i+1] = pLine2[i+1];
+	pLine2[i+1] = temp;
+
+	temp = pLine[i+2];
+	pLine[i+2] = pLine2[i+2];
+	pLine2[i+2] = temp;
+	}
 	}*/
 
 	return pImage;
@@ -93,8 +114,9 @@ LoadedTex *LoadTGA(const char *fullpath)
 		return NULL;
 	}
 
-	// Allocate the structure that will hold our eventual image data (must free it!)
-	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
+	// allocate the structure that will hold our eventual image data (must free it!)
+	pImageData = new LoadedTex;
+	if(!pImageData) OutOfMem(__FILE__, __LINE__);
 
 	// Read in the length in bytes from the header to the pixel data
 	fread(&length, sizeof(byte), 1, pFile);
@@ -127,6 +149,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 			channels = bits / 8;
 			stride = channels * width;
 			pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
+			if(!pImageData->data) OutOfMem(__FILE__, __LINE__);
 
 			// Load in all the pixel data line by line
 			for(int y = 0; y < height; y++)
@@ -158,6 +181,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 			channels = 3;
 			stride = channels * width;
 			pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
+			if(!pImageData->data) OutOfMem(__FILE__, __LINE__);
 
 			// Load in all the pixel data pixel by pixel
 			for(int i = 0; i < width*height; i++)
@@ -193,7 +217,9 @@ LoadedTex *LoadTGA(const char *fullpath)
 		// Next we want to allocate the memory for the pixels and create an array,
 		// depending on the channel count, to read in for each pixel.
 		pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*stride*height));
+		if(!pImageData->data) OutOfMem(__FILE__, __LINE__);
 		byte *pColors = ((byte*)malloc(sizeof(byte)*channels));
+		if(!pColors) OutOfMem(__FILE__, __LINE__);
 
 		// Load in all the pixel data
 		while(i < width*height)
@@ -323,11 +349,13 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 	// Get the row span in bytes for each row
 	int rowSpan = cinfo->image_width * cinfo->num_components;
 
-	// Allocate memory for the pixel buffer
+	// allocate memory for the pixel buffer
 	pImageData->data = ((unsigned char*)malloc(sizeof(unsigned char)*rowSpan*pImageData->sizeY));
+	if(!pImageData->data) OutOfMem(__FILE__, __LINE__);
 
 	// Create an array of row pointers
 	unsigned char** rowPtr = new unsigned char*[pImageData->sizeY];
+	if(!rowPtr) OutOfMem(__FILE__, __LINE__);
 
 	for (int i = 0; i < pImageData->sizeY; i++)
 		rowPtr[i] = &(pImageData->data[i * rowSpan]);
@@ -338,7 +366,7 @@ void DecodeJPG(jpeg_decompress_struct* cinfo, LoadedTex *pImageData)
 	{
 		// Read in the current row of pixels and increase the rowsRead count
 		rowsRead += jpeg_read_scanlines(cinfo, 
-										&rowPtr[rowsRead], cinfo->output_height - rowsRead);
+			&rowPtr[rowsRead], cinfo->output_height - rowsRead);
 	}
 
 	// Delete the temporary row pointers
@@ -374,8 +402,9 @@ LoadedTex *LoadJPG(const char *fullpath)
 	// Specify the data source (Our file pointer)	
 	jpeg_stdio_src(&cinfo, pFile);
 
-	// Allocate the structure that will hold our eventual jpeg data (must free it!)
-	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
+	// allocate the structure that will hold our eventual jpeg data (must free it!)
+	pImageData = new LoadedTex;
+	if(!pImageData) OutOfMem(__FILE__, __LINE__);
 
 	// Decode the jpeg file and fill in the image data structure to pass back
 	DecodeJPG(&cinfo, pImageData);
@@ -395,145 +424,147 @@ LoadedTex *LoadPNG(const char *fullpath)
 	LoadedTex *pImageData = NULL;
 
 	png_structp png_ptr;
-    png_infop info_ptr;
-    unsigned int sig_read = 0;
-    //int color_type, interlace_type;
-    FILE *fp;
+	png_infop info_ptr;
+	unsigned int sig_read = 0;
+	//int color_type, interlace_type;
+	FILE *fp;
 
 	/*
 	if ((fp = fopen(relative, "rb")) == NULL)
-        return NULL;
+	return NULL;
 	png_byte header[8];
 	fread(header, sizeof(png_byte), 8, fp);
 	fclose(fp);
-	
+
 	g_log<<"PNG header "<<relative<<" "
-		<<(int)header[0]<<","<<(int)header[1]<<","<<(int)header[2]<<","<<(int)header[3]<<","
-		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
+	<<(int)header[0]<<","<<(int)header[1]<<","<<(int)header[2]<<","<<(int)header[3]<<","
+	<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
 	*/
 	if ((fp = fopen(fullpath, "rb")) == NULL)
-        return NULL;
+		return NULL;
 
 
 	/* Create and initialize the png_struct
-     * with the desired error handler
-     * functions.  If you want to use the
-     * default stderr and longjump method,
-     * you can supply NULL for the last
-     * three parameters.  We also supply the
-     * the compiler header file version, so
-     * that we know if the application
-     * was compiled with a compatible version
-     * of the library.  REQUIRED
-     */
+	* with the desired error handler
+	* functions.  If you want to use the
+	* default stderr and longjump method,
+	* you can supply NULL for the last
+	* three parameters.  We also supply the
+	* the compiler header file version, so
+	* that we know if the application
+	* was compiled with a compatible version
+	* of the library.  REQUIRED
+	*/
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
 	if (png_ptr == NULL) 
 	{
-        fclose(fp);
-        return NULL;
-    }
+		fclose(fp);
+		return NULL;
+	}
 
-	/* Allocate/initialize the memory
-     * for image information.  REQUIRED. */
-    info_ptr = png_create_info_struct(png_ptr);
-    if (info_ptr == NULL) 
+	/* allocate/initialize the memory
+	* for image information.  REQUIRED. */
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL) 
 	{
-        fclose(fp);
-        png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
-        return NULL;
-    }
+		fclose(fp);
+		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+		return NULL;
+	}
 
 	/* Set error handling if you are
-     * using the setjmp/longjmp method
-     * (this is the normal method of
-     * doing things with libpng).
-     * REQUIRED unless you  set up
-     * your own error handlers in
-     * the png_create_read_struct()
-     * earlier.
-     */
-    if (setjmp(png_jmpbuf(png_ptr))) 
+	* using the setjmp/longjmp method
+	* (this is the normal method of
+	* doing things with libpng).
+	* REQUIRED unless you  set up
+	* your own error handlers in
+	* the png_create_read_struct()
+	* earlier.
+	*/
+	if (setjmp(png_jmpbuf(png_ptr))) 
 	{
-        /* Free all of the memory associated
-         * with the png_ptr and info_ptr */
-        png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
-        fclose(fp);
-        /* If we get here, we had a
-         * problem reading the file */
-        return NULL;
-    }
+		/* Free all of the memory associated
+		* with the png_ptr and info_ptr */
+		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		fclose(fp);
+		/* If we get here, we had a
+		* problem reading the file */
+		return NULL;
+	}
 
 	/* Set up the output control if
-     * you are using standard C streams */
-    png_init_io(png_ptr, fp);
+	* you are using standard C streams */
+	png_init_io(png_ptr, fp);
 
 	/* If we have already
-     * read some of the signature */
-    png_set_sig_bytes(png_ptr, sig_read);
+	* read some of the signature */
+	png_set_sig_bytes(png_ptr, sig_read);
 
 	/*
-     * If you have enough memory to read
-     * in the entire image at once, and
-     * you need to specify only
-     * transforms that can be controlled
-     * with one of the PNG_TRANSFORM_*
-     * bits (this presently excludes
-     * dithering, filling, setting
-     * background, and doing gamma
-     * adjustment), then you can read the
-     * entire image (including pixels)
-     * into the info structure with this
-     * call
-     *
-     * PNG_TRANSFORM_STRIP_16 |
-     * PNG_TRANSFORM_PACKING  forces 8 bit
-     * PNG_TRANSFORM_EXPAND forces to
-     *  expand a palette into RGB
-     */
+	* If you have enough memory to read
+	* in the entire image at once, and
+	* you need to specify only
+	* transforms that can be controlled
+	* with one of the PNG_TRANSFORM_*
+	* bits (this presently excludes
+	* dithering, filling, setting
+	* background, and doing gamma
+	* adjustment), then you can read the
+	* entire image (including pixels)
+	* into the info structure with this
+	* call
+	*
+	* PNG_TRANSFORM_STRIP_16 |
+	* PNG_TRANSFORM_PACKING  forces 8 bit
+	* PNG_TRANSFORM_EXPAND forces to
+	*  expand a palette into RGB
+	*/
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_EXPAND, png_voidp_NULL);
 
-	pImageData = (LoadedTex*)malloc(sizeof(LoadedTex));
+	pImageData = new LoadedTex;
+	if(!pImageData) OutOfMem(__FILE__, __LINE__);
 
 	pImageData->sizeX = png_get_image_width(png_ptr, info_ptr); //info_ptr->width;
-    pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
-    //switch (info_ptr->color_type) 
+	pImageData->sizeY = png_get_image_height(png_ptr, info_ptr); //info_ptr->height;
+	//switch (info_ptr->color_type) 
 	switch( png_get_color_type(png_ptr, info_ptr) )
 	{
-        case PNG_COLOR_TYPE_RGBA:
-            pImageData->channels = 4;
-            break;
-        case PNG_COLOR_TYPE_RGB:
-            pImageData->channels = 3;
-            break;
-        default:
-			g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
-            //std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            fclose(fp);
-			free(pImageData);
-            return NULL;
-    }
+	case PNG_COLOR_TYPE_RGBA:
+		pImageData->channels = 4;
+		break;
+	case PNG_COLOR_TYPE_RGB:
+		pImageData->channels = 3;
+		break;
+	default:
+		g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
+		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		free(pImageData);
+		return NULL;
+	}
 
 	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 	pImageData->data = (unsigned char*) malloc(row_bytes * pImageData->sizeY);
+	if(!pImageData->data) OutOfMem(__FILE__, __LINE__);
 
 	png_bytepp row_pointers = png_get_rows(png_ptr, info_ptr);
 
 	for (int i = 0; i < pImageData->sizeY; i++) 
 	{
-        // note that png is ordered top to
-        // bottom, but OpenGL expect it bottom to top
-        // so the order or swapped
+		// note that png is ordered top to
+		// bottom, but OpenGL expect it bottom to top
+		// so the order or swapped
 
-        memcpy((void*)(pImageData->data+(row_bytes * i)), row_pointers[i], row_bytes);
-        //memcpy((void*)(pImageData->data+(row_bytes * (pImageData->sizeY-1-i))), row_pointers[i], row_bytes);
-    }
+		memcpy((void*)(pImageData->data+(row_bytes * i)), row_pointers[i], row_bytes);
+		//memcpy((void*)(pImageData->data+(row_bytes * (pImageData->sizeY-1-i))), row_pointers[i], row_bytes);
+	}
 
 	/* Clean up after the read,
-     * and free any memory allocated */
-    png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+	* and free any memory allocated */
+	png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
 	fclose(fp);
 
 	return pImageData;
@@ -684,7 +715,7 @@ void FindTextureExtension(char *relative)
 	strcpy(strTGAPath, strJPGPath);
 	strcpy(strBMPPath, strTGAPath);
 	strcpy(strPNGPath, strBMPPath);
-	
+
 	strcat(strJPGPath, ".jpg");
 	strcat(strTGAPath, ".tga");
 	strcat(strBMPPath, ".bmp");
@@ -696,7 +727,7 @@ void FindTextureExtension(char *relative)
 		strcat(relative, ".jpg");
 		return;
 	}
-	
+
 	if((fp = fopen(strPNGPath, "rb")) != NULL)
 	{
 		fclose(fp);
@@ -811,7 +842,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	{
 		g_log<<"Failed to load "<<relative<<endl;
 		g_log.flush();
-		
+
 		if(!reload)
 			texindex = 0;	// Give a harmless texture index
 
@@ -838,12 +869,14 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		textureType = GL_RGBA;
 		transp = true;
 	}
-		
-	// Option 1: with mipmaps
+
 #if 1
-	gluBuild2DMipmaps(GL_TEXTURE_2D, pImage->channels, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
+	CheckGLError(__FILE__, __LINE__);
+
+	// Option 1: with mipmaps
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
 	if(clamp)
 	{
@@ -856,8 +889,18 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
+	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	CheckGLError(__FILE__, __LINE__);
+
+#elif 0
 	// Option 2: without mipmaps
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
 #else
+	// Option 3: without mipmaps linear
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
@@ -868,12 +911,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		g_texwidth = pImage->sizeX;
 		g_texheight = pImage->sizeY;
 
-		if (pImage->data)							// If there is texture data
-		{
-			free(pImage->data);						// Free the texture data, we don't need it anymore
-		}
-
-		free(pImage);								// Free the image structure
+		delete pImage;								// Free the image structure
 
 		g_log<<relative<<"\n\r";
 		g_log.flush();
@@ -894,7 +932,7 @@ void RequeueTextures()
 		if(g_texture[i].loaded)
 			RequeueTexture(i, g_texture[i].filepath, i);
 	}
-	
+
 	//LoadParticles();
 	//LoadProjectiles();
 	//LoadTerrainTextures();
@@ -929,3 +967,344 @@ void OwnPath(const char* basepath, char* ownpath)
 	//StripExtension(ownpath);
 	strcat(ownpath, ".team.png");
 }
+
+void AllocTex(LoadedTex* empty, int width, int height, int channels)
+{
+	empty->data = (unsigned char*)malloc(width * height * channels * sizeof(unsigned char));
+	if(!empty->data) OutOfMem(__FILE__, __LINE__);
+	empty->sizeX = width;
+	empty->sizeY = height;
+	empty->channels = channels;
+}
+
+void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
+{
+	if(src == NULL || src->data == NULL)
+		return;
+
+	for(int x=0; x<src->sizeX; x++)
+	{
+		if(x+pos.x < 0)
+			continue;
+
+		if(x+pos.x >= dest->sizeX)
+			continue;
+
+		for(int y=0; y<src->sizeY; y++)
+		{
+			if(y+pos.y < 0)
+				continue;
+
+			if(y+pos.y >= dest->sizeY)
+				continue;
+
+			int srcpixel = x*src->channels + y*src->channels*src->sizeX;
+			int destpixel = (x+pos.x)*dest->channels + (y+pos.y)*dest->channels*dest->sizeX;
+
+			dest->data[destpixel + 0] = src->data[srcpixel + 0];
+			dest->data[destpixel + 1] = src->data[srcpixel + 1];
+			dest->data[destpixel + 2] = src->data[srcpixel + 2];
+
+			if(dest->channels > 3)
+			{
+				if(src->channels <= 3)
+					dest->data[destpixel + 3] = 255;
+				else
+					dest->data[destpixel + 3] = src->data[srcpixel + 3];
+			}
+		}
+	}
+}
+
+void SaveJPEG(const char* fullpath, LoadedTex* image, float quality)
+{
+	FILE *outfile;
+	if ((outfile = fopen(fullpath, "wb")) == NULL) 
+	{
+		return;
+	}
+
+	struct jpeg_compress_struct cinfo;
+	struct jpeg_error_mgr       jerr;
+
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_compress(&cinfo);
+	jpeg_stdio_dest(&cinfo, outfile);
+
+	cinfo.image_width      = image->sizeX;
+	cinfo.image_height     = image->sizeY;
+	cinfo.input_components = 3;
+	cinfo.in_color_space   = JCS_RGB;
+
+	jpeg_set_defaults(&cinfo);
+	/*set the quality [0..100]  */
+	jpeg_set_quality (&cinfo, 100*quality, true);
+	jpeg_start_compress(&cinfo, true);
+
+	JSAMPROW row_pointer;
+	int row_stride = image->sizeX * 3;
+
+	while (cinfo.next_scanline < cinfo.image_height)
+	{
+		row_pointer = (JSAMPROW) &image->data[cinfo.next_scanline*row_stride];
+		jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+	}
+
+	jpeg_finish_compress(&cinfo);
+
+	fclose(outfile);
+
+	jpeg_destroy_compress(&cinfo);
+}
+
+
+int SavePNG(const char* fullpath, LoadedTex* image)
+{
+	FILE *fp;
+	png_structp png_ptr;
+	png_infop info_ptr;
+	//png_colorp palette;
+
+	/* Open the file */
+	fp = fopen(fullpath, "wb");
+	if (fp == NULL)
+		return (ERROR);
+
+	/* Create and initialize the png_struct with the desired error handler
+	* functions.  If you want to use the default stderr and longjump method,
+	* you can supply NULL for the last three parameters.  We also check that
+	* the library version is compatible with the one used at compile time,
+	* in case we are using dynamically linked libraries.  REQUIRED.
+	*/
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+		(png_voidp) NULL, NULL, NULL);
+
+	if (png_ptr == NULL)
+	{
+		fclose(fp);
+		return (ERROR);
+	}
+
+	/* Allocate/initialize the image information data.  REQUIRED */
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == NULL)
+	{
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr,  NULL);
+		return (ERROR);
+	}
+
+	int color_type = PNG_COLOR_TYPE_RGB;
+
+	if(image->channels == 4)
+		color_type = PNG_COLOR_TYPE_RGBA;
+
+	png_set_IHDR(png_ptr, info_ptr, image->sizeX, image->sizeY, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+	/* Set error handling.  REQUIRED if you aren't supplying your own
+	* error handling functions in the png_create_write_struct() call.
+	*/
+	if (setjmp(png_jmpbuf(png_ptr)))
+	{
+		/* If we get here, we had a problem writing the file */
+		fclose(fp);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		return (ERROR);
+	}
+
+	/* One of the following I/O initialization functions is REQUIRED */
+
+	/* Set up the output control if you are using standard C streams */
+	png_init_io(png_ptr, fp);
+
+
+	png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
+	if(!row_pointers) OutOfMem(__FILE__, __LINE__);
+	for (int y=0; y<image->sizeY; y++)
+		row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
+
+	png_write_info(png_ptr, info_ptr);
+	png_write_image(png_ptr, row_pointers);
+	png_write_end(png_ptr, NULL);
+
+	//for (y=0; y<image->sizeY; y++)
+	//   free(row_pointers[y]);
+	free(row_pointers);
+
+
+	/* This is the easy way.  Use it if you already have all the
+	* image info living in the structure.  You could "|" many
+	* PNG_TRANSFORM flags into the png_transforms integer here.
+	*/
+	//png_write_png(png_ptr, info_ptr, NULL, NULL);
+
+	/* If you png_malloced a palette, free it here (don't free info_ptr->palette,
+	* as recommended in versions 1.0.5m and earlier of this example; if
+	* libpng mallocs info_ptr->palette, libpng will free it).  If you
+	* allocated it with malloc() instead of png_malloc(), use free() instead
+	* of png_free().
+	*/
+	//png_free(png_ptr, palette);
+	//palette = NULL;
+
+	/* Similarly, if you png_malloced any data that you passed in with
+	* png_set_something(), such as a hist or trans array, free it here,
+	* when you can be sure that libpng is through with it.
+	*/
+	//png_free(png_ptr, trans);
+	//trans = NULL;
+	/* Whenever you use png_free() it is a good idea to set the pointer to
+	* NULL in case your application inadvertently tries to png_free() it
+	* again.  When png_free() sees a NULL it returns without action, thus
+	* avoiding the double-free security problem.
+	*/
+
+	/* Clean up after the write, and free any memory allocated */
+	png_destroy_write_struct(&png_ptr, &info_ptr);
+
+	/* Close the file */
+	fclose(fp);
+
+	/* That's it */
+	return (1);
+}
+
+void FlipImage(LoadedTex* image)
+{
+	int x;
+	int y2;
+	byte temp[4];
+	int stride = image->sizeX * image->channels;
+
+	for(int y=0; y<image->sizeY/2; y++)
+	{
+		y2 = image->sizeY - y - 1;
+
+		unsigned char *pLine = &(image->data[stride * y]);
+		unsigned char *pLine2 = &(image->data[stride * y2]);
+
+		for(x = 0; x < image->sizeX * image->channels; x += image->channels)
+		{
+			temp[0] = pLine[x + 0];
+			temp[1] = pLine[x + 1];
+			temp[2] = pLine[x + 2];
+			if(image->channels == 4)
+				temp[3] = pLine[x + 3];
+
+			pLine[x + 0] = pLine2[x + 0];
+			pLine[x + 1] = pLine2[x + 1];
+			pLine[x + 2] = pLine2[x + 2];
+			if(image->channels == 4)
+				pLine[x + 3] = pLine2[x + 3];
+
+			pLine2[x + 0] = temp[0];
+			pLine2[x + 1] = temp[1];
+			pLine2[x + 2] = temp[2];
+			if(image->channels == 4)
+				pLine2[x + 3] = temp[3];
+		}
+	}
+}
+
+// Warning: this function modifies the image data to switch RGB to BGR
+int SaveBMP(const char* fullpath, LoadedTex* image)
+{
+	FILE* filePtr;
+	BITMAPFILEHEADER bitmapFileHeader;
+	BITMAPINFOHEADER bitmapInfoHeader;
+	int imageIdx;
+	unsigned char tempRGB;
+
+	filePtr = fopen(fullpath, "wb");
+	if(!filePtr)
+		return 0;
+
+	bitmapFileHeader.bfSize = sizeof(BITMAPFILEHEADER);
+	bitmapFileHeader.bfType = 0x4D42;
+	bitmapFileHeader.bfReserved1 = 0;
+	bitmapFileHeader.bfReserved2 = 0;
+	bitmapFileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+	bitmapInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmapInfoHeader.biPlanes = 1;
+	bitmapInfoHeader.biBitCount = 24;
+	bitmapInfoHeader.biCompression = BI_RGB;
+	bitmapInfoHeader.biSizeImage = image->sizeX * abs(image->sizeY) * 3;
+	bitmapInfoHeader.biXPelsPerMeter = 0;
+	bitmapInfoHeader.biYPelsPerMeter = 0;
+	bitmapInfoHeader.biClrUsed = 0;
+	bitmapInfoHeader.biClrImportant = 0;
+	bitmapInfoHeader.biWidth = image->sizeX;
+	bitmapInfoHeader.biHeight = image->sizeY;
+
+	for(imageIdx = 0; imageIdx < bitmapInfoHeader.biSizeImage; imageIdx += 3)
+	{
+		tempRGB = image->data[imageIdx];
+		image->data[imageIdx] = image->data[imageIdx + 2];
+		image->data[imageIdx + 2] = tempRGB;
+	}
+
+#if 0
+	for(int imageIdx = image->channels * (image->sizeX - 1); 
+		imageIdx < image->sizeX * image->sizeY * image->channels; 
+		imageIdx += image->channels * image->sizeX)
+	{
+		image->data[imageIdx] = image->data[imageIdx-3];
+		image->data[imageIdx+1] = image->data[imageIdx-2];
+		image->data[imageIdx+2] = image->data[imageIdx-1];
+	}
+#endif
+
+	fwrite(&bitmapFileHeader, 1, sizeof(BITMAPFILEHEADER), filePtr);
+
+	fwrite(&bitmapInfoHeader, 1, sizeof(BITMAPINFOHEADER), filePtr);
+
+	fwrite(image->data, 1, bitmapInfoHeader.biSizeImage, filePtr);
+
+	fclose(filePtr);
+
+	return 1;
+}
+
+
+bool SaveRAW(const char* fullpath, LoadedTex* image)
+{
+	FILE* fp = fopen(fullpath, "wb");
+
+	fwrite(image->data, image->sizeX*image->sizeY*image->channels, 1, fp);
+
+	fclose(fp);
+
+	return true;
+}
+
+void StreamRaw(FILE* fp, unsigned int* texname, Vec2i fullsz, Vec2i srcpos, Vec2i srcsz, Vec2i destsz)
+{
+	if(srcpos.x < 0)
+		srcpos.x = 0;
+	if(srcpos.y < 0)
+		srcpos.y = 0;
+	if(srcpos.x + srcsz.x > fullsz.x)
+		srcsz.x = fullsz.x - srcpos.x;
+	if(srcpos.y + srcsz.y > fullsz.y)
+		srcsz.y = fullsz.y - srcpos.y;
+
+	int stridex = srcsz.x / destsz.x * 3;
+	int stridey = srcsz.y / destsz.y * 3 * fullsz.x;
+
+	LoadedTex newtex;
+	AllocTex(&newtex, destsz.x, destsz.y, 3);
+
+	int i = 0;
+
+	for(int y=srcpos.y; srcpos.y < srcpos.y+srcsz.y; y+=stridey)
+		for(int x=srcpos.x; srcpos.x < srcpos.x+srcsz.x; x+=stridex)
+		{
+			fseek(fp, y * 3 * fullsz.x + x * 3, SEEK_SET);
+			fread(&newtex.data[i], 3, 1, fp);
+			i+=3;
+		}
+
+		newtex.destroy();
+}
+

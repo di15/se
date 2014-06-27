@@ -34,8 +34,12 @@ public:
 	~Model();
 
 	bool load(const char* relative, Vec3f scale, Vec3f translate, bool dontqueue);
-	void usetex();
+	void usedifftex();
+	void usespectex();
+	void usenormtex();
+	void useteamtex();
 	void draw(int frame, Vec3f pos, float yaw);
+	void drawdepth(int frame, Vec3f pos, float yaw);
 	void destroy();
 };
 
@@ -55,6 +59,7 @@ int FindModel(const char* relative);
 void QueueModel(int* id, const char* relative, Vec3f scale, Vec3f translate);
 bool Load1Model();
 void DrawVA(VertexArray* va, Vec3f pos);
+void DrawVADepth(VertexArray* va, Vec3f pos);
 void BeginVertexArrays();
 void EndVertexArrays();
 bool PlayAnimation(float& frame, int first, int last, bool loop, float rate);

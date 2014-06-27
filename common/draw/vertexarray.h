@@ -22,6 +22,9 @@ public:
 	VertexArray()
 	{
 		numverts = 0;
+		vertices = NULL;
+		texcoords = NULL;
+		normals = NULL;
 	}
 
 	~VertexArray()

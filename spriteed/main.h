@@ -5,14 +5,14 @@
 
 #include "../common/platform.h"
 
-#define VERSION				1.0f
+#define VERSION				2.0f
 #define TITLE				"DMD Sprite Editor"
 #define CONFIGFILE			"config.ini"
 
 extern bool g_mouseout;
 extern bool g_gameover;
 
-enum APPMODE{LOADING, LOGO, EDITOR, RENDERING};
+enum APPMODE{LOADING, LOGO, EDITOR, RENDERING, PREREND_ADJFRAME};
 extern APPMODE g_mode;
 extern int g_reStage;
 

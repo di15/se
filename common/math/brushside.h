@@ -44,7 +44,10 @@ public:
 	~BrushSide();
 	void makeva();
 	void vafromcut(CutBrushSide* cutside);
-	void usetex();
+	void usedifftex();
+	void usespectex();
+	void usenormtex();
+	void useteamtex();
 	void gentexeq();	//fit texture to face
 	void fittex();
 	void remaptex();

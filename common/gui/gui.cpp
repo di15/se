@@ -10,6 +10,7 @@
 #include "../window.h"
 #include "draw2d.h"
 #include "../draw/shadow.h"
+#include "../debug.h"
 
 GUI g_GUI;
 int g_currw;
@@ -17,26 +18,63 @@ int g_currh;
 
 void GUI::draw()
 {
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glClear(GL_DEPTH_BUFFER_BIT);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	Ortho(g_width, g_height, 1, 1, 1, 1);
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	for(auto i=view.begin(); i!=view.end(); i++)
 	{
 		if(i->opened)
+		{
 			//LastNum(view[i].name.c_str());
+			//g_log<<(i->name)<<endl;
+			//g_log.flush();
+#ifdef DEBUG
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			i->draw();
+		}
 	}
 	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+	LastNum(__FILE__, __LINE__);
+#endif
+
 	for(auto i=view.begin(); i!=view.end(); i++)
 		if(i->opened)
+		{
+			//g_log<<(i->name)<<endl;
+			//g_log.flush();
+#ifdef DEBUG
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			i->draw2();
+		}
 
 	//DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+	LastNum(__FILE__, __LINE__);
+#endif
+	EndS();
+
 	UseS(SHADER_COLOR2D);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
 	//DrawMarquee();
+	EndS();
 }
 
 void AssignKey(int i, void (*down)(), void (*up)())
@@ -189,7 +227,13 @@ void CenterMoUseS()
 
 void Ortho(int width, int height, float r, float g, float b, float a)
 {
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	UseS(SHADER_ORTHO);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)height);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], r, g, b, a);

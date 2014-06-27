@@ -5,6 +5,7 @@
 #define TEXTURE_H
 
 #include "platform.h"
+#include "math/vec2i.h"
 
 class Texture
 {
@@ -46,12 +47,17 @@ typedef struct
     struct jpeg_source_mgr  pub;
 } JPEGSource;
 
-struct LoadedTex
+class LoadedTex
 {
+public:
 	int channels;			// The channels in the image (3 = RGB : 4 = RGBA)
 	int sizeX;				// The width of the image in pixels
 	int sizeY;				// The height of the image in pixels
 	unsigned char *data;	// The image pixel data
+
+	void destroy();
+	LoadedTex();
+	~LoadedTex();
 };
 
 struct TextureToLoad
@@ -90,5 +96,13 @@ void DiffPath(const char* basepath, char* diffpath);
 void SpecPath(const char* basepath, char* specpath);
 void NormPath(const char* basepath, char* normpath);
 void OwnPath(const char* basepath, char* ownpath);
+void AllocTex(LoadedTex* empty, int width, int height, int channels);
+void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos);
+void SaveJPEG(const char* fullpath, LoadedTex* image, float quality);
+int SavePNG(const char* fullpath, LoadedTex* image);
+void FlipImage(LoadedTex* image);
+int SaveBMP(const char* fullpath, LoadedTex* image);
+bool SaveRAW(const char* fullpath, LoadedTex* image);
+
 
 #endif

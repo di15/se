@@ -23,6 +23,8 @@
 #include "../common/math/frustum.h"
 #include "main.h"
 #include "../common/sim/explocrater.h"
+#include "../common/tool/rendersprite.h"
+#include "../common/debug.h"
 
 ViewportT g_viewportT[VIEWPORT_TYPES];
 Viewport g_viewport[4];
@@ -131,16 +133,25 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 	// draw x axis
 	float xaxisverts[] = {vmin.x, 0.0f, 0.0f, vmax.x, 0.0f, 0.0f};
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xaxisverts);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDrawArrays(GL_LINES, 0, 2);
 
 	// draw y axis
 	float yaxisverts[] = {0.0f, vmin.y, 0.0f, 0.0f, vmax.y, 0.0f};
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yaxisverts);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDrawArrays(GL_LINES, 0, 2);
 
 	// draw z axis
 	float zaxisverts[] = {0.0f, 0.0f, vmin.z, 0.0f, 0.0f, vmax.z};
 	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zaxisverts);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	glDrawArrays(GL_LINES, 0, 2);
 
 	//float interval = (10.0f/g_zoom);
@@ -236,11 +247,20 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 
 void DrawViewport(int which, int x, int y, int width, int height)
 {
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+	EndS();
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Viewport* v = &g_viewport[which];
 	ViewportT* t = &g_viewportT[v->m_type];
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	float aspect = fabsf((float)width / (float)height);
 	Matrix projection;
@@ -284,6 +304,10 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	modelview.setTranslation(translation);
 	modelmat.setTranslation(translation);
 	modelview.postMultiply(viewmat);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
@@ -313,13 +337,30 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		vmax.y = 0;
 	}
 
+#if 1
 	if(v->m_type == VIEWPORT_ANGLE45O)
 	{
+		EndS();
 		//RenderToShadowMap(projection, viewmat, modelmat, g_focus);
+#ifdef DEBUG
+		LastNum(__FILE__, __LINE__);
+#endif
 		RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+#ifdef DEBUG
+		LastNum(__FILE__, __LINE__);
+#endif
 		RenderShadowedScene(projection, viewmat, modelmat, modelview);
 	}
-
+#endif
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+	//EndS();
+	//g_log<<"sh at t p:"<<g_curS<<endl;
+	//g_log.flush();
+	
+#if 1
 	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
 	{
 		UseS(SHADER_COLOR3D);
@@ -327,10 +368,22 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
 		glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
-		glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+		//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		DrawGrid(vmin, vmax);
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
+		EndS();
 	}
+#endif
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 
+	//EndS();
+
+#if 1
 	//if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
 	{
 		Shader* s = &g_shader[g_curS];
@@ -343,17 +396,35 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
 			glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
-			glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+			//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		}
+		else
+		{
+			UseS(SHADER_COLOR3D);
+			s = &g_shader[g_curS];
+			glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
+			glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
+			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+		}
+		
+#ifdef DEBUG
+		LastNum(__FILE__, __LINE__);
+#endif
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 		DrawFilled(&g_edmap, g_modelholder);
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+		LastNum(__FILE__, __LINE__);
+#endif
+
 		if(v->m_type != VIEWPORT_ANGLE45O)
 			DrawOutlines(&g_edmap, g_modelholder);
 		else
 			DrawSelOutlines(&g_edmap, g_modelholder);
 		glEnable(GL_DEPTH_TEST);
+		EndS();
 
 		UseS(SHADER_COLOR2D);
 		s = &g_shader[g_curS];
@@ -363,6 +434,11 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 		DrawDrag(&g_edmap, &mvpmat, width, height, persp);
+		EndS();
+		
+#ifdef DEBUG
+		LastNum(__FILE__, __LINE__);
+#endif
 
 		if(g_edtool == EDTOOL_CUT && v->m_ldown && !g_keys[VK_CONTROL])
 		{
@@ -400,23 +476,58 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 			float line[] = {last4.x, last4.y, 0, cur4.x, cur4.y, 0};
 			glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, line);
+#ifdef DEBUG
+			//CheckGLError(__FILE__, __LINE__);
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			glDrawArrays(GL_LINES, 0, 2);
+			//CheckGLError(__FILE__, __LINE__);
 
 			//g_log<<"cut draw "<<v->m_lastmouse.x<<","<<v->m_lastmouse.y<<"->"<<v->m_curmouse.x<<","<<v->m_curmouse.y<<endl;
 			//g_log<<"cut draw2 "<<last4.x<<","<<last4.y<<"->"<<cur4.x<<","<<cur4.y<<endl;
 			//g_log<<"cut draw3 "<<last.x<<","<<last.y<<","<<last.z<<"->"<<cur.x<<","<<cur.y<<","<<cur.z<<endl;
 			//g_log.flush();
+			EndS();
 		}
+#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
 	}
+#endif
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	Ortho(width, height, 1, 0, 0, 1);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 	//glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(g_mode != RENDERING)
 		DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
-	//glFlush();
+	glFlush();
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+	CheckGLError(__FILE__, __LINE__);
+#endif
 }
 
 bool ViewportLDown(int which, int relx, int rely, int width, int height)

@@ -36,5 +36,6 @@ extern list<ModelHolder> g_modelholder;
 
 void FreeModelHolders();
 void DrawModelHolders();
+void DrawModelHoldersDepth();
 
 #endif

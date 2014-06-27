@@ -68,6 +68,7 @@ void ViewportW::draw()
 	
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	EndS();
     Ortho(g_width, g_height, 1, 1, 1, 1);
 }
 

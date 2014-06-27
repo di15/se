@@ -21,6 +21,7 @@
 #include "../common/tool/compilebl.h"
 #include "../common/save/savesprite.h"
 #include "../common/tool/rendersprite.h"
+#include "../common/draw/screenshot.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -298,7 +299,10 @@ void Click_SaveEdMap()
 void Click_QSaveEdMap()
 {
 	if(g_lastsave[0] == '\0')
+	{
+		Click_SaveEdMap();
 		return;
+	}
 
 	SaveEdMap(g_lastsave, &g_edmap);
 }
@@ -341,6 +345,9 @@ void Click_CompileMap()
 
 void Click_ExportBuildingSprite()
 {
+#ifdef DEMO
+	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
+#else
 	OPENFILENAME ofn;
 	
 	char filepath[MAX_PATH+1];
@@ -351,7 +358,7 @@ void Click_ExportBuildingSprite()
 	FullPath("renders\\", initdir);
 	CorrectSlashes(initdir);
 	//strcpy(filepath, initdir);
-	FullPath("renders\\building", filepath);
+	FullPath("renders\\building base name", filepath);
 	CorrectSlashes(filepath);
 
 	ofn.lStructSize = sizeof ( ofn );
@@ -373,7 +380,49 @@ void Click_ExportBuildingSprite()
 	
 	//CorrectSlashes(filepath);
 	//CompileMap(filepath, &g_edmap);
-	PrepareRender(filepath);
+	PrepareRender(filepath, RENDER_BUILDING);
+#endif
+}
+
+void Click_ExportUnitSprites()
+{
+#ifdef DEMO
+	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
+#else
+	OPENFILENAME ofn;
+	
+	char filepath[MAX_PATH+1];
+	
+	ZeroMemory( &ofn , sizeof( ofn));
+
+	char initdir[MAX_PATH+1];
+	FullPath("renders\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("renders\\unit base name", filepath);
+	CorrectSlashes(filepath);
+
+	ofn.lStructSize = sizeof ( ofn );
+	ofn.hwndOwner = NULL  ;
+	ofn.lpstrInitialDir = initdir;
+	ofn.lpstrFile = filepath;
+	//ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = sizeof( filepath );
+	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex =1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = MAX_PATH;	//0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_OVERWRITEPROMPT;
+
+	if(!GetSaveFileName(&ofn))
+		return;
+	
+	//CorrectSlashes(filepath);
+	//CompileMap(filepath, &g_edmap);
+	PrepareRender(filepath, RENDER_UNIT);
+#endif
 }
 
 void RunMap(const char* full)
@@ -474,6 +523,14 @@ void Click_BChooseTex()
 	CreateTexture(diffuseindex, relativepath.c_str(), false);
 	unsigned int texname = g_texture[diffuseindex].texname;
 
+	if(diffuseindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load diffuse texture %s", relativepath.c_str());
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+	}
+
 	char specpath[MAX_PATH+1];
 	strcpy(specpath, relativepath.c_str());
 	StripExtension(specpath);
@@ -481,6 +538,14 @@ void Click_BChooseTex()
 
 	unsigned int specindex;
 	CreateTexture(specindex, specpath, false);
+	
+	if(specindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load specular texture %s", specpath);
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+	}
 
 	char normpath[MAX_PATH+1];
 	strcpy(normpath, relativepath.c_str());
@@ -489,6 +554,30 @@ void Click_BChooseTex()
 
 	unsigned int normindex;
 	CreateTexture(normindex, normpath, false);
+
+	if(normindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load normal texture %s", normpath);
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+	}
+	
+	char ownpath[MAX_PATH+1];
+	strcpy(ownpath, relativepath.c_str());
+	StripExtension(ownpath);
+	strcat(ownpath, ".team.jpg");
+
+	unsigned int ownindex;
+	CreateTexture(ownindex, ownpath, false);
+	
+	if(ownindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load team color texture %s", normpath);
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+	}
 
 	if(g_sel1b == NULL)
 	{
@@ -504,6 +593,7 @@ void Click_BChooseTex()
 				s->m_diffusem = diffuseindex;
 				s->m_specularm = specindex;
 				s->m_normalm = normindex;
+				s->m_ownerm = ownindex;
 			}
 		}
 	}
@@ -519,6 +609,7 @@ void Click_BChooseTex()
 			s->m_diffusem = diffuseindex;
 			s->m_specularm = specindex;
 			s->m_normalm = normindex;
+			s->m_ownerm = ownindex;
 		}
 		else
 		{
@@ -528,6 +619,7 @@ void Click_BChooseTex()
 				s->m_diffusem = diffuseindex;
 				s->m_specularm = specindex;
 				s->m_normalm = normindex;
+				s->m_ownerm = ownindex;
 			}
 		}
 	}
@@ -695,8 +787,15 @@ void Click_AddMS3D()
 	int modelid = LoadModel(relative.c_str(), Vec3f(1,1,1), Vec3f(0,0,0), true);
 
 	if(modelid < 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load model %s", relative.c_str());
+
+		MessageBox(g_hWnd, msg, "Error", NULL);
+
 		return;
-	
+	}
+
 	LinkPrevUndo();
 
 	ModelHolder mh(modelid, Vec3f(0,0,0));
@@ -1781,6 +1880,10 @@ void Resize_TexShiftButton(Widget* thisw)
 
 void Click_CompileModel()
 {
+#ifdef DEMO
+	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
+#else
+
         OPENFILENAME ofn;
         
         char filepath[MAX_PATH+1];
@@ -1814,6 +1917,7 @@ void Click_CompileModel()
         //CorrectSlashes(filepath);
         //SaveEdBuilding(filepath, &g_edbldg);
 		CompileModel(filepath, &g_edmap, g_modelholder);
+#endif
 }
 
 void FillGUI()
@@ -1822,6 +1926,7 @@ void FillGUI()
 	DrawSceneFunc = &DrawScene;
 
 	AssignAnyKey(&AnyKeyDown, &AnyKeyUp);
+	AssignKey(VK_F1, SaveScreenshot, NULL);
 	AssignKey(VK_ESCAPE, &Escape, NULL);
 	AssignKey(VK_DELETE, &Delete, NULL);
 	AssignKey('C', Down_C, NULL);
@@ -1853,14 +1958,18 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
+#if 1
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, Resize_CompileMapButton, Click_CompileModel, NULL, NULL));
+#endif
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_CompileMap, NULL, NULL));
+	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL));
+#if 0
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
 	//toppanel->m_subwidg.push_back(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
+#endif
 	toppanel->m_subwidg.push_back(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, Resize_UndoButton, Undo, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, Resize_RedoButton, Redo, NULL, NULL));
 	toppanel->m_subwidg.push_back(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL));
@@ -1905,7 +2014,7 @@ void FillGUI()
 
 	//toppanel->m_subwidg.push_back(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
 	toppanel->m_subwidg.push_back(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Resize_SnapGridText));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "1000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
+	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
 	toppanel->m_subwidg.push_back(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
 	toppanel->m_subwidg.push_back(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
 	
@@ -1916,7 +2025,9 @@ void FillGUI()
 	toppanel->m_subwidg.push_back(new Text(toppanel, "frames", "frames",														MAINFONT8, Resize_FramesText));
 	toppanel->m_subwidg.push_back(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
 
+#if 0
 	toppanel->m_subwidg.push_back(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, Resize_ExplodeButton, Click_Explode, NULL, NULL));
+#endif
 
 	//toppanel->m_subwidg.push_back(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
 

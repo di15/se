@@ -13,6 +13,7 @@
 #include "../common/sim/door.h"
 #include "../common/save/modelholder.h"
 #include "../common/save/compilemap.h"
+#include "../common/tool/rendersprite.h"
 
 Brush g_copyB;
 ModelHolder g_copyM;
@@ -45,6 +46,7 @@ void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
 		}
 	}
 	
+#if 1
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
@@ -53,6 +55,7 @@ void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
 
 		DrawVA(&pmh->frames[ g_renderframe % maxframes ], pmh->translation);
 	}
+#endif
 }
 
 // draw brush outlines
@@ -89,6 +92,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 		}
 	}
 
+#if 1
 	for(auto mhiter = modelholder.begin(); mhiter != modelholder.end(); mhiter++)
 	{
 		ModelHolder* pmh = &*mhiter;
@@ -170,6 +174,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
+#endif
 }
 
 // draw selected brush outlines
@@ -203,6 +208,7 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 		}
 	}
 	
+#if 1
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
@@ -284,6 +290,7 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
+#endif
 }
 
 void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
@@ -363,6 +370,40 @@ void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
+}
+
+
+void DrawDrag_Clip(EdMap* map, Matrix* mvp, int w, int h, bool persp)
+{
+	return;
+
+	Vec2i vmin;
+	Vec2i vmax;
+
+	AllScreenMinMax(&vmin, &vmax, w, h);
+
+	Shader* shader = &g_shader[g_curS];
+
+	float verts[] = 
+	{
+		vmin.x, vmin.y, 0,
+		vmax.x, vmin.y, 0,
+		vmax.x, vmax.y, 0,
+		vmin.x, vmax.y, 0,
+		vmin.x, vmin.y, 0
+	};
+
+	float colour[] = VERT_DRAG_FILLRGBA;
+	glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
+
+	glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	float colour2[] = VERT_DRAG_OUTLRGBA;
+	glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
+
+	glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+	glDrawArrays(GL_LINE_STRIP, 0, 5);
 }
 
 void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
@@ -781,6 +822,8 @@ void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 	{
 		DrawDrag_ModelHolder(map, mvp, w, h, persp);
 	}
+
+	DrawDrag_Clip(map, mvp, w, h, persp);
 }
 
 void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)

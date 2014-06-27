@@ -2,6 +2,8 @@
 
 #include "utils.h"
 #include "platform.h"
+#include "window.h"
+#include "draw/shader.h"
 
 ofstream g_log;
 
@@ -17,6 +19,24 @@ const string DateTime()
 
     return buf;
 }
+
+const string FileDateTime() 
+{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://www.cplusplus.com/reference/clibrary/ctime/strftime/
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+
+	for(int i=0; i<strlen(buf); i++)
+		if(buf[i] == ':')
+			buf[i] = '-';
+
+    return buf;
+}
+
 
 void OpenLog(const char* filename, float version)
 {
@@ -195,3 +215,25 @@ void BackSlashes(char* corrected)
 			corrected[i] = '\\';
 }
 
+
+void OutOfMem(const char* file, int line)
+{
+	char msg[2048];
+	sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
+	//ErrorMessage("Out of memory", msg);
+	MessageBox(g_hWnd, msg, "Out of memory", NULL);
+	//g_quit = true;
+}
+
+void CheckGLError(const char* file, int line)
+{
+	//char msg[2048];
+	//sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
+	//ErrorMessage("Out of memory", msg);
+	int error = glGetError();
+
+	if(error == GL_NO_ERROR)
+		return;
+
+	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<endl;
+}

@@ -11,5 +11,6 @@
 using namespace std;
 
 void LastNum(const char* l);
+void LastNum(const char* f, const int line);
 
 #endif

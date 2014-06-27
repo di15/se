@@ -286,6 +286,9 @@
     <ClCompile Include="..\common\sim\explocrater.cpp">
       <Filter>source\common\sim</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\draw\screenshot.cpp">
+      <Filter>source\common\draw</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -539,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="..\common\sim\explocrater.h">
       <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\draw\screenshot.h">
+      <Filter>source\common\draw</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

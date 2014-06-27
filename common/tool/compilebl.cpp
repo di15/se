@@ -11,6 +11,8 @@
 
 //#define COMPILEB_DEBUG
 
+#define TEXTYPES		4
+
 TexFitRow::TexFitRow()
 {
 	bounds[0].x = 0;
@@ -30,18 +32,28 @@ int Max2Pow(int lowerbound)
 {
 	int twopow = 2;
 
-	while( twopow < lowerbound && twopow < 2048 )
+	while( twopow < lowerbound
+#if 0
+		&& twopow < 2048 
+#endif
+		)
 		twopow *= 2;
 
 	return twopow;
 }
 
-void AllocTex(LoadedTex* empty, int width, int height, int channels)
+int Max2Pow32(int lowerbound)
 {
-	empty->data = (unsigned char*)malloc(width * height * channels * sizeof(unsigned char));
-	empty->sizeX = width;
-	empty->sizeY = height;
-	empty->channels = channels;
+	int twopow = 32;
+
+	while( twopow < lowerbound
+#if 0
+		&& twopow < 2048 
+#endif
+		)
+		twopow *= 2;
+
+	return twopow;
 }
 
 // determine how many times a triangle tiles on a texture
@@ -172,191 +184,6 @@ void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 	g_log<<"\t done resample"<<endl;
 	g_log.flush();
 #endif
-}
-
-void Blit(LoadedTex* src, LoadedTex* dest, Vec2i pos)
-{
-	if(src == NULL || src->data == NULL)
-		return;
-
-	for(int x=0; x<src->sizeX; x++)
-	{
-		if(x+pos.x >= dest->sizeX)
-			continue;
-
-		for(int y=0; y<src->sizeY; y++)
-		{
-			if(y+pos.y >= dest->sizeY)
-				continue;
-
-			int srcpixel = x*src->channels + y*src->channels*src->sizeX;
-			int destpixel = (x+pos.x)*dest->channels + (y+pos.y)*dest->channels*dest->sizeX;
-
-			dest->data[destpixel + 0] = src->data[srcpixel + 0];
-			dest->data[destpixel + 1] = src->data[srcpixel + 1];
-			dest->data[destpixel + 2] = src->data[srcpixel + 2];
-
-			if(dest->channels > 3)
-			{
-				if(src->channels <= 3)
-					dest->data[destpixel + 3] = 255;
-				else
-					dest->data[destpixel + 3] = src->data[srcpixel + 3];
-			}
-		}
-	}
-}
-
-void SaveJPEG(const char* fullpath, LoadedTex* image, float quality)
-{
-	FILE *outfile;
-	if ((outfile = fopen(fullpath, "wb")) == NULL) 
-	{
-		return;
-	}
-
-	struct jpeg_compress_struct cinfo;
-	struct jpeg_error_mgr       jerr;
-
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_compress(&cinfo);
-	jpeg_stdio_dest(&cinfo, outfile);
-
-	cinfo.image_width      = image->sizeX;
-	cinfo.image_height     = image->sizeY;
-	cinfo.input_components = 3;
-	cinfo.in_color_space   = JCS_RGB;
-
-	jpeg_set_defaults(&cinfo);
-	/*set the quality [0..100]  */
-	jpeg_set_quality (&cinfo, 100*quality, true);
-	jpeg_start_compress(&cinfo, true);
-
-	JSAMPROW row_pointer;
-	int row_stride = image->sizeX * 3;
-
-	while (cinfo.next_scanline < cinfo.image_height)
-	{
-		row_pointer = (JSAMPROW) &image->data[cinfo.next_scanline*row_stride];
-		jpeg_write_scanlines(&cinfo, &row_pointer, 1);
-	}
-
-	jpeg_finish_compress(&cinfo);
-
-	fclose(outfile);
-
-	jpeg_destroy_compress(&cinfo);
-}
-
-
-int SavePNG(const char* fullpath, LoadedTex* image)
-{
-	FILE *fp;
-	png_structp png_ptr;
-	png_infop info_ptr;
-	//png_colorp palette;
-
-	/* Open the file */
-	fp = fopen(fullpath, "wb");
-	if (fp == NULL)
-		return (ERROR);
-
-	/* Create and initialize the png_struct with the desired error handler
-	* functions.  If you want to use the default stderr and longjump method,
-	* you can supply NULL for the last three parameters.  We also check that
-	* the library version is compatible with the one used at compile time,
-	* in case we are using dynamically linked libraries.  REQUIRED.
-	*/
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-		(png_voidp) NULL, NULL, NULL);
-
-	if (png_ptr == NULL)
-	{
-		fclose(fp);
-		return (ERROR);
-	}
-
-	/* Allocate/initialize the image information data.  REQUIRED */
-	info_ptr = png_create_info_struct(png_ptr);
-	if (info_ptr == NULL)
-	{
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr,  NULL);
-		return (ERROR);
-	}
-
-	int color_type = PNG_COLOR_TYPE_RGB;
-
-	if(image->channels == 4)
-		color_type = PNG_COLOR_TYPE_RGBA;
-
-	png_set_IHDR(png_ptr, info_ptr, image->sizeX, image->sizeY, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-	/* Set error handling.  REQUIRED if you aren't supplying your own
-	* error handling functions in the png_create_write_struct() call.
-	*/
-	if (setjmp(png_jmpbuf(png_ptr)))
-	{
-		/* If we get here, we had a problem writing the file */
-		fclose(fp);
-		png_destroy_write_struct(&png_ptr, &info_ptr);
-		return (ERROR);
-	}
-
-	/* One of the following I/O initialization functions is REQUIRED */
-
-	/* Set up the output control if you are using standard C streams */
-	png_init_io(png_ptr, fp);
-
-
-	png_bytep* row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * image->sizeY);
-	for (int y=0; y<image->sizeY; y++)
-		row_pointers[y] = (png_byte*)&image->data[y*image->sizeX*image->channels];
-
-	png_write_info(png_ptr, info_ptr);
-	png_write_image(png_ptr, row_pointers);
-	png_write_end(png_ptr, NULL);
-
-	//for (y=0; y<image->sizeY; y++)
-	//   free(row_pointers[y]);
-	free(row_pointers);
-
-
-	/* This is the easy way.  Use it if you already have all the
-	* image info living in the structure.  You could "|" many
-	* PNG_TRANSFORM flags into the png_transforms integer here.
-	*/
-	//png_write_png(png_ptr, info_ptr, NULL, NULL);
-
-	/* If you png_malloced a palette, free it here (don't free info_ptr->palette,
-	* as recommended in versions 1.0.5m and earlier of this example; if
-	* libpng mallocs info_ptr->palette, libpng will free it).  If you
-	* allocated it with malloc() instead of png_malloc(), use free() instead
-	* of png_free().
-	*/
-	//png_free(png_ptr, palette);
-	//palette = NULL;
-
-	/* Similarly, if you png_malloced any data that you passed in with
-	* png_set_something(), such as a hist or trans array, free it here,
-	* when you can be sure that libpng is through with it.
-	*/
-	//png_free(png_ptr, trans);
-	//trans = NULL;
-	/* Whenever you use png_free() it is a good idea to set the pointer to
-	* NULL in case your application inadvertently tries to png_free() it
-	* again.  When png_free() sees a NULL it returns without action, thus
-	* avoiding the double-free security problem.
-	*/
-
-	/* Clean up after the write, and free any memory allocated */
-	png_destroy_write_struct(&png_ptr, &info_ptr);
-
-	/* Close the file */
-	fclose(fp);
-
-	/* That's it */
-	return (1);
 }
 
 static bool transparency = false;
@@ -537,7 +364,7 @@ static LoadedTex** images;
 
 void LoadAllRGBData()
 {
-	images = new LoadedTex*[uniquetexs.size()*3];
+	images = new LoadedTex*[uniquetexs.size()*TEXTYPES];
 
 	int i=0;
 	for(auto ut=uniquetexs.begin(); ut!=uniquetexs.end(); ut++, i++)
@@ -575,6 +402,13 @@ void LoadAllRGBData()
 		NormPath(basepath, fullnormalpath);
 		images[i] = LoadTexture(fullnormalpath);
 		tr->normindex = i;
+
+		i++;
+
+		char fullownerpath[MAX_PATH+1];
+		OwnPath(basepath, fullownerpath);
+		images[i] = LoadTexture(fullownerpath);
+		tr->ownindex = i;
 
 #ifdef COMPILEB_DEBUG
 		g_log<<"------"<<endl;
@@ -796,9 +630,9 @@ void ResizeImages()
 	g_log.flush();
 #endif
 
-	resizedimages = new LoadedTex[ uniquetexs.size()*3 ];
+	resizedimages = new LoadedTex[ uniquetexs.size()*TEXTYPES ];
 
-	for(int i=0; i<uniquetexs.size()*3; i++)
+	for(int i=0; i<uniquetexs.size()*TEXTYPES; i++)
 		resizedimages[i].data = NULL;
 
 #ifdef COMPILEB_DEBUG
@@ -843,6 +677,8 @@ void ResizeImages()
 			g_log<<"\t done compile 6 image norm"<<endl;
 			g_log.flush();
 #endif
+			
+			Resample(images[ tr->ownindex ], &resizedimages[ tr->ownindex ], newdim);
 		}
 	}
 }
@@ -850,6 +686,7 @@ void ResizeImages()
 static LoadedTex finaldiff;
 static LoadedTex finalspec;
 static LoadedTex finalnorm;
+static LoadedTex finalown;
 
 void CombineImages()
 {
@@ -861,6 +698,7 @@ void CombineImages()
 	AllocTex(&finaldiff, finaldim.x, finaldim.y, transparency ? 4 : 3);
 	AllocTex(&finalspec, finaldim.x, finaldim.y, 3);
 	AllocTex(&finalnorm, finaldim.x, finaldim.y, 3);
+	AllocTex(&finalown, finaldim.x, finaldim.y, 4);
 
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7b"<<endl;
@@ -910,7 +748,8 @@ void CombineImages()
 	g_log.flush();
 #endif
 
-	for(int i=0; i<uniquetexs.size()*3; i++)
+#if 1
+	for(int i=0; i<uniquetexs.size()*TEXTYPES; i++)
 	{
 
 #ifdef COMPILEB_DEBUG
@@ -918,9 +757,13 @@ void CombineImages()
 		g_log.flush();
 #endif
 
+#if 0
 		if(resizedimages[i].data)
 			free(resizedimages[i].data);
+#endif
+		resizedimages[i].destroy();
 	}
+#endif
 
 #ifdef COMPILEB_DEBUG
 	g_log<<"compile 7d"<<endl;
@@ -939,6 +782,7 @@ static string difffull;
 static string difffullpng;
 static string specfull;
 static string normfull;
+static string ownfull;
 
 void WriteImages()
 {
@@ -948,6 +792,7 @@ void WriteImages()
 		SaveJPEG(difffull.c_str(), &finaldiff, 0.75f);
 	SaveJPEG(specfull.c_str(), &finalspec, 0.75f);
 	SaveJPEG(normfull.c_str(), &finalnorm, 0.75f);
+	SavePNG(ownfull.c_str(), &finalown);
 
 	//SavePNG(difffullpng.c_str(), &finaldiff);
 	//SavePNG(specfull.c_str(), &finalspec);
@@ -959,8 +804,8 @@ void CalcTexCoords(EdMap* map, list<ModelHolder> &modelholders)
 	int vindex = 0;
 
 #ifdef COMPILEB_DEBUG
-	unsigned int window3index;
-	CreateTextureI(window3index, "textures/apartment/stuccowindow3.jpg", false);
+	//unsigned int window3index;
+	//CreateTextureI(window3index, "textures/apartment/stuccowindow3.jpg", false);
 #endif
 
 	for(auto br=map->m_brush.begin(); br!=map->m_brush.end(); br++)
@@ -1081,23 +926,33 @@ void SaveModel(const char* fullfile)
 
 void CleanupModelCompile()
 {
+#if 0
 	if(finaldiff.data)
 		free(finaldiff.data);
 	if(finalspec.data)
 		free(finalspec.data);
 	if(finalnorm.data)
 		free(finalnorm.data);
+#endif
+	
+	finaldiff.destroy();
+	finalspec.destroy();
+	finalnorm.destroy();
+	finalown.destroy();
 
-	for(int i=0; i<uniquetexs.size()*3; i++)
+	for(int i=0; i<uniquetexs.size()*TEXTYPES; i++)
 	{
 		if(images[i])
 		{
+#if 0
 			if(images[i]->data)
 			{
 				free(images[i]->data);
 			}
-
-			free(images[i]);
+#endif
+			images[i]->destroy();
+			//free(images[i]);
+			delete images[i];
 		}
 	}
 
@@ -1119,6 +974,7 @@ void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelhold
 	difffullpng = fullpath + string(basename) + ".png";
 	specfull = fullpath + string(basename) + ".spec.jpg";
 	normfull = fullpath + string(basename) + ".norm.jpg";
+	ownfull = fullpath + string(basename) + ".team.png";
 
 	//string diffpath = string(basename) + ".jpg";
 	//string diffpathpng = string(basename) + ".png";

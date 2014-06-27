@@ -32,5 +32,6 @@ extern ModelHolder* g_sel1m;	//drag selected model (model being dragged or manip
 #define DRAG_DOOR_AXIS		2
 
 void DrawEdMap(EdMap* map, bool showsky);
+void DrawEdMapDepth(EdMap* map, bool showsky);
 
 #endif

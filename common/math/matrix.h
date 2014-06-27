@@ -17,8 +17,9 @@ class Matrix
 		~Matrix();
 		void loadIdentity();
 		void set( const float *matrix );
-
+		
 		void postMultiply( const Matrix& matrix );
+		void postMultiply2( const Matrix& matrix );
 
 		//	Set the translation of the current matrix. Will erase any previous values.
 		void setTranslation( const float *translation );
@@ -51,5 +52,8 @@ class Matrix
 		//	Rotate a vector by the inverse of the rotation part of this matrix.
 		void inverseRotateVect( float *pVect );
 };
+
+
+void LogMat(const float* m);
 
 #endif

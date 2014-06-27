@@ -6,6 +6,7 @@
 #include "gui/font.h"
 #include "draw/shadow.h"
 #include "math/3dmath.h"
+#include "debug.h"
 
 bool g_quit = false;
 double g_frameinterval = 0.0f;
@@ -89,6 +90,11 @@ void Resize(int width, int height)
 	{
 		g_width = width;
 		g_height = height;
+
+#ifdef DEBUG
+		g_log<<"!=rsz "<<g_width<<","<<g_height<<endl;
+		g_log.flush();
+#endif
 
 		//if(g_fullscreen)
 			//Reload();
@@ -174,32 +180,72 @@ bool AnimateNextFrame(int desiredFrameRate)
 bool InitWindow()
 {
 	glShadeModel(GL_SMOOTH);
+	CheckGLError(__FILE__, __LINE__);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	CheckGLError(__FILE__, __LINE__);
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClearDepth(1.0f);
+	CheckGLError(__FILE__, __LINE__);
 	glEnable(GL_DEPTH_TEST);
+	CheckGLError(__FILE__, __LINE__);
 	glDepthFunc(GL_LEQUAL);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glEnable(GL_TEXTURE_2D);
+	CheckGLError(__FILE__, __LINE__);
+	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	CheckGLError(__FILE__, __LINE__);
+	//glEnable(GL_TEXTURE_2D);
+	CheckGLError(__FILE__, __LINE__);
 	glEnable(GL_BLEND);
+	CheckGLError(__FILE__, __LINE__);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	CheckGLError(__FILE__, __LINE__);
 	//glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CW);
+	CheckGLError(__FILE__, __LINE__);
 	glCullFace(GL_BACK);
 
-	glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
-	glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
-    glClientActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+	CheckGLError(__FILE__, __LINE__);
 
-	if(!glActiveTextureARB || !glMultiTexCoord2fARB || !glClientActiveTextureARB)
+#if 1
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+	glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+	//glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
+   // glClientActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
+
+
+	if(!glActiveTextureARB 
+		//|| !glMultiTexCoord2fARB || !glClientActiveTextureARB
+			)
 	{
 		MessageBox(g_hWnd, TEXT("Your current setup does not support multitexturing"), TEXT("Error"), MB_OK);
 		return false;
 	}
+#endif
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	InitGLSL();
 	InitShadows();
 	LoadFonts();
+
+#if 0
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeofvertdata, tempVertData, GL_STATIC_DRAW);
+#endif
 
 	return true;
 }
@@ -368,18 +414,82 @@ bool MakeWindow(const char* title, HICON icon, WNDPROC wndproc)
 		MessageBox(NULL, TEXT("Can't set the pixel format"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
 		return false;
 	}
-
-	if (!(g_hRC = wglCreateContext(g_hDC)))
+	
+	HGLRC tempContext; 
+	
+	if (!(tempContext = wglCreateContext(g_hDC)))
+	//if (!(g_hRC = wglCreateContext(g_hDC)))
+	//if (!(g_hRC = wglCreateContextAttribsARB(g_hDC, 0, attribs)))
 	{
 		DestroyWindow(title);
 		MessageBox(NULL, TEXT("Can't create a GL rendering context"), TEXT("ERROR"), MB_OK | MB_ICONEXCLAMATION);
 		return false;
 	}
 
-	if(!wglMakeCurrent(g_hDC, g_hRC))
+	if(!wglMakeCurrent(g_hDC, tempContext))
 	{
 		DestroyWindow(title);
 		MessageBox(NULL, TEXT("Can't activate the GL rendering context"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
+		return false;
+	}
+
+	int major, minor;
+	GetGLVersion(&major, &minor);
+
+	if( major < 3 || ( major == 3 && minor < 2 ) )
+	{
+		DestroyWindow(title);
+		MessageBox(g_hWnd, "OpenGL 3.2 is not supported!", "Error", NULL);
+		return false;
+	}
+
+#define WGL_CONTEXT_MAJOR_VERSION_ARB       0x2091
+#define WGL_CONTEXT_MINOR_VERSION_ARB       0x2092
+#define WGL_CONTEXT_LAYER_PLANE_ARB     0x2093
+#define WGL_CONTEXT_FLAGS_ARB           0x2094
+#define WGL_CONTEXT_PROFILE_MASK_ARB        0x9126
+#define WGL_CONTEXT_CORE_PROFILE_BIT_ARB            0x00000001
+#define WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB	0x00000002
+	GLint attribs[] =
+	{
+		// Here we ask for OpenGL 2.1
+		WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+		WGL_CONTEXT_MINOR_VERSION_ARB, 2,
+		// Uncomment this for forward compatibility mode
+		//WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+		// Uncomment this for Compatibility profile
+		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+		// We are using Core profile here
+		//WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		0
+	};
+
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
+	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress("wglCreateContextAttribsARB");
+	if(wglCreateContextAttribsARB == NULL)
+	{
+		//g_hRC = wglCreateContextAttribsARB(g_hDC,0, attribs);
+		DestroyWindow(title);
+		MessageBox(NULL, TEXT("Can't get pointer to wglCreateContextAttribsARB"), TEXT("ERROR"), MB_OK | MB_ICONEXCLAMATION);
+		return false;
+	}
+
+	//if (!(tempContext = wglCreateContext(g_hDC)))
+	//if (!(g_hRC = wglCreateContext(g_hDC)))
+	if (!(g_hRC = wglCreateContextAttribsARB(g_hDC, 0, attribs)))
+	{
+		DestroyWindow(title);
+		MessageBox(NULL, TEXT("Can't create a GL 3.2 rendering context"), TEXT("ERROR"), MB_OK | MB_ICONEXCLAMATION);
+		return false;
+	}
+	
+	wglMakeCurrent(0, 0);
+	wglDeleteContext(tempContext);
+
+	if(!wglMakeCurrent(g_hDC, g_hRC))
+	{
+		DestroyWindow(title);
+		MessageBox(NULL, TEXT("Can't activate the GL 3.2 rendering context"), TEXT("Error"), MB_OK | MB_ICONEXCLAMATION);
 		return false;
 	}
 

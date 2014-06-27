@@ -13,6 +13,8 @@ using namespace std;
 
 extern ofstream g_log;
 
+const string DateTime();
+const string FileDateTime();
 void FullPath(const char* filename, char* full);
 string MakePathRelative(const char* full);
 void ExePath(char* exepath);
@@ -26,3 +28,5 @@ int HexToInt(const char* s);
 int StrToInt(const char *s);
 void CorrectSlashes(char* corrected);
 void BackSlashes(char* corrected);
+void OutOfMem(const char* file, int line);
+void CheckGLError(const char* file, int line);

@@ -54,16 +54,11 @@ public:
 	}
 };
 
-#define FONT_CORBEL28		0
-#define FONT_EUROSTILE16	1
-#define FONT_EUROSTILE32	2
-#define FONT_GULIM10		3
-#define FONT_GULIM16		4
-#define FONT_GULIM32		5
-#define FONT_MSUIGOTHIC10	6
-#define FONT_MSUIGOTHIC16	7
-#define FONT_SMALLFONTS10	8
-#define FONTS				9
+#define FONT_GULIM32		0
+#define FONT_MSUIGOTHIC10	1
+#define FONT_MSUIGOTHIC16	2
+#define FONT_SMALLFONTS10	3
+#define FONTS				4
 extern Font g_font[FONTS];
 
 #define MAINFONT8 (FONT_SMALLFONTS10)

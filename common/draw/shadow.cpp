@@ -46,6 +46,8 @@ Vec3f g_viewInter;
 
 void InitShadows()
 {
+	CheckGLError(__FILE__, __LINE__);
+
 	glGenTextures(1, &g_depth);
 	glBindTexture(GL_TEXTURE_2D, g_depth);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -53,19 +55,31 @@ void InitShadows()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
+	CheckGLError(__FILE__, __LINE__);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+
+	
+	CheckGLError(__FILE__, __LINE__);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	CheckGLError(__FILE__, __LINE__);
 
 	glGenRenderbuffersEXT(1, &g_rbDepth);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, g_rbDepth);
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, g_depthSizeX, g_depthSizeY);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 	
+	CheckGLError(__FILE__, __LINE__);
+
 	glGenFramebuffersEXT(1, &g_fbDepth);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, g_depth, 0);
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_rbDepth);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	CheckGLError(__FILE__, __LINE__);
 }
 
 void InverseMatrix(Matrix* dstm, Matrix srcm)
@@ -406,9 +420,18 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
+	
+#ifdef DEBUG
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
 	glViewport(0, 0, g_depthSizeX, g_depthSizeY);
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+	LastNum(__FILE__, __LINE__);
+#endif
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -428,18 +451,28 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 		g_lightEye.x, g_lightEye.y, g_lightEye.z, 
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+	LastNum(__FILE__, __LINE__);
+#endif
+
 	UseS(SHADER_DEPTH);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightProjectionMatrix.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 	glUniformMatrix4fv(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightModelViewMatrix.m_matrix);
-	glUniform4f(g_shader[SHADER_MODEL].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+	//glUniform4f(g_shader[SHADER_MODEL].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
+	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 	if(DrawSceneDepthFunc != NULL)
 		DrawSceneDepthFunc();
 
-	TurnOffShader();
+	//TurnOffShader();
+	EndS();
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -529,7 +562,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 		DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
 
-	TurnOffShader();
+	//TurnOffShader();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	/*
@@ -545,7 +578,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 		DrawTileSq();
 	}*/
 	
-	TurnOffShader();
+	//TurnOffShader();
 	//g_camera.Look();
 }
 

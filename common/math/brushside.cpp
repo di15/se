@@ -28,6 +28,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	if(m_ntris > 0)
 	{
 		m_tris = new Triangle2[m_ntris];
+		if(!m_tris) OutOfMem(__FILE__, __LINE__);
 		memcpy(m_tris, original.m_tris, sizeof(Triangle2)*m_ntris);
 	}
 	m_outline = original.m_outline;
@@ -39,6 +40,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	if(m_ntris > 0)
 	{
 		m_vindices = new int[m_ntris+2];
+		if(!m_vindices) OutOfMem(__FILE__, __LINE__);
 		memcpy(m_vindices, original.m_vindices, sizeof(int)*(m_ntris+2));
 	}
 	
@@ -337,27 +339,49 @@ BrushSide::BrushSide(Vec3f normal, Vec3f point)
 	//m_centroid = Vec3f(0,0,0);
 }
 
-void BrushSide::usetex()
+void BrushSide::usedifftex()
 {
 	glActiveTextureARB(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_diffusem].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
-	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+}
+
+void BrushSide::usespectex()
+{
 	glActiveTextureARB(GL_TEXTURE1);
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_specularm].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SPECULARMAP], 1);
-	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+}
+
+
+void BrushSide::usenormtex()
+{
 	glActiveTextureARB(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_normalm].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_NORMALMAP], 2);
-	
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+}
+
+void BrushSide::useteamtex()
+{
 	glActiveTextureARB(GL_TEXTURE3);
 	//glBindTexture(GL_TEXTURE_2D, m_diffusem);
 	glBindTexture(GL_TEXTURE_2D, g_texture[m_ownerm].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 }
 /*
 void BrushSide::usetex()

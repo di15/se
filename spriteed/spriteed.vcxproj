@@ -24,6 +24,7 @@
     <ClCompile Include="..\common\draw\ms3d.cpp" />
     <ClCompile Include="..\common\draw\particle.cpp" />
     <ClCompile Include="..\common\draw\projectile.cpp" />
+    <ClCompile Include="..\common\draw\screenshot.cpp" />
     <ClCompile Include="..\common\draw\shader.cpp" />
     <ClCompile Include="..\common\draw\shadow.cpp" />
     <ClCompile Include="..\common\draw\sortb.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="..\common\draw\ms3d.h" />
     <ClInclude Include="..\common\draw\particle.h" />
     <ClInclude Include="..\common\draw\projectile.h" />
+    <ClInclude Include="..\common\draw\screenshot.h" />
     <ClInclude Include="..\common\draw\shader.h" />
     <ClInclude Include="..\common\draw\shadow.h" />
     <ClInclude Include="..\common\draw\sortb.h" />
@@ -201,7 +203,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110_xp</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -222,8 +224,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\opengl;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\GL;$(LibraryPath)</LibraryPath>
+    <TargetName>SpriteEdDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -239,11 +242,16 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(SolutionDir)Debug\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -262,6 +270,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Release\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
