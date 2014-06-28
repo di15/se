@@ -23,7 +23,7 @@ attribute vec2 texCoordIn0;
 varying vec2 texCoordOut0;
 
 //uniform mat4 invModelView;
-//uniform mat4 normalMat;
+uniform mat4 normalMat;
 
 void main(void)
 {
@@ -40,9 +40,9 @@ void main(void)
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
-	mat4 normalMat = transpose( inverse( model * view ) );
+	//mat4 normalMat = transpose( inverse( model * view ) );
 	//mat4 normalMat = invModelView;
-	vec3 normalEyeSpace = vec3( normalMat * vec4(normalIn, 0.0) );
+	vec3 normalEyeSpace = vec3( normalMat * vec4(gl_Normal, 0.0) );
 	normalOut = normalize(normalEyeSpace);
 
 	texCoordOut0 = texCoordIn0;
