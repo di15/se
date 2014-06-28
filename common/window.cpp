@@ -332,6 +332,10 @@ bool MakeWindow(const char* title)
 	g_glcontext = SDL_GL_CreateContext(g_window);
 
 	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<endl;
+	//g_log<<"GL_MAX_TEXTURE_SIZE: "<<glGetString(GL_MAX_TEXTURE_SIZE)<<endl;
+	int maxtex;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtex);
+    g_log<<"GL_MAX_TEXTURE_SIZE: "<<maxtex<<endl;
 	g_log.flush();
 
 	if(!g_glcontext)

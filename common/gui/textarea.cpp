@@ -133,14 +133,14 @@ bool TextArea::keydown(int k)
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == SDLK_LEFT)
+	if(k == SDL_SCANCODE_LEFT)
 	{
 		if(m_caret <= 0)
 			return true;
 
 		m_caret --;
 	}
-	else if(k == SDLK_RIGHT)
+	else if(k == SDL_SCANCODE_RIGHT)
 	{
 		int len = m_value.length();
 
@@ -149,9 +149,9 @@ bool TextArea::keydown(int k)
 
 		m_caret ++;
 	}
-	else if(k == 190 && !g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
+	else if(k == 190 && !g_keys[SDL_SCANCODE_LSHIFT] && !g_keys[SDL_SCANCODE_RSHIFT])
 		placechar('.');/*
-	else if(k == SDLK_TAB)
+	else if(k == SDL_SCANCODE_TAB)
 	{
 		for(int i=0; i<g_GUI.view.size(); i++)
 		{
@@ -224,7 +224,7 @@ bool TextArea::charin(int k)
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == SDLK_BACKSPACE)
+	if(k == SDL_SCANCODE_BACKSPACE)
 	{
 		int len = m_value.length();
 
@@ -238,7 +238,7 @@ bool TextArea::charin(int k)
 
 		m_caret--;
 	}
-	else if(k == SDLK_DELETE)
+	else if(k == SDL_SCANCODE_DELETE)
 	{
 		int len = m_value.length();
 
@@ -250,15 +250,15 @@ bool TextArea::charin(int k)
 		m_value = before;
 		m_value.append(after);
 	}
-	else if(k == SDLK_LSHIFT && k == SDLK_RSHIFT)
+	else if(k == SDL_SCANCODE_LSHIFT && k == SDL_SCANCODE_RSHIFT)
 		return true;
-	else if(k == SDLK_CAPSLOCK)
+	else if(k == SDL_SCANCODE_CAPSLOCK)
 		return true;
-	else if(k == SDLK_SPACE)
+	else if(k == SDL_SCANCODE_SPACE)
 	{
 		placechar(' ');
 	}
-	else if(k == SDLK_RETURN)
+	else if(k == SDL_SCANCODE_RETURN)
 	{
 		placechar('\n');
 	}

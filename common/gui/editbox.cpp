@@ -253,7 +253,7 @@ bool EditBox::keydown(int k)
 	if(m_caret > len)
 		m_caret = len;
 /*
-	if(k == SDLK_BACK)
+	if(k == SDL_SCANCODE_BACK)
 	{
 		int len = value.length();
 
@@ -267,7 +267,7 @@ bool EditBox::keydown(int k)
 
 		caret--;
 	}
-	else if(k == SDLK_DELETE)
+	else if(k == SDL_SCANCODE_DELETE)
 	{
 		int len = value.length();
 
@@ -279,7 +279,7 @@ bool EditBox::keydown(int k)
 		value = before;
 		value.append(after);
 	}
-	else*/ if(k == SDLK_LEFT)
+	else*/ if(k == SDL_SCANCODE_LEFT)
 	{
 		if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 		{
@@ -300,7 +300,7 @@ bool EditBox::keydown(int k)
 		if(endx <= m_pos[0])
 			m_scroll[0] += m_pos[0] - endx + 1;
 	}
-	else if(k == SDLK_RIGHT)
+	else if(k == SDL_SCANCODE_RIGHT)
 	{
 		int len = m_value.length();
 
@@ -320,14 +320,14 @@ bool EditBox::keydown(int k)
 		if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == 190 && !g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
+	else if(k == 190 && !g_keys[SDL_SCANCODE_LSHIFT] && !g_keys[SDL_SCANCODE_RSHIFT])
 		placechar('.');
 	/*
-	else if(k == SDLK_SHIFT)
+	else if(k == SDL_SCANCODE_SHIFT)
 		return true;
-	else if(k == SDLK_CAPITAL)
+	else if(k == SDL_SCANCODE_CAPITAL)
 		return true;
-	else if(k == SDLK_SPACE)
+	else if(k == SDL_SCANCODE_SPACE)
 	{
 		int len = value.length();
 
@@ -349,7 +349,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(!g_keys[SDLK_SHIFT] && !g_keys[SDLK_CAPITAL])
+		if(!g_keys[SDL_SCANCODE_SHIFT] && !g_keys[SDL_SCANCODE_CAPITAL])
 			addchar += 32;
 
 		string before = value.substr(0, caret);
@@ -366,7 +366,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(g_keys[SDLK_SHIFT])
+		if(g_keys[SDL_SCANCODE_SHIFT])
 		{
 			if(k == 190)
 				addchar = '>';
@@ -395,7 +395,7 @@ bool EditBox::keydown(int k)
 
 		char addchar = k;
 
-		if(g_keys[SDLK_SHIFT])
+		if(g_keys[SDL_SCANCODE_SHIFT])
 		{
 			if(k == '0')
 				addchar = ')';
@@ -427,7 +427,7 @@ bool EditBox::keydown(int k)
 		caret ++;
 	}*/
 	/*
-	else if(k == SDLK_TAB)
+	else if(k == SDL_SCANCODE_TAB)
 	{
 		for(int i=0; i<g_GUI.view.size(); i++)
 		{
@@ -612,7 +612,7 @@ bool EditBox::charin(int k)
 	if(m_caret > len)
 		m_caret = len;
 
-	if(k == SDLK_BACKSPACE)
+	if(k == SDL_SCANCODE_BACKSPACE)
 	{
 		int len = m_value.length();
 
@@ -645,7 +645,7 @@ bool EditBox::charin(int k)
 		else if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == SDLK_DELETE)
+	else if(k == SDL_SCANCODE_DELETE)
 	{
 		int len = m_value.length();
 
@@ -676,13 +676,13 @@ bool EditBox::charin(int k)
 		else if(endx >= m_pos[2])
 			m_scroll[0] -= endx - m_pos[2] + 1;
 	}
-	else if(k == SDLK_LSHIFT || k == SDLK_RSHIFT)
+	else if(k == SDL_SCANCODE_LSHIFT || k == SDL_SCANCODE_RSHIFT)
 		return true;
-	else if(k == SDLK_CAPSLOCK)
+	else if(k == SDL_SCANCODE_CAPSLOCK)
 		return true;
-	else if(k == SDLK_RETURN)
+	else if(k == SDL_SCANCODE_RETURN)
 		return true;
-	else if(k == SDLK_SPACE)
+	else if(k == SDL_SCANCODE_SPACE)
 	{
 		placechar(' ');
 	}
@@ -694,7 +694,7 @@ bool EditBox::charin(int k)
 		g_log.flush();
 #endif
 
-		//if(k == 'C' && g_keys[SDLK_CONTROL])
+		//if(k == 'C' && g_keys[SDL_SCANCODE_CONTROL])
 		if(k == 3)	//copy
 		{
 #ifdef PASTE_DEBUG
@@ -729,7 +729,7 @@ bool EditBox::charin(int k)
 			}
 #endif
 		}
-		//else if(k == 'V' && g_keys[SDLK_CONTROL])
+		//else if(k == 'V' && g_keys[SDL_SCANCODE_CONTROL])
 		else if(k == 22)	//paste
 		{
 #ifdef PLATFORM_WIN32
@@ -764,7 +764,7 @@ bool EditBox::charin(int k)
 			CloseClipboard();
 #endif
 		}
-		//else if(k == 'A' && g_keys[SDLK_CONTROL])
+		//else if(k == 'A' && g_keys[SDL_SCANCODE_CONTROL])
 		else if(k == 1)	//select all
 		{
 			m_highl[0] = 0;

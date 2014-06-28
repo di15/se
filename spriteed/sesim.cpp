@@ -40,12 +40,13 @@ void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
 
 			//glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_drawva.vertices);
-			
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_drawva.vertices);
+            glVertexPointer(3, GL_FLOAT, 0, side->m_drawva.vertices);
+
 			glDrawArrays(GL_TRIANGLES, 0, side->m_drawva.numverts);
 		}
 	}
-	
+
 #if 1
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
@@ -86,7 +87,8 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 
 			glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_outline.m_drawoutva);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_outline.m_drawoutva);
+            glVertexPointer(3, GL_FLOAT, 0, side->m_outline.m_drawoutva);
 
 			glDrawArrays(GL_LINE_STRIP, 0, side->m_outline.m_edv.size());
 		}
@@ -97,7 +99,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	{
 		ModelHolder* pmh = &*mhiter;
 
-		float topverts[] = 
+		float topverts[] =
 		{
 			//top
 			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
@@ -107,7 +109,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
 		};
 
-		float bottomverts[] = 
+		float bottomverts[] =
 		{
 			//bottom
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
@@ -116,8 +118,8 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//bottom near left
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
 		};
-		
-		float leftverts[] = 
+
+		float leftverts[] =
 		{
 			//left
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
@@ -126,8 +128,8 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//left bottom near
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
 		};
-		
-		float rightverts[] = 
+
+		float rightverts[] =
 		{
 			//right
 			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
@@ -136,8 +138,8 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//right bottom near
 			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
 		};
-		
-		float nearverts[] = 
+
+		float nearverts[] =
 		{
 			//near
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
@@ -146,8 +148,8 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//near right bottom
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
 		};
-		
-		float farverts[] = 
+
+		float farverts[] =
 		{
 			//far
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
@@ -161,17 +163,23 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 
 		glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+        glVertexPointer(3, GL_FLOAT, 0, topverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+        glVertexPointer(3, GL_FLOAT, 0, bottomverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+        glVertexPointer(3, GL_FLOAT, 0, leftverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+        glVertexPointer(3, GL_FLOAT, 0, rightverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+        glVertexPointer(3, GL_FLOAT, 0, nearverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+        glVertexPointer(3, GL_FLOAT, 0, farverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 #endif
@@ -202,18 +210,19 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 
 			//glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_outline.m_drawoutva);
-			
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, side->m_outline.m_drawoutva);
+            glVertexPointer(3, GL_FLOAT, 0, side->m_outline.m_drawoutva);
+
 			glDrawArrays(GL_LINE_STRIP, 0, side->m_outline.m_edv.size());
 		}
 	}
-	
+
 #if 1
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
 
-		float topverts[] = 
+		float topverts[] =
 		{
 			//top
 			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
@@ -223,7 +232,7 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmax.y, pmh->absmin.z,	//top far left
 		};
 
-		float bottomverts[] = 
+		float bottomverts[] =
 		{
 			//bottom
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
@@ -232,8 +241,8 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//bottom near left
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//bottom far left
 		};
-		
-		float leftverts[] = 
+
+		float leftverts[] =
 		{
 			//left
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
@@ -242,8 +251,8 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//left bottom near
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//left bottom far
 		};
-		
-		float rightverts[] = 
+
+		float rightverts[] =
 		{
 			//right
 			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
@@ -252,8 +261,8 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//right bottom near
 			pmh->absmax.x, pmh->absmin.y, pmh->absmin.z,	//right bottom far
 		};
-		
-		float nearverts[] = 
+
+		float nearverts[] =
 		{
 			//near
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
@@ -262,8 +271,8 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 			pmh->absmax.x, pmh->absmin.y, pmh->absmax.z,	//near right bottom
 			pmh->absmin.x, pmh->absmin.y, pmh->absmax.z,	//near left bottom
 		};
-		
-		float farverts[] = 
+
+		float farverts[] =
 		{
 			//far
 			pmh->absmin.x, pmh->absmin.y, pmh->absmin.z,	//far left bottom
@@ -277,17 +286,23 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 
 		glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, alpha);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+        glVertexPointer(3, GL_FLOAT, 0, topverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+        glVertexPointer(3, GL_FLOAT, 0, bottomverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+        glVertexPointer(3, GL_FLOAT, 0, leftverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+        glVertexPointer(3, GL_FLOAT, 0, rightverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+        glVertexPointer(3, GL_FLOAT, 0, nearverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+        glVertexPointer(3, GL_FLOAT, 0, farverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 #endif
@@ -311,7 +326,7 @@ void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 	Vec4f axisscreenpos = ScreenPos(mvp, axispoint, w, h, persp);
 
 	{
-		float verts[] = 
+		float verts[] =
 		{
 			startscreenpos.x, startscreenpos.y, 0,
 			axisscreenpos.x, axisscreenpos.y, 0
@@ -320,13 +335,14 @@ void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		float colour2[] = DOOR_POINT_DRAG_FILLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 2);
 
 	}
 
 	{
-		float verts[] = 
+		float verts[] =
 		{
 			startscreenpos.x - DOOR_POINT_DRAG_HSIZE, startscreenpos.y - DOOR_POINT_DRAG_HSIZE, 0,
 			startscreenpos.x + DOOR_POINT_DRAG_HSIZE, startscreenpos.y - DOOR_POINT_DRAG_HSIZE, 0,
@@ -338,18 +354,20 @@ void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		float colour[] = DOOR_POINT_DRAG_FILLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_QUADS, 0, 4);
 
 		float colour2[] = DOOR_POINT_DRAG_OUTLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 
 	{
-		float verts[] = 
+		float verts[] =
 		{
 			axisscreenpos.x - DOOR_AXIS_DRAG_HSIZE, axisscreenpos.y - DOOR_AXIS_DRAG_HSIZE, 0,
 			axisscreenpos.x + DOOR_AXIS_DRAG_HSIZE, axisscreenpos.y - DOOR_AXIS_DRAG_HSIZE, 0,
@@ -361,13 +379,15 @@ void DrawDrag_Door(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		float colour[] = DOOR_AXIS_DRAG_FILLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_QUADS, 0, 4);
 
 		float colour2[] = DOOR_AXIS_DRAG_OUTLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 }
@@ -384,7 +404,7 @@ void DrawDrag_Clip(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 
 	Shader* shader = &g_shader[g_curS];
 
-	float verts[] = 
+	float verts[] =
 	{
 		vmin.x, vmin.y, 0,
 		vmax.x, vmin.y, 0,
@@ -409,7 +429,7 @@ void DrawDrag_Clip(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 {
 	Shader* shader = &g_shader[g_curS];
-	
+
 	for(auto i=g_selB.begin(); i!=g_selB.end(); i++)
 	{
 		Brush* b = *i;
@@ -419,7 +439,7 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			Vec3f sharedv = b->m_sharedv[j];
 			Vec4f screenpos = ScreenPos(mvp, sharedv, w, h, persp);
 
-			float verts[] = 
+			float verts[] =
 			{
 				screenpos.x - VERT_DRAG_HSIZE, screenpos.y - VERT_DRAG_HSIZE, 0,
 				screenpos.x + VERT_DRAG_HSIZE, screenpos.y - VERT_DRAG_HSIZE, 0,
@@ -431,13 +451,15 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = VERT_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+            glVertexPointer(3, GL_FLOAT, 0, verts);
 			glDrawArrays(GL_QUADS, 0, 4);
 
 			float colour2[] = VERT_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+            glVertexPointer(3, GL_FLOAT, 0, verts);
 			glDrawArrays(GL_LINE_STRIP, 0, 5);
 		}
 	}
@@ -451,7 +473,7 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			BrushSide* side = &b->m_sides[j];
 			Vec4f screenpos = ScreenPos(mvp, side->m_centroid, w, h, persp);
 
-			float verts[] = 
+			float verts[] =
 			{
 				screenpos.x - FACE_DRAG_HSIZE, screenpos.y - FACE_DRAG_HSIZE, 0,
 				screenpos.x + FACE_DRAG_HSIZE, screenpos.y - FACE_DRAG_HSIZE, 0,
@@ -471,7 +493,8 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 				glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 			}
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+            glVertexPointer(3, GL_FLOAT, 0, verts);
 			glDrawArrays(GL_QUADS, 0, 4);
 
 			if(g_sel1b == b && g_dragS == j)
@@ -485,7 +508,8 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 				glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 			}
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+            glVertexPointer(3, GL_FLOAT, 0, verts);
 			glDrawArrays(GL_LINE_STRIP, 0, 5);
 		}
 	}
@@ -505,7 +529,7 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 
 		Vec4f screenpos = ScreenPos(mvp, centroid, w, h, persp);
 
-		float verts[] = 
+		float verts[] =
 		{
 			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
 			screenpos.x + BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
@@ -517,13 +541,15 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		float coluor[] = BRUSH_DRAG_FILLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, coluor);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_QUADS, 0, 4);
 
 		float colour2[] = BRUSH_DRAG_OUTLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 }
@@ -532,7 +558,7 @@ void DrawDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 {
 	Shader* shader = &g_shader[g_curS];
-	
+
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
@@ -540,7 +566,7 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		// Top side
 		Vec3f topcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmax.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f topscreenpos = ScreenPos(mvp, topcentroid, w, h, persp);
-		float topverts[] = 
+		float topverts[] =
 		{
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
 			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -548,11 +574,11 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Bottom side
 		Vec3f bottomcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmin.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f bottomscreenpos = ScreenPos(mvp, bottomcentroid, w, h, persp);
-		float bottomverts[] = 
+		float bottomverts[] =
 		{
 			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
 			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -564,7 +590,7 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		// Left side
 		Vec3f leftcentroid = Vec3f( pmh->absmin.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f leftscreenpos = ScreenPos(mvp, leftcentroid, w, h, persp);
-		float leftverts[] = 
+		float leftverts[] =
 		{
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
 			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -572,11 +598,11 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Right side
 		Vec3f rightcentroid = Vec3f( pmh->absmax.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f rightscreenpos = ScreenPos(mvp, rightcentroid, w, h, persp);
-		float rightverts[] = 
+		float rightverts[] =
 		{
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
 			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -584,11 +610,11 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Near side
 		Vec3f nearcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmax.z );
 		Vec4f nearscreenpos = ScreenPos(mvp, nearcentroid, w, h, persp);
-		float nearverts[] = 
+		float nearverts[] =
 		{
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
 			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -596,11 +622,11 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Far side
 		Vec3f farcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmin.z );
 		Vec4f farscreenpos = ScreenPos(mvp, farcentroid, w, h, persp);
-		float farverts[] = 
+		float farverts[] =
 		{
 			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
 			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -620,7 +646,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+        glVertexPointer(3, GL_FLOAT, 0, topverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_TOP)
 		{
@@ -632,7 +659,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, topverts);
+        glVertexPointer(3, GL_FLOAT, 0, topverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 		// Bottom side
@@ -646,7 +674,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+        glVertexPointer(3, GL_FLOAT, 0, bottomverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_BOTTOM)
 		{
@@ -658,7 +687,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, bottomverts);
+        glVertexPointer(3, GL_FLOAT, 0, bottomverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 		// Left side
@@ -672,7 +702,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+        glVertexPointer(3, GL_FLOAT, 0, leftverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_LEFT)
 		{
@@ -684,7 +715,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, leftverts);
+        glVertexPointer(3, GL_FLOAT, 0, leftverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 		// Right side
@@ -698,7 +730,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+        glVertexPointer(3, GL_FLOAT, 0, rightverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_RIGHT)
 		{
@@ -710,7 +743,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, rightverts);
+        glVertexPointer(3, GL_FLOAT, 0, rightverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 		// Near side
@@ -724,7 +758,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+        glVertexPointer(3, GL_FLOAT, 0, nearverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_NEAR)
 		{
@@ -736,7 +771,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, nearverts);
+        glVertexPointer(3, GL_FLOAT, 0, nearverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 		// Far side
@@ -750,7 +786,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour[] = FACE_DRAG_FILLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+        glVertexPointer(3, GL_FLOAT, 0, farverts);
 		glDrawArrays(GL_QUADS, 0, 4);
 		if(g_sel1m == pmh && g_dragS == DRAG_FAR)
 		{
@@ -762,22 +799,23 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			float colour2[] = FACE_DRAG_OUTLRGBA;
 			glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 		}
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, farverts);
+        glVertexPointer(3, GL_FLOAT, 0, farverts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 
 
 	}
 
-	
+
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
-		
+
 		Vec3f centroid = (pmh->absmin + pmh->absmax) / 2.0f;
 
 		Vec4f screenpos = ScreenPos(mvp, centroid, w, h, persp);
 
-		float verts[] = 
+		float verts[] =
 		{
 			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
 			screenpos.x + BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0,
@@ -789,13 +827,15 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 		float coluor[] = BRUSH_DRAG_FILLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, coluor);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_QUADS, 0, 4);
 
 		float colour2[] = BRUSH_DRAG_OUTLRGBA;
 		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colour2);
 
-		glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
+        glVertexPointer(3, GL_FLOAT, 0, verts);
 		glDrawArrays(GL_LINE_STRIP, 0, 5);
 	}
 }
@@ -840,9 +880,9 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
 		Vec3f trace = b->traceray(line);
-		if(trace != line[1] && trace.y <= g_maxelev 
+		if(trace != line[1] && trace.y <= g_maxelev
 #if 1
-			&& 
+			&&
 			trace.x >= vmin.x && trace.x <= vmax.x &&
 			trace.y >= vmin.y && trace.y <= vmax.y &&
 			trace.z >= vmin.z && trace.z <= vmax.z
@@ -860,9 +900,9 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	for(auto mh=g_modelholder.begin(); mh!=g_modelholder.end(); mh++)
 	{
 		Vec3f trace = mh->traceray(line);
-		if(trace != line[1] && trace.y <= g_maxelev 
+		if(trace != line[1] && trace.y <= g_maxelev
 #if 1
-			&& 
+			&&
 			trace.x >= vmin.x && trace.x <= vmax.x &&
 			trace.y >= vmin.y && trace.y <= vmax.y &&
 			trace.z >= vmin.z && trace.z <= vmax.z
@@ -876,7 +916,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			//return;
 		}
 	}
-	
+
 	//If we already have a selected brush (globally),
 	//choose the one after it in our selection array
 	//(selB) as the next selected brush.
@@ -892,19 +932,19 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 				OpenAnotherView("brush edit");
 				return;
 			}
-			
+
 			auto j = g_selB.begin();
 
 			if(*i == *j)
 				found = true;
 		}
 	}
-	
+
 	int prevnB = g_selB.size();
 	g_selB.clear();
-	
+
 	//If we've reached the end of the selection array,
-	//(selB), select through the models, 
+	//(selB), select through the models,
 	if(g_selM.size() == 1)
 	{
 		bool found = false;
@@ -917,21 +957,21 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 				//OpenAnotherView("model edit");
 				return;
 			}
-			
+
 			auto j = g_selM.begin();
 
 			if(*i == *j)
 				found = true;
 		}
 	}
-	
+
 	int prevnM = g_selM.size();
 	g_selM.clear();
 
 	//and then restart at model at the front
-	//if we previously selected a brush or if 
+	//if we previously selected a brush or if
 	//there aren't any brushes at all
-	if(selM.size() > 0 
+	if(selM.size() > 0
 		&& (prevnB > 0 || map->m_brush.size() == 0))
 	{
 		g_selM.push_back( *selM.begin() );
@@ -1009,11 +1049,11 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 			//g_log<<"centroid "<<side->m_centroid.x<<","<<side->m_centroid.y<<","<<side->m_centroid.z<<endl;
 			//g_log.flush();
 			Vec4f screenpos = ScreenPos(mvp, side->m_centroid, w, h, persp);
-			
+
 			if(x >= screenpos.x - FACE_DRAG_HSIZE && x <= screenpos.x + FACE_DRAG_HSIZE && y >= screenpos.y - FACE_DRAG_HSIZE && y <= screenpos.y + FACE_DRAG_HSIZE)
 			{
 				float thisD = Magnitude(side->m_centroid - eye);
-				
+
 				if(thisD <= nearest || nearest < 0 || g_dragS < 0)
 				{
 					g_sel1b = b;
@@ -1035,7 +1075,7 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 
 		centroid = centroid / (float)b->m_nsides;
 		Vec4f screenpos = ScreenPos(mvp, centroid, w, h, persp);
-		
+
 		if(x >= screenpos.x - BRUSH_DRAG_HSIZE && x <= screenpos.x + BRUSH_DRAG_HSIZE && y >= screenpos.y - BRUSH_DRAG_HSIZE && y <= screenpos.y + BRUSH_DRAG_HSIZE)
 		{
 			float thisD = Magnitude(centroid - eye);
@@ -1053,7 +1093,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 {
 	float nearest = -1;
 	Shader* shader = &g_shader[g_curS];
-	
+
 	for(auto mhiter = g_selM.begin(); mhiter != g_selM.end(); mhiter++)
 	{
 		ModelHolder* pmh = *mhiter;
@@ -1061,7 +1101,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 		// Whole model centroid
 		Vec3f modelcentroid =(pmh->absmin + pmh->absmax)/2.0f;
 		Vec4f modelscreenpos = ScreenPos(mvp, modelcentroid, w, h, persp);
-		float centerverts[] = 
+		float centerverts[] =
 		{
 			modelscreenpos.x - FACE_DRAG_HSIZE, modelscreenpos.y - FACE_DRAG_HSIZE, 0,
 			modelscreenpos.x + FACE_DRAG_HSIZE, modelscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1073,7 +1113,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 		// Top side
 		Vec3f topcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmax.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f topscreenpos = ScreenPos(mvp, topcentroid, w, h, persp);
-		float topverts[] = 
+		float topverts[] =
 		{
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
 			topscreenpos.x + FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1081,11 +1121,11 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y + FACE_DRAG_HSIZE, 0,
 			topscreenpos.x - FACE_DRAG_HSIZE, topscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Bottom side
 		Vec3f bottomcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, pmh->absmin.y, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f bottomscreenpos = ScreenPos(mvp, bottomcentroid, w, h, persp);
-		float bottomverts[] = 
+		float bottomverts[] =
 		{
 			bottomscreenpos.x - FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
 			bottomscreenpos.x + FACE_DRAG_HSIZE, bottomscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1097,7 +1137,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 		// Left side
 		Vec3f leftcentroid = Vec3f( pmh->absmin.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f leftscreenpos = ScreenPos(mvp, leftcentroid, w, h, persp);
-		float leftverts[] = 
+		float leftverts[] =
 		{
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
 			leftscreenpos.x + FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1105,11 +1145,11 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y + FACE_DRAG_HSIZE, 0,
 			leftscreenpos.x - FACE_DRAG_HSIZE, leftscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Right side
 		Vec3f rightcentroid = Vec3f( pmh->absmax.x, (pmh->absmin.y + pmh->absmax.y)/2.0f, (pmh->absmin.z + pmh->absmax.z)/2.0f );
 		Vec4f rightscreenpos = ScreenPos(mvp, rightcentroid, w, h, persp);
-		float rightverts[] = 
+		float rightverts[] =
 		{
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
 			rightscreenpos.x + FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1117,11 +1157,11 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y + FACE_DRAG_HSIZE, 0,
 			rightscreenpos.x - FACE_DRAG_HSIZE, rightscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Near side
 		Vec3f nearcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmax.z );
 		Vec4f nearscreenpos = ScreenPos(mvp, nearcentroid, w, h, persp);
-		float nearverts[] = 
+		float nearverts[] =
 		{
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
 			nearscreenpos.x + FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1129,11 +1169,11 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y + FACE_DRAG_HSIZE, 0,
 			nearscreenpos.x - FACE_DRAG_HSIZE, nearscreenpos.y - FACE_DRAG_HSIZE, 0
 		};
-		
+
 		// Far side
 		Vec3f farcentroid = Vec3f( (pmh->absmin.x + pmh->absmax.x)/2.0f, (pmh->absmin.y + pmh->absmax.y)/2.0f, pmh->absmin.z );
 		Vec4f farscreenpos = ScreenPos(mvp, farcentroid, w, h, persp);
-		float farverts[] = 
+		float farverts[] =
 		{
 			farscreenpos.x - FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
 			farscreenpos.x + FACE_DRAG_HSIZE, farscreenpos.y - FACE_DRAG_HSIZE, 0,
@@ -1156,7 +1196,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
-		
+
 		// Bottom side
 		if(x >= bottomscreenpos.x - FACE_DRAG_HSIZE && x <= bottomscreenpos.x + FACE_DRAG_HSIZE && y >= bottomscreenpos.y - FACE_DRAG_HSIZE && y <= bottomscreenpos.y + FACE_DRAG_HSIZE)
 		{
@@ -1171,7 +1211,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
-		
+
 		// Left side
 		if(x >= leftscreenpos.x - FACE_DRAG_HSIZE && x <= leftscreenpos.x + FACE_DRAG_HSIZE && y >= leftscreenpos.y - FACE_DRAG_HSIZE && y <= leftscreenpos.y + FACE_DRAG_HSIZE)
 		{
@@ -1186,7 +1226,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
-		
+
 		// Right side
 		if(x >= rightscreenpos.x - FACE_DRAG_HSIZE && x <= rightscreenpos.x + FACE_DRAG_HSIZE && y >= rightscreenpos.y - FACE_DRAG_HSIZE && y <= rightscreenpos.y + FACE_DRAG_HSIZE)
 		{
@@ -1201,7 +1241,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
-		
+
 		// Near side
 		if(x >= nearscreenpos.x - FACE_DRAG_HSIZE && x <= nearscreenpos.x + FACE_DRAG_HSIZE && y >= nearscreenpos.y - FACE_DRAG_HSIZE && y <= nearscreenpos.y + FACE_DRAG_HSIZE)
 		{
@@ -1216,7 +1256,7 @@ void SelectDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, int x, int y,
 				nearest = thisD;
 			}
 		}
-		
+
 		// Far side
 		if(x >= farscreenpos.x - FACE_DRAG_HSIZE && x <= farscreenpos.x + FACE_DRAG_HSIZE && y >= farscreenpos.y - FACE_DRAG_HSIZE && y <= farscreenpos.y + FACE_DRAG_HSIZE)
 		{
@@ -1292,7 +1332,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 
 		return true;
 	}
-	
+
 	SelectDrag_ModelHolder(map, mvp, w, h, x, y, eye, persp);
 
 	if(g_sel1m != NULL)
@@ -1340,10 +1380,10 @@ bool PruneB(EdMap* map, Brush* b)
 			i--;
 			continue;
 		}
-		
+
 		bool allclose = true;
 		Vec3f matchv = b->m_sharedv[ s1->m_vindices[0] ];
-		
+
 #ifdef PRUNEB_DEBUG
 		g_log<<"s1->m_ntris = "<<s1->m_ntris<<endl;
 #endif
@@ -1351,7 +1391,7 @@ bool PruneB(EdMap* map, Brush* b)
 		for(int v=0; v<s1->m_outline.m_edv.size(); v++)
 		{
 			Vec3f thisv = b->m_sharedv[ s1->m_vindices[v] ];
-			
+
 #ifdef PRUNEB_DEBUG
 			g_log<<"vertex "<<v<<" = "<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
 			g_log.flush();
@@ -1361,7 +1401,7 @@ bool PruneB(EdMap* map, Brush* b)
 
 			if(mag > MERGEV_D)
 			{
-				allclose = false;		
+				allclose = false;
 #ifndef PRUNEB_DEBUG
 				break;
 #endif
@@ -1451,7 +1491,7 @@ bool PruneB(EdMap* map, Brush* b)
 					i--;
 				}
 			}
-			
+
 			//if(g_sel1b == &*b)
 			if(g_sel1b == b)
 			{

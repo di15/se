@@ -1,14 +1,74 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="spriteed/seviewport.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="common/draw/water.cpp" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="41249" topLine="1474" />
+			<Cursor1 position="2213" topLine="53" />
+		</Cursor>
+	</File>
+	<File name="common/draw/projectile.cpp" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2765" topLine="82" />
+		</Cursor>
+	</File>
+	<File name="spriteed/sesim.cpp" open="1" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13115" topLine="317" />
+		</Cursor>
+	</File>
+	<File name="common/math/matrix.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="724" topLine="12" />
 		</Cursor>
 	</File>
 	<File name="common/texture.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="35504" topLine="1055" />
+			<Cursor1 position="23219" topLine="944" />
+		</Cursor>
+	</File>
+	<File name="common/window.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8369" topLine="324" />
+		</Cursor>
+	</File>
+	<File name="common/gui/textarea.cpp" open="1" top="0" tabpos="26" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5377" topLine="225" />
+		</Cursor>
+	</File>
+	<File name="common/gui/editbox.cpp" open="1" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="15985" topLine="731" />
+		</Cursor>
+	</File>
+	<File name="common/gui/textblock.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="8" />
+		</Cursor>
+	</File>
+	<File name="common/draw/shader.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="13399" topLine="438" />
+		</Cursor>
+	</File>
+	<File name="common/sim/selection.cpp" open="1" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2481" topLine="56" />
+		</Cursor>
+	</File>
+	<File name="spriteed/main.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="93" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="spriteed/seviewport.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7287" topLine="246" />
+		</Cursor>
+	</File>
+	<File name="common/gui/textblock.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="581" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="common/draw/screenshot.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -16,9 +76,49 @@
 			<Cursor1 position="1003" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="spriteed/main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="common/gui/gui.cpp" open="1" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10287" topLine="412" />
+			<Cursor1 position="1592" topLine="62" />
+		</Cursor>
+	</File>
+	<File name="common/gui/font.cpp" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="11441" topLine="458" />
+		</Cursor>
+	</File>
+	<File name="common/draw/model.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4845" topLine="158" />
+		</Cursor>
+	</File>
+	<File name="spriteed/undo.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="221" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="common/draw/billboard.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4765" topLine="199" />
+		</Cursor>
+	</File>
+	<File name="common/save/edmap.cpp" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2273" topLine="54" />
+		</Cursor>
+	</File>
+	<File name="common/gui/gui.h" open="1" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="777" topLine="19" />
+		</Cursor>
+	</File>
+	<File name="common/gui/draw2d.cpp" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2100" topLine="37" />
+		</Cursor>
+	</File>
+	<File name="common/sim/map.cpp" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5254" topLine="181" />
 		</Cursor>
 	</File>
 	<File name="spriteed/sesim.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -28,42 +128,12 @@
 	</File>
 	<File name="spriteed/segui.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="50355" topLine="1907" />
+			<Cursor1 position="1431" topLine="47" />
 		</Cursor>
 	</File>
-	<File name="common/math/matrix.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="spriteed/main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="724" topLine="12" />
-		</Cursor>
-	</File>
-	<File name="common/gui/textblock.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="0" topLine="8" />
-		</Cursor>
-	</File>
-	<File name="common/draw/shader.cpp" open="1" top="1" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2651" topLine="118" />
-		</Cursor>
-	</File>
-	<File name="spriteed/undo.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="221" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="common/window.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5452" topLine="203" />
-		</Cursor>
-	</File>
-	<File name="spriteed/main.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="93" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="common/gui/textblock.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="581" topLine="0" />
+			<Cursor1 position="1423" topLine="48" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

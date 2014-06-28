@@ -376,30 +376,34 @@ void UseS(int shader)
 #endif
 	g_curS = shader;
 	//glUseProgramObjectARB(g_shader[shader].m_hProgramObject);
-	glUseProgram(g_shader[shader].m_hProgramObject);
+	glUseProgramObjectARB(g_shader[shader].m_hProgramObject);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	Shader* s = &g_shader[g_curS];
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	//if(s->m_slot[SSLOT_POSITION] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	//if(s->m_slot[SSLOT_TEXCOORD0] != -1) glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+	//if(s->m_slot[SSLOT_NORMAL] != -1)	glEnableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 }
 
 void EndS()
@@ -416,20 +420,24 @@ void EndS()
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+	//if(s->m_slot[SSLOT_POSITION] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
+	//if(s->m_slot[SSLOT_TEXCOORD0] != -1) glDisableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
+	//if(s->m_slot[SSLOT_NORMAL] != -1)	glDisableVertexAttribArray(s->m_slot[SSLOT_NORMAL]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-	glUseProgram(0);
+	glUseProgramObjectARB(0);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 
 	g_curS = -1;
 }

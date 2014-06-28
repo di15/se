@@ -1,3 +1,6 @@
+
+#version 120
+
 uniform vec4 color;
 
 //varying vec2 texCoordOut0;

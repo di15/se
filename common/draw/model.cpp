@@ -76,20 +76,23 @@ bool Load1Model()
 }
 
 void DrawVA(VertexArray* va, Vec3f pos)
-{	
+{
 	Shader* s = &g_shader[g_curS];
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
-    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-    if(s->m_slot[SSLOT_TEXCOORD0] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-    if(s->m_slot[SSLOT_NORMAL] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-	
+    //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    //if(s->m_slot[SSLOT_TEXCOORD0] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    //if(s->m_slot[SSLOT_NORMAL] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+    glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+    glNormalPointer(GL_FLOAT, 0, va->normals);
+
 	//if(s->m_slot[SSLOT_TEXCOORD0] == -1) g_log<<"s->m_slot[SSLOT_TEXCOORD0] = -1"<<endl;
 	//if(s->m_slot[SSLOT_NORMAL] == -1) g_log<<"s->m_slot[SSLOT_NORMAL] = -1"<<endl;
-	g_log.flush();
+	//g_log.flush();
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
@@ -98,15 +101,17 @@ void DrawVA(VertexArray* va, Vec3f pos)
 }
 
 void DrawVADepth(VertexArray* va, Vec3f pos)
-{	
+{
 	Shader* s = &g_shader[g_curS];
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
-    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    //glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
     //glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
@@ -115,7 +120,7 @@ void DrawVADepth(VertexArray* va, Vec3f pos)
 }
 
 void Model::usedifftex()
-{	
+{
 	glActiveTextureARB(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, g_texture[ m_diffusem ].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
@@ -157,16 +162,19 @@ void Model::draw(int frame, Vec3f pos, float yaw)
     glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m_va[frame];
-	
+
 	usedifftex();
 	usespectex();
 	usenormtex();
 	useteamtex();
-    
-    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-    glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-	
+
+    //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    //glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    //glVertexAttribPointer(s->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+    glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+    glNormalPointer(GL_FLOAT, 0, va->normals);
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -189,10 +197,12 @@ void Model::drawdepth(int frame, Vec3f pos, float yaw)
 	VertexArray* va = &m_va[frame];
 
 	usedifftex();
-    
-    glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-    glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-	
+
+    //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+    //glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+    glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -279,19 +289,19 @@ bool PlayAnimation(float& frame, int first, int last, bool loop, float rate)
         frame = first;
         return false;
     }
-    
+
     frame += rate;
-    
+
     if(frame > last)
     {
         if(loop)
             frame = first;
 		else
 			frame = last;
-        
+
         return true;
     }
-    
+
     return false;
 }
 
@@ -303,19 +313,19 @@ bool PlayAnimationB(float& frame, int first, int last, bool loop, float rate)
         frame = last;
         return false;
     }
-    
+
     frame -= rate;
-    
+
     if(frame < first)
     {
         if(loop)
             frame = last;
 		else
 			frame = first;
-        
+
         return true;
     }
-    
+
     return false;
 }
 

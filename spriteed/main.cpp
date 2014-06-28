@@ -86,6 +86,8 @@ void Draw()
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
+    return;
+
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
 #endif
@@ -162,6 +164,8 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 void DrawSceneDepth()
 {
+    return;
+
     //g_model[themodel].draw(0, Vec3f(0,0,0), 0);
 
 #ifdef DEBUG
@@ -251,29 +255,29 @@ void UpdateGameState()
 
 void UpdateEditor()
 {
-    if(g_keys[SDLK_w])
+    if(g_keys[SDL_SCANCODE_W])
     {
         g_camera.accelerate(50.0f/g_zoom);
     }
-    if(g_keys[SDLK_s])
+    if(g_keys[SDL_SCANCODE_S])
     {
         g_camera.accelerate(-50.0f/g_zoom);
     }
 
-    if(g_keys[SDLK_a])
+    if(g_keys[SDL_SCANCODE_A])
     {
         g_camera.accelstrafe(-50.0f/g_zoom);
     }
-    if(g_keys[SDLK_d])
+    if(g_keys[SDL_SCANCODE_D])
     {
         g_camera.accelstrafe(50.0f/g_zoom);
     }
 
-    if(g_keys[SDLK_r])
+    if(g_keys[SDL_SCANCODE_R])
     {
         g_camera.accelrise(25.0f/g_zoom);
     }
-    if(g_keys[SDLK_f])
+    if(g_keys[SDL_SCANCODE_F])
     {
         g_camera.accelrise(-25.0f/g_zoom);
     }
@@ -642,30 +646,49 @@ void EventLoop()
             }
         }
 
+        g_log<<"draw"<<endl;
+        g_log.flush();
+
         if(g_mode == LOADING || g_mode == RENDERING || DrawNextFrame(FRAME_RATE))
         {
 #ifdef DEBUG
             CheckGLError(__FILE__, __LINE__);
 #endif
             CalcDrawRate();
+
+            g_log<<"draw1"<<endl;
+            g_log.flush();
 #ifdef DEBUG
             CheckGLError(__FILE__, __LINE__);
 #endif
             ScoreFPS();
+
+            g_log<<"draw2"<<endl;
+            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif
             Update();
+
+            g_log<<"draw3"<<endl;
+            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif
             Draw();
+
+            g_log<<"draw4"<<endl;
+            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
 #endif
         }
+
+
+        g_log<<"adraw"<<endl;
+        g_log.flush();
     }
 }
 

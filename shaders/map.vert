@@ -1,5 +1,5 @@
 
-#version 150
+#version 120
 
 attribute vec4 position;
 
@@ -36,13 +36,13 @@ uniform vec3 sundirection;
 
 void main(void)
 {
-	//vec4 vpos = (view * (model * position));
+	//vec4 vpos = (view * (model * gl_Vertex));
 	vec4 vpos = model * position;
 	//vec4 vpos = position;
 	//vpos.w = 1;	//ortho=1/persp?
 	lpos = lightMatrix * vpos;
 	//lpos.w = 1;
-	gl_Position = projection * (view * (model * position));
+	gl_Position = projection * (view * (model * gl_Vertex));
 	//gl_Position.w = 1;	//ortho=1/persp?
 
 	elevy = position.y;
@@ -53,7 +53,7 @@ void main(void)
 	//	elevtransp = 0;
 	//}
 
-	vpos = (view * (model * position));
+	vpos = (view * (model * gl_Vertex));
 
 	//vec3 normalEyeSpace = vec3( normalMatrix * vec4(normalIn, 0.0) );
 	//vec3 normalEyeSpace = mat3(normalMatrix) * normalIn;
@@ -84,7 +84,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	vec3 vVertex = vec3(view * (model * position));
+	vec3 vVertex = vec3(view * (model * gl_Vertex));
 
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;

@@ -88,7 +88,7 @@ void LogBrush()
 //Draw opaque brushes first
 void DrawMap(Map* map)
 {
-	
+
 	//return;
 	//glDisable(GL_CULL_FACE);
 	//glEnable(GL_CULL_FACE);
@@ -132,17 +132,20 @@ void DrawMap(Map* map)
 	*/
 			VertexArray* va = &pside->m_drawva;
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-			glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+            glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+            glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+            glNormalPointer(GL_FLOAT, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-			
+
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
-			
+
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{
@@ -164,7 +167,7 @@ void DrawMap2(Map* map)
 	//glEnable(GL_CULL_FACE);
 
 	//Reset the model matrix from the model rotations and translations
-	
+
 	Shader* pshader = &g_shader[g_curS];
 	Matrix modelmat;
 	modelmat.loadIdentity();
@@ -209,17 +212,20 @@ void DrawMap2(Map* map)
 	*/
 			VertexArray* va = &pside->m_drawva;
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
-			glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+            glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+            glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+            glNormalPointer(GL_FLOAT, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-			
+
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
-			
+
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{
@@ -235,7 +241,7 @@ void DrawMap2(Map* map)
 //Draw opaque brushes first
 void DrawMapDepth(Map* map)
 {
-	
+
 	//return;
 	//glDisable(GL_CULL_FACE);
 	//glEnable(GL_CULL_FACE);
@@ -276,17 +282,19 @@ void DrawMapDepth(Map* map)
 	*/
 			VertexArray* va = &pside->m_drawva;
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
-			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+            glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+            glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
-			
+
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
-			
+
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{

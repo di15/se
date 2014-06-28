@@ -1,5 +1,5 @@
 
-#version 150
+#version 120
 
 attribute vec4 position;
 
@@ -25,24 +25,24 @@ varying vec2 texCoordOut0;
 //uniform mat4 invModelView;
 //uniform mat4 normalMat;
 
-varying vec3 eyevec;
+attribute vec3 eyevec;
 //attribute vec3 tangent;
 
 uniform float maxelev;
 //varying float elevtransp;
-varying float elevy;
+attribute float elevy;
 
 uniform vec3 sundirection;
 
 void main(void)
 {
 	//vec4 vpos = (view * (model * position));
-	vec4 vpos = model * position;
+	vec4 vpos = model * gl_Vertex;
 	//vec4 vpos = position;
 	vpos.w = 1;
 	lpos = lightMatrix * vpos;
 	//lpos.w = 1;
-	gl_Position = projection * (view * (model * position));
+	gl_Position = projection * (view * (model * gl_Vertex));
 	gl_Position.w = 1;
 
 	elevy = position.y;
@@ -83,7 +83,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	vec3 vVertex = vec3(view * (model * position));
+	vec3 vVertex = vec3(view * (model * gl_Vertex));
 
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;

@@ -55,18 +55,21 @@ void DrawEdMap(EdMap* map, bool showsky)
 	*/
 			VertexArray* va = &side->m_drawva;
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
-			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
-			glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_NORMAL], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
+            glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+            glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+            glNormalPointer(GL_FLOAT, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 
@@ -113,14 +116,16 @@ void DrawEdMapDepth(EdMap* map, bool showsky)
 	*/
 			VertexArray* va = &side->m_drawva;
 
-			glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
-			glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
+			//glVertexAttribPointer(shader->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
+            glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+            glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 

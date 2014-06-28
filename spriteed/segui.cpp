@@ -742,7 +742,7 @@ void Down_C()
 	if(g_mode != EDITOR)
 		return;
 
-	//if(g_keys[SDLK_CONTROL])
+	//if(g_keys[SDL_SCANCODE_CONTROL])
 		CopyBrush();
 }
 
@@ -751,7 +751,7 @@ void Down_V()
 	if(g_mode != EDITOR)
 		return;
 
-	//if(g_keys[SDLK_CONTROL])
+	//if(g_keys[SDL_SCANCODE_CONTROL])
 		PasteBrush();
 }
 
@@ -1940,21 +1940,46 @@ void FillGUI()
 	DrawSceneDepthFunc = &DrawSceneDepth;
 	DrawSceneFunc = &DrawScene;
 
+	g_log<<"assign keys"<<endl;
+	g_log.flush();
+
 	AssignAnyKey(&AnyKeyDown, &AnyKeyUp);
-	AssignKey(SDLK_F1, SaveScreenshot, NULL);
-	AssignKey(SDLK_ESCAPE, &Escape, NULL);
-	AssignKey(SDLK_DELETE, &Delete, NULL);
-	AssignKey('C', Down_C, NULL);
-	AssignKey('V', Down_V, NULL);
+
+	g_log<<"1,";
+	g_log.flush();
+
+	AssignKey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
+	g_log<<"2,";
+	g_log.flush();
+	AssignKey(SDL_SCANCODE_ESCAPE, &Escape, NULL);
+	g_log<<"3,";
+	g_log.flush();
+	AssignKey(SDL_SCANCODE_DELETE, &Delete, NULL);
+	g_log<<"4,";
+	g_log.flush();
+	AssignKey(SDL_SCANCODE_C, Down_C, NULL);
+	g_log<<"5,";
+	g_log.flush();
+	AssignKey(SDL_SCANCODE_V, Down_V, NULL);
+	g_log<<"5,";
+	g_log.flush();
 	//AssignMouseWheel(&MouseWheel);
 	//AssignMouseMove(&MouseMove);
 	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	//AssignRButton(NULL, &MouseRightButtonUp);
+	g_log<<"6,"<<endl;
+	g_log.flush();
 
 	Font* f = &g_font[MAINFONT8];
 
+	g_log<<"logo..."<<endl;
+	g_log.flush();
+
 	View* logoview = AddView("logo");
 	logoview->widget.push_back(new Image(NULL, "logo", "gui/dmd.jpg", Resize_Logo, 1,1,1,0));
+
+	g_log<<"loading..."<<endl;
+	g_log.flush();
 
 	View* loadingview = AddView("loading");
 	loadingview->widget.push_back(new Text(NULL, "status", "Loading...", MAINFONT8, Resize_LoadingText));

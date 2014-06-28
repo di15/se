@@ -132,7 +132,8 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 
 	// draw x axis
 	float xaxisverts[] = {vmin.x, 0.0f, 0.0f, vmax.x, 0.0f, 0.0f};
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xaxisverts);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xaxisverts);
+    glVertexPointer(3, GL_FLOAT, 0, xaxisverts);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -140,7 +141,8 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 
 	// draw y axis
 	float yaxisverts[] = {0.0f, vmin.y, 0.0f, 0.0f, vmax.y, 0.0f};
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yaxisverts);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yaxisverts);
+    glVertexPointer(3, GL_FLOAT, 0, yaxisverts);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -148,7 +150,8 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 
 	// draw z axis
 	float zaxisverts[] = {0.0f, 0.0f, vmin.z, 0.0f, 0.0f, vmax.z};
-	glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zaxisverts);
+	//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zaxisverts);
+    glVertexPointer(3, GL_FLOAT, 0, zaxisverts);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -217,7 +220,8 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 			for(float z=start.z; z<=end.z; z+=interval)
 			{
 				float point[] = {x, y, z};
-				glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, point);
+				//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, point);
+                glVertexPointer(3, GL_FLOAT, 0, point);
 				glDrawArrays(GL_POINTS, 0, 1);
 			}
 
@@ -232,15 +236,18 @@ void DrawGrid(Vec3f vmin, Vec3f vmax)
 					for(float z=start.z; z<=end.z; z+=interval2)
 					{
 						float xline[] = {x-interval/2.0f, y, z, x+interval/2.0f, y, z};
-						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xline);
+						//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, xline);
+                        glVertexPointer(3, GL_FLOAT, 0, xline);
 						glDrawArrays(GL_LINES, 0, 2);
 
 						float yline[] = {x, y-interval/2.0f, z, x, y+interval/2.0f, z};
-						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yline);
+						//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, yline);
+                        glVertexPointer(3, GL_FLOAT, 0, yline);
 						glDrawArrays(GL_LINES, 0, 2);
 
 						float zline[] = {x, y, z-interval/2.0f, x, y, z+interval/2.0f};
-						glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zline);
+						//glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, zline);
+                        glVertexPointer(3, GL_FLOAT, 0, zline);
 						glDrawArrays(GL_LINES, 0, 2);
 					}
 }
@@ -345,7 +352,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif
-		RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+		///RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif
@@ -440,7 +447,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		LastNum(__FILE__, __LINE__);
 #endif
 
-		if(g_edtool == EDTOOL_CUT && v->m_ldown && !g_keys[SDLK_LCTRL] && !g_keys[SDLK_RCTRL])
+		if(g_edtool == EDTOOL_CUT && v->m_ldown && !g_keys[SDL_SCANCODE_LCTRL] && !g_keys[SDL_SCANCODE_RCTRL])
 		{
 			UseS(SHADER_COLOR2D);
 			glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)width);
@@ -475,7 +482,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			Vec4f cur4 = ScreenPos(&mvpmat, cur, width, height, persp);
 
 			float line[] = {last4.x, last4.y, 0, cur4.x, cur4.y, 0};
-			glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, line);
+			//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, line);
+            glVertexPointer(3, GL_FLOAT, 0, line);
 #ifdef DEBUG
 			//CheckGLError(__FILE__, __LINE__);
 			CheckGLError(__FILE__, __LINE__);
@@ -892,7 +900,7 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 		//g_log<<"vp["<<which<<"] l up = false"<<endl;
 		//g_log.flush();
 
-		if(!g_keys[SDLK_LCTRL] && !g_keys[SDLK_RCTRL])
+		if(!g_keys[SDL_SCANCODE_LCTRL] && !g_keys[SDL_SCANCODE_RCTRL])
 		{
 			if(g_edtool == EDTOOL_CUT)
 			{
@@ -1025,7 +1033,7 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 
 	//if(s->m_outline.m_edv.size() % 2 == 0)
 	//if(true)
-	if(!g_keys[SDLK_LSHIFT] && !g_keys[SDLK_RSHIFT])
+	if(!g_keys[SDL_SCANCODE_LSHIFT] && !g_keys[SDL_SCANCODE_RSHIFT])
 	{
 		Vec3f farthestv = movev;
 		float farthestD = 0;
@@ -1479,12 +1487,12 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		{
 			Drag(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
-		else if(g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL])
+		else if(g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL])
 		{
 			ViewportTranslate(which, relx - v->m_lastmouse.x, rely - v->m_lastmouse.y, width, height);
 		}
 
-		if((g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL]) || g_edtool != EDTOOL_CUT || !v->m_ldown)
+		if((g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]) || g_edtool != EDTOOL_CUT || !v->m_ldown)
 			v->m_lastmouse = Vec2i(relx, rely);
 		v->m_curmouse = Vec2i(relx, rely);
 		return true;
@@ -1500,7 +1508,7 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 		return true;
 	}
 
-	if((g_keys[SDLK_LCTRL] || g_keys[SDLK_RCTRL]) || g_edtool != EDTOOL_CUT || (!v->m_ldown && !v->m_rdown))
+	if((g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]) || g_edtool != EDTOOL_CUT || (!v->m_ldown && !v->m_rdown))
 		v->m_lastmouse = Vec2i(relx, rely);
 
 	v->m_curmouse = Vec2i(relx, rely);

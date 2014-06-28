@@ -1,6 +1,6 @@
 
 
-#version 150
+#version 120
 
 uniform vec4 color;
 uniform vec4 owncolor;
@@ -26,12 +26,19 @@ varying vec3 eyevec;
 uniform float maxelev;
 varying float elevy;
 
+const vec2 poissonDisk[4] = vec2[](
+  vec2( -0.94201624, -0.39906216 ),
+  vec2( 0.94558609, -0.76890725 ),
+  vec2( -0.094184101, -0.92938870 ),
+  vec2( 0.34495938, 0.29387760 )
+);
+
 void main (void)
 {
 	if(elevy > maxelev)
 		discard;
 
-	vec4 texel0 = texture(texture0, texCoordOut0);
+	vec4 texel0 = texture2D(texture0, texCoordOut0);
 	//vec4 texel1 = texture(texture1, texCoordOut0);
 	//vec4 texel2 = texture(texture2, texCoordOut0);
 	//vec4 texel3 = texture(texture3, texCoordOut0);
@@ -39,11 +46,31 @@ void main (void)
 	if(texel0.w < 0.5)
 		discard;
 
-	vec3 smcoord = lpos.xyz / lpos.w;
-	float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
-	//float shadow = 1;
+	float cosTheta = dot( normalOut, light_vec );
+	float shadow_bias = 0.005 * tan(acos(cosTheta)); 
+	// cosTheta is dot( n,l ), clamped between 0 and 1
+	shadow_bias = clamp(shadow_bias, 0, 0.01);
+	//shadow_bias = 0;
 
-	vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
+	vec3 smcoord = lpos.xyz / lpos.w;
+	//vec3 smcoord = lpos.xyz;
+	//float shadow = max(0.6, 
+	//	float(smcoord.z - shadow_bias <= texture(shadowmap, smcoord.xy).x));
+	//	float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
+
+
+	float shadow = 1;
+
+	for (int i=0;i<4;i++)
+	{
+  		if ( texture2D( shadowmap, smcoord.xy + poissonDisk[i]/700.0 ).z 
+			<  smcoord.z - shadow_bias )
+		{
+    			shadow-=0.1;
+  		}
+	}
+
+	vec3 bump = normalize( texture2D(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
 
 	//vec3 lvec = normalize(light_vec);
 	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
@@ -55,7 +82,7 @@ void main (void)
 	vec3 vvec = normalize(eyevec);
 	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
-	vec3 vspecular = texture(specularmap, texCoordOut0).xyz * specular;
+	vec3 vspecular = texture2D(specularmap, texCoordOut0).xyz * specular;
 
 	//float alph1 = texel1.w;
 	//float alph2 = texel2.w;
@@ -70,8 +97,12 @@ void main (void)
 	//float alph = color.w * texel0.w;
 	float alph = 1;
 
-	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
+	// with specular highlights:
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+
+	// without specular highlights:
+	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
+
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;
 	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	

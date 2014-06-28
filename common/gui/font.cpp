@@ -339,16 +339,18 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+    //glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+    //glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 	CheckGLError(__FILE__, __LINE__);
 #endif
+    glVertexPointer(3, GL_FLOAT, sizeof(float) * 5, &vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 5, &vertices[3]);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 #ifdef DEBUG
@@ -428,8 +430,10 @@ void DrawGlyphF(float left, float top, float right, float bottom, float texleft,
         newleft, newtop,0,          newtexleft, newtextop
     };
 
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
-    glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+    //glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
+    //glVertexAttribPointer(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
+    glVertexPointer(3, GL_FLOAT, sizeof(float) * 5, &vertices[0]);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 5, &vertices[3]);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -473,7 +477,8 @@ void HighlGlyphF(float left, float top, float right, float bottom)
         newleft, newtop,0,
     };
 
-    glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+    //glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
+    glVertexPointer(3, GL_FLOAT, sizeof(float) * 5, &vertices[0]);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

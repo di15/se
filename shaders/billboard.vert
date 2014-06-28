@@ -1,4 +1,7 @@
-attribute vec4 position;
+
+#version 120
+
+//attribute vec4 position;
 
 uniform mat4 projection;
 uniform mat4 model;
@@ -12,7 +15,7 @@ varying vec2 texCoordOut0;
 
 void main(void)
 {
-	gl_Position = projection * (view * (model * position));
+	gl_Position = projection * (view * (model * gl_Vertex));
 	//normalOut = normalIn;
 	texCoordOut0 = texCoordIn0;
 	gl_Position.w = 1;
