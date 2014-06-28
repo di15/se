@@ -21,13 +21,13 @@ varying vec3 normalOut;
 void main (void)
 {
 	vec3 smcoord = lpos.xyz / lpos.w;
-	float shadow = max(0.5, float(smcoord.z <= texture(shadowMap, smcoord.xy).x));
+	float shadow = max(0.5, float(smcoord.z <= texture2D(shadowMap, smcoord.xy).x));
 
 	vec3 lvec = normalize(light_vec);
 	float diffuse = max(dot(-lvec, normalOut), 0.0) * 0.75 + 0.25;
 
-	vec4 texel0 = texture(texture0, texCoordOut0);
-	vec4 texel1 = texture(texture1, texCoordOut0);
+	vec4 texel0 = texture2D(texture0, texCoordOut0);
+	vec4 texel1 = texture2D(texture1, texCoordOut0);
 
 	float alph1 = texel1.w;
 

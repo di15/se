@@ -16,5 +16,5 @@ void main(void)
 		gl_Vertex.z, 
 		1.0);
                      
-	texCoordOut0 = texCoordIn0;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 }
