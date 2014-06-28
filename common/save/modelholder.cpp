@@ -8,6 +8,7 @@
 #include "compilemap.h"
 #include "../platform.h"
 #include "../utils.h"
+#include "../debug.h"
 
 list<ModelHolder> g_modelholder;
 
@@ -108,7 +109,7 @@ void ModelHolder::retransform()
 	destroy();
 
 	Model* m = &g_model[model];
-	
+
 	CopyVAs(&frames, &nframes, &m->m_va, m->m_ms3d.m_totalFrames);
 
 	//Quaternion rotquat;
@@ -147,18 +148,18 @@ void ModelHolder::regennormals()
 	vector<Vec3f>* normalweights;
 
 	normalweights = new vector<Vec3f>[ms3d->m_numVertices];
-	
+
 	for(int f = 0; f < nframes; f++)
 	{
 		for(int index = 0; index < ms3d->m_numVertices; index++)
 		{
 			normalweights[index].clear();
 		}
-		
+
 		Vec3f* vertices = frames[f].vertices;
 		//Vec2f* texcoords = frames[f].texcoords;
 		Vec3f* normals = frames[f].normals;
-  
+
 		int vert = 0;
 
 		for(int i = 0; i < ms3d->m_numMeshes; i++)
@@ -183,7 +184,7 @@ void ModelHolder::regennormals()
 				{
 					int index = pTri->m_vertexIndices[k];
 					normalweights[index].push_back(normal);
-					
+
 					// Reverse vertex order
 					//0=>2=>1
 
@@ -218,7 +219,7 @@ void ModelHolder::regennormals()
 					}
 
 					normals[vert] = weighsum;
-					
+
 					// Reverse vertex order
 					//0=>2=>1
 
@@ -279,7 +280,7 @@ void DrawModelHolders()
 	{
 		ModelHolder* h = &*iter;
 		Model* m = &g_model[h->model];
-		
+
 #ifdef DEBUG
 		CheckGLError(__FILE__, __LINE__);
 #endif

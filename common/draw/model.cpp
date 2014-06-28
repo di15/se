@@ -81,7 +81,7 @@ void DrawVA(VertexArray* va, Vec3f pos)
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
     //if(s->m_slot[SSLOT_TEXCOORD0] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -106,7 +106,7 @@ void DrawVADepth(VertexArray* va, Vec3f pos)
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
     //glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -159,7 +159,7 @@ void Model::draw(int frame, Vec3f pos, float yaw)
     Matrix rotation;
     rotation.setRotationRadians(radians);
     modelmat.postMultiply(rotation);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 
@@ -192,7 +192,7 @@ void Model::drawdepth(int frame, Vec3f pos, float yaw)
     Matrix rotation;
     rotation.setRotationRadians(radians);
     modelmat.postMultiply(rotation);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 

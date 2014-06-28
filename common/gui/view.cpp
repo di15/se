@@ -2,6 +2,7 @@
 
 #include "gui.h"
 #include "../texture.h"
+#include "../debug.h"
 
 void View::draw()
 {

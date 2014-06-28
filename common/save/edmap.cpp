@@ -5,6 +5,7 @@
 #include "../texture.h"
 #include "../utils.h"
 #include "../save/modelholder.h"
+#include "../debug.h"
 
 EdMap g_edmap;
 vector<Brush*> g_selB;
@@ -27,7 +28,8 @@ void DrawEdMap(EdMap* map, bool showsky)
 
 	Matrix modelmat;
 	modelmat.loadIdentity();
-    glUniformMatrix4fv(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    CheckGLError(__FILE__, __LINE__);
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
@@ -46,6 +48,8 @@ void DrawEdMap(EdMap* map, bool showsky)
 			side->usespectex();
 			side->usenormtex();
 			side->useteamtex();
+
+			CheckGLError(__FILE__, __LINE__);
 			/*
 			unsigned int atex;
 			CreateTexture(atex, "gui/dmd.jpg", false);
@@ -67,12 +71,14 @@ void DrawEdMap(EdMap* map, bool showsky)
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
 #endif
+    		glActiveTextureARB(GL_TEXTURE0);
             glVertexPointer(3, GL_FLOAT, 0, va->vertices);
             glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
             glNormalPointer(GL_FLOAT, 0, va->normals);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->tangents);
 			//glVertexAttribPointer(shader->m_slot[SSLOT_TANGENT], 3, GL_FLOAT, GL_FALSE, 0, va->normals);
 
+			CheckGLError(__FILE__, __LINE__);
 			glDrawArrays(GL_TRIANGLES, 0, va->numverts);
 #ifdef DEBUG
 			CheckGLError(__FILE__, __LINE__);
@@ -91,7 +97,7 @@ void DrawEdMapDepth(EdMap* map, bool showsky)
 
 	Matrix modelmat;
 	modelmat.loadIdentity();
-    glUniformMatrix4fv(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{

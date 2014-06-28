@@ -377,13 +377,13 @@ void UseS(int shader)
 	g_curS = shader;
 	//glUseProgramObjectARB(g_shader[shader].m_hProgramObject);
 	glUseProgramObjectARB(g_shader[shader].m_hProgramObject);
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	Shader* s = &g_shader[g_curS];
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);

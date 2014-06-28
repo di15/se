@@ -13,6 +13,14 @@ extern Vec3f g_lightUp;
 
 class Matrix;
 
+extern Matrix g_lightproj;
+extern Matrix g_lightview;
+extern Matrix g_caminvmv;  //camera inverse modelview
+extern Matrix g_lightmat;
+extern Matrix g_cammodelview;
+extern Matrix g_camproj;
+extern Matrix g_cammvp;
+
 void InitShadows();
 void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus);
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview);

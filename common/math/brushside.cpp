@@ -8,6 +8,7 @@
 #include "../utils.h"
 #include "brush.h"
 #include "../save/compilemap.h"
+#include "../debug.h"
 
 BrushSide& BrushSide::operator=(const BrushSide &original)
 {

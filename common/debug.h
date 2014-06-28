@@ -8,5 +8,6 @@
 
 void LastNum(const char* l);
 void LastNum(const char* f, const int line);
+void CheckGLError(const char* file, int line);
 
 #endif

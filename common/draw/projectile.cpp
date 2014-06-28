@@ -5,6 +5,7 @@
 #include "../draw/shader.h"
 #include "../platform.h"
 #include "../math/camera.h"
+#include "../debug.h"
 
 ProjectileType g_projectileType[PROJECTILE_TYPES];
 Projectile g_projectile[PROJECTILES];

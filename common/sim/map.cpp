@@ -6,6 +6,7 @@
 #include "../draw/shader.h"
 #include "../texture.h"
 #include "../utils.h"
+#include "../debug.h"
 
 Map g_map;
 
@@ -171,7 +172,7 @@ void DrawMap2(Map* map)
 	Shader* pshader = &g_shader[g_curS];
 	Matrix modelmat;
 	modelmat.loadIdentity();
-    glUniformMatrix4fv(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Shader* shader = &g_shader[g_curS];
 

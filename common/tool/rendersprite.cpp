@@ -157,7 +157,7 @@ bool CallResize(int w, int h)
 	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);
 #endif
 
-#ifdef DEBUG
+#if 0
 	g_log<<"rf"<<g_renderframe<<" desired: "<<w<<","<<h<<", g_wh: "<<g_width<<","<<g_height<<" wr.rl: "<<(WindowRect.right-WindowRect.left)<<","<<(WindowRect.bottom-WindowRect.top)<<endl;
 	g_log.flush();
 #endif

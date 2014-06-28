@@ -4,6 +4,8 @@
 
 #include "debug.h"
 #include "utils.h"
+#include "platform.h"
+#include "draw/shader.h"
 
 void LastNum(const char* l)
 {
@@ -27,3 +29,18 @@ void LastNum(const char* f, const int line)
 	g_log<<f<<":"<<line<<endl;
 	g_log.flush();
 }
+
+#ifdef GLDEBUG
+void CheckGLError(const char* file, int line)
+{
+	//char msg[2048];
+	//sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
+	//ErrorMessage("Out of memory", msg);
+	int error = glGetError();
+
+	if(error == GL_NO_ERROR)
+		return;
+
+	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<endl;
+}
+#endif

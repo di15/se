@@ -147,7 +147,8 @@ extern SDL_GLContext g_glcontext;
 
 #define SPECBUMPSHADOW
 
-//#define GLDEBUG
+#define DEBUG
+#define GLDEBUG
 #ifndef GLDEBUG
 #define CheckGLError(a,b); a;b;
 #endif

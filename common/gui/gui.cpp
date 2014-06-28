@@ -228,8 +228,8 @@ void Ortho(int width, int height, float r, float g, float b, float a)
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)height);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], r, g, b, a);
-	glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0]);
 	g_currw = width;
 	g_currh = height;
 }
