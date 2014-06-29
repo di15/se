@@ -97,6 +97,8 @@
 		<Unit filename="common/gui/button.h" />
 		<Unit filename="common/gui/checkbox.cpp" />
 		<Unit filename="common/gui/checkbox.h" />
+		<Unit filename="common/gui/choosefile.cpp" />
+		<Unit filename="common/gui/choosefile.h" />
 		<Unit filename="common/gui/draw2d.cpp" />
 		<Unit filename="common/gui/draw2d.h" />
 		<Unit filename="common/gui/dropdownl.cpp" />

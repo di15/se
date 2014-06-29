@@ -15,7 +15,7 @@ varying vec4 lpos;
 varying vec3 light_vec;
 varying vec3 light_dir;
 
-varying vec2 texCoordOut0;
+//varying vec2 texCoordOut0;
 
 varying vec3 normalOut;
 
@@ -87,7 +87,8 @@ void main (void)
 
 	float distSqr = dot(light_vec, light_vec);
 	vec3 lvec = light_vec * inversesqrt(distSqr);
-	float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
+	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
+	float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.50;
 
 	vec3 vvec = normalize(eyevec);
 	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
@@ -108,15 +109,17 @@ void main (void)
 	float alph = 1;
 
 	// with specular highlights:
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
-	gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse, alph);
+	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
 
 	// without specular highlights:
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
 
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse, alph);
+	//gl_FragColor = vec4(normalOut, alph);
+	//gl_FragColor = vec4(normalize(light_vec), alph);
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;
-	//gl_FragColor = vec4(light_vec, color.w * texel0.w);	
+	//gl_FragColor = vec4(normalize(light_vec), color.w * texel0.w);	
 	//gl_FragColor = vec4(vspecular, color.w * texel0.w);
 	//gl_FragColor = vec4(eyevec, color.w * texel0.w);
 }

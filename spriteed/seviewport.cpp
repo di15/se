@@ -359,7 +359,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif
-		///RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
+		RenderToShadowMap(projection, viewmat, modelmat, g_camera.m_view);
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
 #endif

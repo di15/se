@@ -27,6 +27,9 @@ void DrawEdMap(EdMap* map, bool showsky)
 
 	Shader* s = &g_shader[g_curS];
 
+	//glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, g_camproj.m_matrix);
+	//glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, g_camview.m_matrix);
+
 	Matrix modelmat;
 	modelmat.loadIdentity();
     glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
@@ -57,8 +60,8 @@ void DrawEdMap(EdMap* map, bool showsky)
 	//modelview.set(g_camview.m_matrix);
 	//modelview.postmult(modelmat);
 	Matrix modelviewinv;
-	///Transpose(modelview, modelview);
-	///Inverse2(modelview, modelviewinv);
+    Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
 	//Transpose(modelviewinv, modelviewinv);
 	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 #endif

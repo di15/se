@@ -40,7 +40,7 @@ class Widget;
 #define WIDGET_BUTTON				2
 #define WIDGET_TEXT					3
 #define WIDGET_LINK					4
-#define WIDGET_DROPDOWNSELECTOR		5 
+#define WIDGET_DROPDOWNSELECTOR		5
 #define WIDGET_EDITBOX				6
 #define WIDGET_BARBUTTON			7
 #define WIDGET_HSCROLLER			8
@@ -54,6 +54,7 @@ class Widget;
 #define WIDGET_FRAME				16
 #define WIDGET_DROPDOWNMENU			17
 #define WIDGET_DROPDOWNLIST			18
+#define WIDGET_CHOOSEFILE           19
 
 #define ALIGNMENT_LESSERSIDE		0
 #define ALIGNMENT_CENTER			1
@@ -94,7 +95,7 @@ public:
 	int m_lines;
 	//int m_alignment;
 	string m_label;
-	
+
 	void (*clickfunc)();
 	void (*clickfunc2)(int p);
 	void (*overfunc)();
@@ -104,7 +105,7 @@ public:
 	void (*changefunc2)(int p);
 	void (*reframefunc)(Widget* thisw);
 
-	Widget() 
+	Widget()
 	{
 		clickfunc = NULL;
 		clickfunc2 = NULL;
@@ -127,7 +128,7 @@ public:
 
 		m_subwidg.clear();
 	}
-	
+
 	virtual void draw()	{}
 	virtual void draw2()	{}
 	//virtual void newover()	{}

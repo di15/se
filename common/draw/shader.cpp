@@ -323,10 +323,10 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	CheckGLError(__FILE__, __LINE__);
     s->MapUniform(SSLOT_VIEWMAT, "view");
 	CheckGLError(__FILE__, __LINE__);
-    s->MapUniform(SSLOT_MVP, "mvpmat");
+    s->MapUniform(SSLOT_MVP, "mvp");
 	CheckGLError(__FILE__, __LINE__);
     s->MapUniform(SSLOT_MODELVIEW, "modelview");
-	//s->MapUniform(SSLOT_NORMALMAT, "normalMat");
+	s->MapUniform(SSLOT_NORMALMAT, "normalMat");
 	//s->MapUniform(SSLOT_INVMODLVIEWMAT, "invModelView");
     s->MapUniform(SSLOT_COLOR, "color");
 	CheckGLError(__FILE__, __LINE__);

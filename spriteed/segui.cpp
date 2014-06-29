@@ -217,7 +217,7 @@ void Click_NewBrush()
 
 void Click_LoadEdMap()
 {
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -263,7 +263,7 @@ void Click_LoadEdMap()
 
 void Click_SaveEdMap()
 {
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -313,7 +313,7 @@ void Click_QSaveEdMap()
 
 void Click_CompileMap()
 {
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -354,7 +354,7 @@ void Click_ExportBuildingSprite()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -397,7 +397,7 @@ void Click_ExportUnitSprites()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -496,7 +496,7 @@ void Click_CompileRunMap()
 
 void Click_BChooseTex()
 {
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -764,7 +764,7 @@ void Click_CutBrush()
 
 void Click_AddMS3D()
 {
-#if 0
+#ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
 
 	char filepath[MAX_PATH+1];
@@ -1899,7 +1899,7 @@ void Click_CompileModel()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#if 0
+#ifdef PLATFORM_WIN
         OPENFILENAME ofn;
 
         char filepath[MAX_PATH+1];
