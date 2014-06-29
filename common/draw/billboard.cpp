@@ -10,6 +10,7 @@
 #include "../utils.h"
 #include "../math/vec3f.h"
 #include "../math/camera.h"
+#include "../debug.h"
 
 BillboardT g_billbT[BILLBOARD_TYPES];
 Billboard g_billb[BILLBOARDS];

@@ -30,6 +30,7 @@ void DrawImage(unsigned int tex, float left, float top, float right, float botto
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    //glDrawArrays(GL_LINE_STRIP, 0, 6);
 }
 
 void DrawSquare(float r, float g, float b, float a, float left, float top, float right, float bottom)

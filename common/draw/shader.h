@@ -24,7 +24,7 @@
 #define SSLOT_VIEWMAT			14
 #define SSLOT_NORMALMAT			15
 #define SSLOT_INVMODLVIEWMAT	16
-#define SSLOT_MVPMAT			17
+#define SSLOT_MVP			17
 #define SSLOT_COLOR				18
 #define SSLOT_OWNCOLOR			19
 #define SSLOT_WIDTH				20
@@ -55,7 +55,8 @@
 #define SSLOT_GRADIENTTEX		44
 #define SSLOT_DETAILTEX			45
 #define SSLOT_OWNERMAP			46
-#define SSLOTS					47
+#define SSLOT_MODELVIEW			47
+#define SSLOTS					48
 
 class Shader
 {

@@ -36,7 +36,7 @@ void main (void)
 	if(elevy > maxelev)
 		discard;
 
-	vec4 texel0 = texture2D(texture0, texCoordOut0);
+	vec4 texel0 = texture2D(texture0, gl_TexCoord[0].xy);
 	//vec4 texel1 = texture(texture1, texCoordOut0);
 	//vec4 texel2 = texture(texture2, texCoordOut0);
 	//vec4 texel3 = texture(texture3, texCoordOut0);
@@ -80,7 +80,7 @@ void main (void)
 	//float shadow = max(0.6, float(smcoord.z <= texture(shadowmap, smcoord.xy).x));
 	//float shadow = 1;
 
-	vec3 bump = normalize( texture(normalmap, texCoordOut0).xyz * 2.0 - 1.0);
+	vec3 bump = normalize( texture2D(normalmap, gl_TexCoord[0].xy).xyz * 2.0 - 1.0);
 
 	//vec3 lvec = normalize(light_vec);
 	//float diffuse = max(dot(-lvec, normalOut), 0.0) + 0.50;
@@ -92,7 +92,7 @@ void main (void)
 	vec3 vvec = normalize(eyevec);
 	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
 	//vec3 vspecular = vec3(0,0,0);
-	vec3 vspecular = texture2D(specularmap, texCoordOut0).xyz * specular;
+	vec3 vspecular = texture2D(specularmap, gl_TexCoord[0].xy).xyz * specular;
 
 	//float alph1 = texel1.w;
 	//float alph2 = texel2.w;
@@ -108,7 +108,8 @@ void main (void)
 	float alph = 1;
 
 	// with specular highlights:
-	gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+	gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse, alph);
 
 	// without specular highlights:
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);

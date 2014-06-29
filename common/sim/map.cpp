@@ -6,6 +6,8 @@
 #include "../draw/shader.h"
 #include "../texture.h"
 #include "../utils.h"
+#include "../debug.h"
+#include "../draw/shadow.h"
 
 Map g_map;
 
@@ -93,7 +95,39 @@ void DrawMap(Map* map)
 	//glDisable(GL_CULL_FACE);
 	//glEnable(GL_CULL_FACE);
 
-	Shader* shader = &g_shader[g_curS];
+	Shader* s = &g_shader[g_curS];
+
+	Matrix modelmat;
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
+	Matrix modelview;
+#ifdef SPECBUMPSHADOW
+    modelview.set(g_camview.m_matrix);
+#endif
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	//modelview.set(g_camview.m_matrix);
+	//modelview.postmult(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	for(auto brushiterator = map->m_opaquebrush.begin(); brushiterator != map->m_opaquebrush.end(); brushiterator++)
 	{
@@ -171,7 +205,36 @@ void DrawMap2(Map* map)
 	Shader* pshader = &g_shader[g_curS];
 	Matrix modelmat;
 	modelmat.loadIdentity();
-    glUniformMatrix4fv(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(pshader->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
+	Matrix modelview;
+#ifdef SPECBUMPSHADOW
+    modelview.set(g_camview.m_matrix);
+#endif
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(pshader->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	//modelview.set(g_camview.m_matrix);
+	//modelview.postmult(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(pshader->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	Shader* shader = &g_shader[g_curS];
 

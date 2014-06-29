@@ -60,7 +60,7 @@ void Matrix::inverseTranslateVect( float *pVect )
 	pVect[2] = pVect[2]-m_matrix[14];
 }
 
-void Matrix::postMultiply( const Matrix& matrix )
+void Matrix::postmult( const Matrix& matrix )
 {
 	float newMatrix[16];
 
@@ -117,7 +117,7 @@ void Matrix::postMultiply( const Matrix& matrix )
 	set( newMatrix );
 }
 
-void Matrix::postMultiply2( const Matrix& matrix )
+void Matrix::postmult2( const Matrix& matrix )
 {
 	float newMatrix[16];
 

@@ -127,7 +127,7 @@ typedef int16_t WORD;
 #define _isnan isnan
 #define stricmp strcasecmp
 #define _stricmp strcasecmp
-
+#define APIENTRY
 #define ERROR 0
 #endif
 
@@ -147,7 +147,8 @@ extern SDL_GLContext g_glcontext;
 
 #define SPECBUMPSHADOW
 
-//#define GLDEBUG
+#define DEBUG
+#define GLDEBUG
 #ifndef GLDEBUG
 #define CheckGLError(a,b); a;b;
 #endif

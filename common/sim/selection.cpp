@@ -33,9 +33,9 @@ void DrawSelectionCircles(Matrix* projection, Matrix* modelmat, Matrix* viewmat)
 
 	Shader* s = &g_shader[g_curS];
 
-	glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
-	glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
+	glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, 0, projection->m_matrix);
+	glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat->m_matrix);
+	glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, 0, viewmat->m_matrix);
 	glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 	glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);

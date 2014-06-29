@@ -284,6 +284,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
+	g_camproj = projection;
+
 	//Vec3f viewvec = g_focus;	//g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view;
 	Vec3f focusvec = v->focus();
@@ -305,20 +307,25 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
+	g_camview = viewmat;
+
 	Matrix modelview;
 	Matrix modelmat;
 	float translation[] = {0, 0, 0};
 	modelview.setTranslation(translation);
 	modelmat.setTranslation(translation);
-	modelview.postMultiply(viewmat);
+	modelview.postmult(viewmat);
+
+	g_cammodelview = modelview;
+
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postmult(viewmat);
+	g_cammvp = mvpmat;
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
-
-	Matrix mvpmat;
-	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
 
 	float extentx = PROJ_RIGHT*aspect/g_zoom;
 	float extenty = PROJ_RIGHT/g_zoom;
@@ -371,10 +378,40 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
 	{
 		UseS(SHADER_COLOR3D);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		Shader* s = &g_shader[g_curS];
-		glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
-		glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
-		glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+
+		//if(s->m_slot[SSLOT_PROJECTION] == -1)	ErrorMessage("po", "po");
+		//if(s->m_slot[SSLOT_VIEWMAT] == -1)	ErrorMessage("v", "v");
+		//if(s->m_slot[SSLOT_MODELMAT] == -1)	ErrorMessage("m", "m");
+
+#if 0
+		for(int i=0; i<16; i+=4)
+		{
+			float* m = projection.m_matrix;
+			g_log<<"pr"<<endl;
+			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+		}
+
+		for(int i=0; i<16; i+=4)
+		{
+			float* m = viewmat.m_matrix;
+			g_log<<"vm"<<endl;
+			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+		}
+
+		for(int i=0; i<16; i+=4)
+		{
+			float* m = modelmat.m_matrix;
+			g_log<<"mm"<<endl;
+			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+		}
+#endif
+
+		glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
+		glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
+		glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
 		//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		DrawGrid(vmin, vmax);
 #ifdef DEBUG
@@ -400,18 +437,18 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		{
 			UseS(SHADER_COLOR3DPERSP);
 			s = &g_shader[g_curS];
-			glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
-			glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
 			//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		}
 		else
 		{
 			UseS(SHADER_COLOR3D);
 			s = &g_shader[g_curS];
-			glUniformMatrix4fv(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
-			glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
-			glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
 		}
 
 #ifdef DEBUG
@@ -438,9 +475,12 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		glUniform1f(s->m_slot[SSLOT_WIDTH], (float)width);
 		glUniform1f(s->m_slot[SSLOT_HEIGHT], (float)height);
 		glUniform4f(s->m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-		glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
+		//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		//glEnableVertexAttribArray(s->m_slot[SSLOT_TEXCOORD0]);
 		DrawDrag(&g_edmap, &mvpmat, width, height, persp);
+#ifdef GLDEBUG
+		CheckGLError(__FILE__, __LINE__);
+#endif
 		EndS();
 
 #ifdef DEBUG
@@ -453,7 +493,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)width);
 			glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)height);
 			glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 0, 0, 1);
-			glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION]);
+			//glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION]);
 			//glEnableVertexAttribArray(g_shader[SHADER_COLOR2D].m_slot[SSLOT_TEXCOORD0]);
 			/*
 			Vec3f strafe = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, t->m_up));
@@ -484,20 +524,24 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			float line[] = {last4.x, last4.y, 0, cur4.x, cur4.y, 0};
 			//glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, line);
             glVertexPointer(3, GL_FLOAT, 0, line);
-#ifdef DEBUG
+#ifdef GLDEBUG
 			//CheckGLError(__FILE__, __LINE__);
 			CheckGLError(__FILE__, __LINE__);
 #endif
 			glDrawArrays(GL_LINES, 0, 2);
 			//CheckGLError(__FILE__, __LINE__);
 
+#ifdef GLDEBUG
+			//CheckGLError(__FILE__, __LINE__);
+			CheckGLError(__FILE__, __LINE__);
+#endif
 			//g_log<<"cut draw "<<v->m_lastmouse.x<<","<<v->m_lastmouse.y<<"->"<<v->m_curmouse.x<<","<<v->m_curmouse.y<<endl;
 			//g_log<<"cut draw2 "<<last4.x<<","<<last4.y<<"->"<<cur4.x<<","<<cur4.y<<endl;
 			//g_log<<"cut draw3 "<<last.x<<","<<last.y<<","<<last.z<<"->"<<cur.x<<","<<cur.y<<","<<cur.z<<endl;
 			//g_log.flush();
 			EndS();
 		}
-#ifdef DEBUG
+#ifdef GLDEBUG
 		CheckGLError(__FILE__, __LINE__);
 #endif
 	}
@@ -604,7 +648,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	SelectDrag(&g_edmap, &mvpmat, width, height, relx, rely, posvec, persp);
 

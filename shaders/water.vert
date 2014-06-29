@@ -25,12 +25,12 @@ varying vec2 texCoordOut0;
 //uniform mat4 invModelView;
 //uniform mat4 normalMat;
 
-attribute vec3 eyevec;
+varying vec3 eyevec;
 //attribute vec3 tangent;
 
 uniform float maxelev;
 //varying float elevtransp;
-attribute float elevy;
+varying float elevy;
 
 uniform vec3 sundirection;
 uniform mat4 normalMat;

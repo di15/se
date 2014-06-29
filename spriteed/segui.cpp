@@ -639,6 +639,8 @@ void Click_BChooseTex()
 
 void Click_FitToFace()
 {
+	LinkPrevUndo();
+
 	if(g_sel1b == NULL)
 	{
 		for(auto i=g_selB.begin(); i!=g_selB.end(); i++)

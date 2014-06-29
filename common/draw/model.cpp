@@ -8,6 +8,7 @@
 #include "shader.h"
 #include "../debug.h"
 #include "vertexarray.h"
+#include "shadow.h"
 
 Model g_model[MODELS];
 vector<ModelToLoad> g_modelsToLoad;
@@ -81,7 +82,36 @@ void DrawVA(VertexArray* va, Vec3f pos)
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
+	Matrix modelview;
+#ifdef SPECBUMPSHADOW
+    modelview.set(g_camview.m_matrix);
+#endif
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	//modelview.set(g_camview.m_matrix);
+	//modelview.postmult(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
     //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
     //if(s->m_slot[SSLOT_TEXCOORD0] != -1)	glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -106,7 +136,7 @@ void DrawVADepth(VertexArray* va, Vec3f pos)
 
 	Matrix modelmat;
     modelmat.setTranslation((const float*)&pos);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
     //glVertexAttribPointer(s->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);
     //glVertexAttribPointer(s->m_slot[SSLOT_TEXCOORD0], 2, GL_FLOAT, GL_FALSE, 0, va->texcoords);
@@ -158,8 +188,37 @@ void Model::draw(int frame, Vec3f pos, float yaw)
     modelmat.setTranslation((const float*)&pos);
     Matrix rotation;
     rotation.setRotationRadians(radians);
-    modelmat.postMultiply(rotation);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    modelmat.postmult(rotation);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
+	Matrix modelview;
+#ifdef SPECBUMPSHADOW
+    modelview.set(g_camview.m_matrix);
+#endif
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+	//modelview.set(g_camview.m_matrix);
+	//modelview.postmult(modelmat);
+	Matrix modelviewinv;
+	Transpose(modelview, modelview);
+	Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 
@@ -191,8 +250,8 @@ void Model::drawdepth(int frame, Vec3f pos, float yaw)
     modelmat.setTranslation((const float*)&pos);
     Matrix rotation;
     rotation.setRotationRadians(radians);
-    modelmat.postMultiply(rotation);
-    glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    modelmat.postmult(rotation);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	VertexArray* va = &m_va[frame];
 

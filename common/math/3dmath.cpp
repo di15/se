@@ -63,7 +63,7 @@ Vec3f Normalize(Vec3f vNormal)
 Vec3f Cross(Vec3f vVector1, Vec3f vVector2)
 {
 	Vec3f vNormal;
-	
+
 	vNormal.x = ((vVector1.y * vVector2.z) - (vVector1.z * vVector2.y));
 	vNormal.y = ((vVector1.z * vVector2.x) - (vVector1.x * vVector2.z));
 	vNormal.z = ((vVector1.x * vVector2.y) - (vVector1.y * vVector2.x));
@@ -84,7 +84,7 @@ Vec3f Vector(Vec3f vPoint1, Vec3f vPoint2)
 }
 
 // Clockwise
-Vec3f Normal(Vec3f vTriangle[])					
+Vec3f Normal(Vec3f vTriangle[])
 {
 	Vec3f vVector1 = Vector(vTriangle[2], vTriangle[0]);
 	Vec3f vVector2 = Vector(vTriangle[1], vTriangle[0]);
@@ -97,7 +97,7 @@ Vec3f Normal(Vec3f vTriangle[])
 }
 
 // Counter-clockwise
-Vec3f Normal2(Vec3f vTriangle[])					
+Vec3f Normal2(Vec3f vTriangle[])
 {
 	Vec3f vVector1 = Vector(vTriangle[2], vTriangle[0]);
 	Vec3f vVector2 = Vector(vTriangle[1], vTriangle[0]);
@@ -112,7 +112,7 @@ Vec3f Normal2(Vec3f vTriangle[])
 bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &originDistance)
 {
 	float distance1=0, distance2=0;						// The distances from the 2 points of the line from the plane
-			
+
 	vNormal = Normal(vPoly);
 
 	// Let's find the distance our plane is from the origin.  We can find this value
@@ -124,9 +124,9 @@ bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &origi
 	distance1 = ((vNormal.x * vLine[0].x)  +					// Ax +
 		         (vNormal.y * vLine[0].y)  +					// Bx +
 				 (vNormal.z * vLine[0].z)) + originDistance;	// Cz + D
-	
+
 	// Get the distance from point2 from the plane using Ax + By + Cz + D = (The distance from the plane)
-	
+
 	distance2 = ((vNormal.x * vLine[1].x)  +					// Ax +
 		         (vNormal.y * vLine[1].y)  +					// Bx +
 				 (vNormal.z * vLine[1].z)) + originDistance;	// Cz + D
@@ -137,7 +137,7 @@ bool IntersectedPlane(Vec3f vPoly[], Vec3f vLine[], Vec3f &vNormal, float &origi
 
 	if(distance1 * distance2 >= 0)			// Check to see if both point's distances are both negative or both positive
 	   return false;
-					
+
 	return true;
 }
 
@@ -158,7 +158,7 @@ bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
 		return false;
 
 	Vec3f p0 = PointOnPlane(p);
-	
+
 #ifdef MATH_DEBUG
 	g_log<<"intersection pointonplane="<<p0.x<<","<<p0.y<<","<<p0.z<<endl;
 	g_log.flush();
@@ -170,14 +170,14 @@ bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
 	return true;
 }
 
-float Dot(Vec3f vVector1, Vec3f vVector2) 
+float Dot(Vec3f vVector1, Vec3f vVector2)
 {
 	return ( (vVector1.x * vVector2.x) + (vVector1.y * vVector2.y) + (vVector1.z * vVector2.z) );
 }
 
 double AngleBetweenVectors(Vec3f Vector1, Vec3f Vector2)
-{							
-	float dotProduct = Dot(Vector1, Vector2);				
+{
+	float dotProduct = Dot(Vector1, Vector2);
 	float vectorsMagnitude = Magnitude(Vector1) * Magnitude(Vector2) ;
 	double angle = acos( dotProduct / vectorsMagnitude );
 
@@ -215,7 +215,7 @@ float DYaw(Camera* c, Vec3f p)
 
 	if(fabs(dyaw2) < fabs(mindyaw))
 		mindyaw = dyaw2;
-	
+
 	if(fabs(dyaw3) < fabs(mindyaw))
 		mindyaw = dyaw3;
 
@@ -230,7 +230,7 @@ Vec3f IntersectionPoint(Vec3f vNormal, Vec3f vLine[], double distance)
 
 	// Here comes the confusing part.  We need to find the 3D point that is actually
 	// on the plane.  Here are some steps to do that:
-	
+
 	// 1)  First we need to get the vector of our line, Then normalize it so it's a length of 1
 	vLineDir = Vector(vLine[1], vLine[0]);		// Get the Vector of the line
 	vLineDir = Normalize(vLineDir);				// Normalize the lines vector
@@ -248,10 +248,10 @@ Vec3f IntersectionPoint(Vec3f vNormal, Vec3f vLine[], double distance)
 	//    this will give us the cosine of the angle between the 2 (since they are both normalized - length 1).
 	//    We will then divide our Numerator by this value to find the offset towards the plane from our arbitrary point.
 	Denominator = Dot(vNormal, vLineDir);		// Get the dot product of the line's vector and the normal of the plane
-				  
+
 	// Since we are using division, we need to make sure we don't get a divide by zero error
 	// If we do get a 0, that means that there are INFINATE points because the the line is
-	// on the plane (the normal is perpendicular to the line - (Normal.Vector = 0)).  
+	// on the plane (the normal is perpendicular to the line - (Normal.Vector = 0)).
 	// In this case, we should just return any point on the line.
 
 	if( Denominator == 0.0)						// Check so we don't divide by zero
@@ -271,7 +271,7 @@ Vec3f IntersectionPoint(Vec3f vNormal, Vec3f vLine[], double distance)
 	// of our line vector and the normal of the plane, we get the correct length.  Cool huh?
 
 	dist = Numerator / Denominator;				// Divide to get the multiplying (percentage) factor
-	
+
 	// Now, like we said above, we times the dist by the vector, then add our arbitrary point.
 	// This essentially moves the point along the vector to a certain distance.  This now gives
 	// us the intersection point.  Yay!
@@ -306,7 +306,7 @@ Vec3f Rotate(Vec3f v, float rad, float x, float y, float z)
 
 Vec3f RotateAround(Vec3f v, Vec3f around, float rad, float x, float y, float z)
 {
-	v = v - around;		
+	v = v - around;
 	v = Rotate(v, rad, x, y, z);
 	v = around + v;
 	return v;
@@ -319,7 +319,7 @@ float GetYaw(float dx, float dz)
 
 /*
 // http://webglfactory.blogspot.ca/2011/06/how-to-create-view-matrix.html
-Matrix lookAt(Vec3f eye, Vec3f target, Vec3f up) 
+Matrix lookAt(Vec3f eye, Vec3f target, Vec3f up)
 {
          Vec3f vz= Normalize(eye - target);
          Vec3f vx = normalize(crossProduct(up, vz));
@@ -338,9 +338,9 @@ Matrix gluLookAt2(float eyex, float eyey, float eyez,
     float m[16];
     float x[3], y[3], z[3];
     float mag;
-    
+
     /* Make rotation matrix */
-    
+
     /* Z vector */
     z[0] = eyex - centerx;
     z[1] = eyey - centery;
@@ -351,41 +351,41 @@ Matrix gluLookAt2(float eyex, float eyey, float eyez,
         z[1] /= mag;
         z[2] /= mag;
     }
-    
+
     /* Y vector */
     y[0] = upx;
     y[1] = upy;
     y[2] = upz;
-    
+
     /* X vector = Y cross Z */
     x[0] = y[1] * z[2] - y[2] * z[1];
     x[1] = -y[0] * z[2] + y[2] * z[0];
     x[2] = y[0] * z[1] - y[1] * z[0];
-    
+
     /* Recompute Y = Z cross X */
     y[0] = z[1] * x[2] - z[2] * x[1];
     y[1] = -z[0] * x[2] + z[2] * x[0];
     y[2] = z[0] * x[1] - z[1] * x[0];
-    
+
     /* mpichler, 19950515 */
     /* cross product gives area of parallelogram, which is < 1.0 for
      * non-perpendicular unit-length vectors; so normalize x, y here
      */
-    
+
     mag = sqrtf(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
     if (mag) {
         x[0] /= mag;
         x[1] /= mag;
         x[2] /= mag;
     }
-    
+
     mag = sqrtf(y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
     if (mag) {
         y[0] /= mag;
         y[1] /= mag;
         y[2] /= mag;
     }
-    
+
 #define M(row,col)  m[col*4+row]
     M(0, 0) = x[0];
     M(0, 1) = x[1];
@@ -407,15 +407,15 @@ Matrix gluLookAt2(float eyex, float eyey, float eyez,
     //glMultMatrixf(m);
     Matrix mat;
     mat.set(m);
-    
+
     /* Translate Eye to Origin */
     //glTranslatef(-eyex, -eyey, -eyez);
     Matrix mat2;
     float trans[] = {-eyex, -eyey, -eyez};
     mat2.setTranslation(trans);
-    
-    mat.postMultiply(mat2);
-    
+
+    mat.postmult(mat2);
+
     return mat;
 }
 
@@ -425,29 +425,29 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 {
     float m[16];
     Vec3f x, y, z;
-    
+
     /* Make rotation matrix */
-    
+
     /* Z vector */
     z = Vec3f(eyex, eyey, eyez) - Vec3f(centerx, centery, centerz);
     z = Normalize(z);
-    
+
     /* Y vector */
     y = Vec3f(upx, upy, upz);
 
     //Vec3f vCross = Cross(m_view - m_pos, m_up);
     /* X vector = Y cross Z */
     x = Normalize(Cross(y, z));
-    
+
 	// return Normalize( Cross( m_strafe, m_view - m_pos ) );
     /* Recompute Y = Z cross X */
 	y = Normalize(Cross(z, x));
-    
+
     /* mpichler, 19950515 */
     /* cross product gives area of parallelogram, which is < 1.0 for
      * non-perpendicular unit-length vectors; so normalize x, y here
      */
-    
+
 #define M(row,col)  m[col*4+row]
 //#define M(row,col)  m[row*4+col]
     M(0, 0) = x.x;
@@ -477,7 +477,7 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
     //glMultMatrixf(m);
     Matrix mat;
     mat.set(m);
-    
+
     /* Translate Eye to Origin */
     //glTranslatef(-eyex, -eyey, -eyez);
     Matrix mat2;
@@ -485,7 +485,7 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
     //float trans[] = {eyex, eyey, eyez};
     mat2.setTranslation(trans);
 	//mat2.inverseTranslateVect(trans);
-    
+
 	//Matrix mat;
     //float trans[] = {-eyex, -eyey, -eyez};
     //mat.setTranslation(trans);
@@ -500,12 +500,12 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 	for(int i=0; i<16; i++)
 		g_log<<"the translation["<<i<<"] = "<<mat2.m_matrix[i]<<endl;*/
 
-    mat.postMultiply(mat2);
+    mat.postmult(mat2);
     /*
 	for(int i=0; i<16; i++)
 		g_log<<"final view matrix, after translation["<<i<<"] = "<<mat.m_matrix[i]<<endl;
 	g_log<<"------------------------"<<endl;
-	
+
 	g_log.flush();
 	*/
 
@@ -518,31 +518,31 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 Matrix setorthographicmat(float l, float r, float t, float b, float n, float f)
 {
     float m[16];
-	
+
 #define M(row,col)  m[col*4+row]
     M(0, 0) = 2 / (r - l);
     M(0, 1) = 0;
     M(0, 2) = 0;
     M(0, 3) = 0;
- 
+
     M(1, 0) = 0;
     M(1, 1) = 2 / (t - b);
     M(1, 2) = 0;
     M(1, 3) = 0;
- 
+
     M(2, 0) = 0;
     M(2, 1) = 0;
     M(2, 2) = -1 / (f - n);
     //M(2, 2) = -2 / (f - n);
     M(2, 3) = 0;
- 
+
     M(3, 0) = -(r + l) / (r - l);
     M(3, 1) = -(t + b) / (t - b);
     M(3, 2) = -n / (f - n);
     //M(3, 2) = -(f + n) / (f - n);
     M(3, 3) = 1;
 #undef M
-	
+
     Matrix mat;
     mat.set(m);
 	/*
@@ -566,17 +566,17 @@ Matrix setorthographicmat2(float l, float r, float t, float b, float n, float f)
             orthomatrix[0].y = 0;
             orthomatrix[0].z = 0;
             orthomatrix[0].w = 0;
- 
+
             orthomatrix[1].x = 0;
             orthomatrix[1].y = 2.0/(top-bottom);
             orthomatrix[1].z = 0;
             orthomatrix[1].w = 0;
- 
+
             orthomatrix[2].x = 0;
             orthomatrix[2].y = 0;
             orthomatrix[2].z = 2.0/(Zfar-Znear);
             orthomatrix[2].w = 0;
- 
+
             orthomatrix[3].x = -(right+left)/(right-left);
             orthomatrix[3].y = -(top+bottom)/(top-bottom);
             orthomatrix[3].z = -(Zfar+Znear)/(Zfar-Znear);
@@ -661,7 +661,7 @@ Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp)
 	screenpos.y = vec.y;
 	screenpos.z = vec.z;
 	screenpos.w = 1;
-			
+
 	screenpos.transform(*mvp);
 
 	if(persp)
@@ -693,7 +693,7 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 
 	return ( direction * MIN_DISTANCE + g_camera.m_strafe * ratioX * Wnear/2.0f + g_camera.up2() * ratioY * Hnear/2.0f );
 	*/
-	
+
 	float halfWidth = (float)width / 2.0f;
 	float halfHeight = (float)height / 2.0f;
 
@@ -710,7 +710,7 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 	float aspect = fabsf((float)width / (float)height);
 	float Wnear = PROJ_RIGHT * aspect / g_zoom;
 	float Hnear = PROJ_RIGHT / g_zoom;
-	
+
 	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
 	Vec3f result = posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
@@ -725,7 +725,7 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, Vec3f upvec, Vec3f viewdir, float fov, float mind)
 {
 	viewdir = Normalize(viewdir);
-	
+
 	float halfWidth = (float)width / 2.0f;
 	float halfHeight = (float)height / 2.0f;
 
@@ -735,7 +735,7 @@ Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidev
 	float aspect = fabsf((float)width / (float)height);
 	float Hnear = 2 * tan( DEGTORAD(fov) / 2) * mind;
 	float Wnear = Hnear * aspect;
-	
+
 	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
 	Vec3f result = viewdir * mind + posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
@@ -755,11 +755,11 @@ Vec3f ScreenPerspRay(int x, int y, int width, int height, Vec3f posvec, Vec3f si
 	float ratiox = (x - halfWidth) / halfWidth;
 
 	float ratioy = -(y - halfHeight) / halfHeight;
-	
+
 	float aspect = fabsf((float)width / (float)height);
 	float Hnear = 2.0f * tan( DEGTORAD(fov) / 2.0f );
 	float Wnear = Hnear * aspect;
-	
+
 	return Normalize(viewdir) + sidevec * ratiox * Wnear/2.0f + upvec * ratioy * Hnear/2.0f;
 
 #if 0

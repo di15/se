@@ -86,8 +86,6 @@ void Draw()
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
-    return;
-
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
 #endif
@@ -115,6 +113,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     LastNum(__FILE__, __LINE__);
 #endif
 
+#if 0
     UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);
@@ -124,23 +123,21 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     glBindTexture(GL_TEXTURE_2D, g_transparency);
     glUniform1iARB(g_shader[SHADER_OWNED].m_slot[SSLOT_TEXTURE1], 1);
     glActiveTextureARB(GL_TEXTURE0);*/
-
     DrawModelHolders();
 #ifdef DEBUG
     CheckGLError(__FILE__, __LINE__);
 #endif
     EndS();
+#endif
 
     UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
-
+    CheckGLError(__FILE__, __LINE__);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
-
-    DrawEdMap(&g_edmap, g_showsky);
-#ifdef DEBUG
     CheckGLError(__FILE__, __LINE__);
-#endif
+    DrawEdMap(&g_edmap, g_showsky);
+    CheckGLError(__FILE__, __LINE__);
     EndS();
 
     if(g_mode == EDITOR)
@@ -542,7 +539,7 @@ void EventLoop()
                     }
                     else
                     {
-#ifdef DEBUG
+#if 0
                         g_log<<"rf"<<g_renderframe<<" rsz "<<(LOWORD(lParam))<<","<<(HIWORD(lParam))<<endl;
 #endif
                         Resize(e.window.data1, e.window.data2);
@@ -646,49 +643,30 @@ void EventLoop()
             }
         }
 
-        g_log<<"draw"<<endl;
-        g_log.flush();
-
         if(g_mode == LOADING || g_mode == RENDERING || DrawNextFrame(FRAME_RATE))
         {
 #ifdef DEBUG
             CheckGLError(__FILE__, __LINE__);
 #endif
             CalcDrawRate();
-
-            g_log<<"draw1"<<endl;
-            g_log.flush();
 #ifdef DEBUG
             CheckGLError(__FILE__, __LINE__);
 #endif
             ScoreFPS();
-
-            g_log<<"draw2"<<endl;
-            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif
             Update();
-
-            g_log<<"draw3"<<endl;
-            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif
             Draw();
-
-            g_log<<"draw4"<<endl;
-            g_log.flush();
 #ifdef DEBUG
             LastNum(__FILE__, __LINE__);
 #endif
         }
-
-
-        g_log<<"adraw"<<endl;
-        g_log.flush();
     }
 }
 
