@@ -127,7 +127,7 @@ typedef int16_t WORD;
 #define _isnan isnan
 #define stricmp strcasecmp
 #define _stricmp strcasecmp
-
+#define APIENTRY
 #define ERROR 0
 #endif
 

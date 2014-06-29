@@ -824,8 +824,8 @@ void DrawDrag_ModelHolder(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 			screenpos.x - BRUSH_DRAG_HSIZE, screenpos.y - BRUSH_DRAG_HSIZE, 0
 		};
 
-		float coluor[] = BRUSH_DRAG_FILLRGBA;
-		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, coluor);
+		float colorr[] = BRUSH_DRAG_FILLRGBA;
+		glUniform4fv(shader->m_slot[SSLOT_COLOR], 1, colorr);
 
 		//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, verts);
         glVertexPointer(3, GL_FLOAT, 0, verts);

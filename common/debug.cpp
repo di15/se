@@ -44,3 +44,9 @@ void CheckGLError(const char* file, int line)
 	g_log<<"GL Error #"<<error<<" in "<<file<<" on line "<<line<<" using shader #"<<g_curS<<endl;
 }
 #endif
+
+GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
+{
+   //ErrorMessage("GL Error", message);
+   g_log<<"GL Error: "<<message<<endl;
+}

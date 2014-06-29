@@ -310,7 +310,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
     Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	persp = false;
 
@@ -403,7 +403,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
     Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 
 #ifdef DEBUG
@@ -834,7 +834,7 @@ void UpdateRender()
 		float translation[] = {0, 0, 0};
 		modelview.setTranslation(translation);
 		modelmat.setTranslation(translation);
-		modelview.postMultiply(viewmat);
+		modelview.postmult(viewmat);
 
 #ifdef DEBUG
 		LastNum(__FILE__, __LINE__);
@@ -842,7 +842,7 @@ void UpdateRender()
 
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
-		mvpmat.postMultiply(viewmat);
+		mvpmat.postmult(viewmat);
 
 #if 1
 		if(v->m_type == VIEWPORT_ANGLE45O)

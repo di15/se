@@ -20,6 +20,10 @@ extern Matrix g_lightmat;
 extern Matrix g_cammodelview;
 extern Matrix g_camproj;
 extern Matrix g_cammvp;
+extern Matrix g_camview;
+
+void Transpose(Matrix mat, Matrix& transpMat);
+bool Inverse2(Matrix mat, Matrix& invMat);
 
 void InitShadows();
 void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus);

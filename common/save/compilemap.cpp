@@ -51,7 +51,7 @@ public:
 	Plane m_tceq[2];
 	list<Triangle> m_frag;
 	*/
-	
+
 	cuts->m_diffusem = eds->m_diffusem;
 	cuts->m_specularm = eds->m_specularm;
 	cuts->m_normalm = eds->m_normalm;
@@ -134,13 +134,13 @@ void RemoveHiddenFrags(CutBrush* cutb, Brush* edb)
 					inall = false;
 					break;
 				}
-				
+
 				if(!PointOnOrBehindPlane(j->m_vertex[1], *p))
 				{
 					inall = false;
 					break;
 				}
-				
+
 				if(!PointOnOrBehindPlane(j->m_vertex[2], *p))
 				{
 					inall = false;
@@ -177,7 +177,7 @@ void CutBrushes()
 	}
 
 	ntouch = 0;
-	
+
 	auto a = cmap->m_brush.begin();
 	auto cuta = cutbs.begin();
 	for(; a!=cmap->m_brush.end(); a++, cuta++)
@@ -200,14 +200,14 @@ void CutBrushes()
 				continue;
 
 			ntouch++;
-			
-			//FragBrush(&*cuta, &*b);	
+
+			//FragBrush(&*cuta, &*b);
 			//FragBrush(&*cutb, &*a);
 		}
 	}
 
 	g_log<<"num touches: "<<ntouch<<endl;
-	
+
 	// For each brush, see which other brush
 	//it touches, and remove any hidden fragments
 	//covered up by the other brush.
@@ -232,8 +232,8 @@ void CutBrushes()
 		{
 			if(!BrushTouch(&*a, &*b) && !BrushTouch(&*b, &*a))
 				continue;
-			
-			RemoveHiddenFrags(&*cuta, &*b);	
+
+			RemoveHiddenFrags(&*cuta, &*b);
 			RemoveHiddenFrags(&*cutb, &*a);
 		}
 	}
@@ -252,7 +252,7 @@ void MakeFinalBrushes()
 	{
 		Brush finalb = *brushitr;
 		auto cutsideitr = cutbrushitr->m_side.begin();
-		
+
 		for(int sideindex = 0; sideindex < finalb.m_nsides; cutsideitr++, sideindex++)
 		{
 			BrushSide* s = &finalb.m_sides[sideindex];
@@ -278,7 +278,7 @@ void CompileMap(const char* full, EdMap* map)
 	g_log<<"num brushes: "<<map->m_brush.size()<<endl;
 
 	CutBrushes();
-	
+
 	g_log<<"frags removed: "<<g_fragerased<<endl;
 
 	MakeFinalBrushes();
@@ -298,12 +298,12 @@ void ResetView()
 	g_camera.rotateabout(Vec3f(0,0,0), DEGTORAD(g_renderyaw), 0, 1, 0);
 
 	g_zoom = 1;
-	
+
 	Vec3f topleft(-TILE_SIZE/2, 0, -TILE_SIZE/2);
 	Vec3f bottomleft(-TILE_SIZE/2, 0, TILE_SIZE/2);
 	Vec3f topright(TILE_SIZE/2, 0, -TILE_SIZE/2);
 	Vec3f bottomright(TILE_SIZE/2, 0, TILE_SIZE/2);
-	
+
 	int width;
 	int height;
 
@@ -324,7 +324,7 @@ void ResetView()
 
 	float aspect = fabsf((float)width / (float)height);
 	Matrix projection;
-	
+
 #ifdef DEBUG
 	{
 		g_log<<"rv"<<aspect<<","<<width<<","<<height<<" r-l:"<<(PROJ_RIGHT*aspect/g_zoom)<<","<<(-PROJ_RIGHT*aspect/g_zoom)<<" gwh:"<<g_width<<","<<g_height<<endl;
@@ -332,7 +332,7 @@ void ResetView()
 #endif
 
 	bool persp = false;
-	
+
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
 		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
@@ -359,7 +359,7 @@ void ResetView()
     //Vec3f posvec = g_focus + t->m_offset;
 	Vec3f posvec = g_camera.m_pos;
 	//Vec3f posvec = v->pos();
-	
+
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	{
 	//	posvec = g_camera.m_view + t->m_offset;
@@ -380,7 +380,7 @@ void ResetView()
     Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 #ifdef DEBUG
 	{
@@ -392,12 +392,12 @@ void ResetView()
 #endif
 
 	persp = false;
-	
+
 	Vec4f topleft4 = ScreenPos(&mvpmat, topleft, width, height, persp);
 	Vec4f topright4 = ScreenPos(&mvpmat, topright, width, height, persp);
 	Vec4f bottomleft4 = ScreenPos(&mvpmat, bottomleft, width, height, persp);
 	Vec4f bottomright4 = ScreenPos(&mvpmat, bottomright, width, height, persp);
-	
+
 	float minx = min(topleft4.x, min(topright4.x, min(bottomleft4.x, bottomright4.x)));
 	float maxx = max(topleft4.x, max(topright4.x, max(bottomleft4.x, bottomright4.x)));
 	//float miny = min(topleft4.y, min(topright4.y, min(bottomleft4.y, bottomright4.y)));

@@ -6,6 +6,7 @@
 #include "../utils.h"
 #include "../save/modelholder.h"
 #include "../debug.h"
+#include "../draw/shadow.h"
 
 EdMap g_edmap;
 vector<Brush*> g_selB;
@@ -24,12 +25,43 @@ void DrawEdMap(EdMap* map, bool showsky)
 	//glDisable(GL_CULL_FACE);
 	//glEnable(GL_CULL_FACE);
 
-	Shader* shader = &g_shader[g_curS];
+	Shader* s = &g_shader[g_curS];
 
 	Matrix modelmat;
 	modelmat.loadIdentity();
-    glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+    glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
     CheckGLError(__FILE__, __LINE__);
+
+	Matrix mvp;
+#if 0
+	mvp.set(modelview.m_matrix);
+	mvp.postmult(g_camproj);
+#elif 0
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(modelview);
+#else
+	mvp.set(g_camproj.m_matrix);
+	mvp.postmult(g_camview);
+	mvp.postmult(modelmat);
+#endif
+	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
+
+	Matrix modelview;
+#ifdef SPECBUMPSHADOW
+    modelview.set(g_camview.m_matrix);
+#endif
+    modelview.postmult(modelmat);
+	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
+
+#if 1
+	//modelview.set(g_camview.m_matrix);
+	//modelview.postmult(modelmat);
+	Matrix modelviewinv;
+	///Transpose(modelview, modelview);
+	///Inverse2(modelview, modelviewinv);
+	//Transpose(modelviewinv, modelviewinv);
+	glUniformMatrix4fv(s->m_slot[SSLOT_NORMALMAT], 1, 0, modelviewinv.m_matrix);
+#endif
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{

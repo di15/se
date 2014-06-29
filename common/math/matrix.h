@@ -17,9 +17,9 @@ class Matrix
 		~Matrix();
 		void loadIdentity();
 		void set( const float *matrix );
-		
-		void postMultiply( const Matrix& matrix );
-		void postMultiply2( const Matrix& matrix );
+
+		void postmult( const Matrix& matrix );
+		void postmult2( const Matrix& matrix );
 
 		//	Set the translation of the current matrix. Will erase any previous values.
 		void setTranslation( const float *translation );

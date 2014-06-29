@@ -62,6 +62,8 @@ void main(void)
 	//mat4 normalMat = transpose( inverse( model ) );
 	//mat4 normalMat = invModelView;
 	vec3 normalEyeSpace = vec3( normalMat * vec4(gl_Normal, 0.0) );
+	//mat4 normalMat2;
+	//vec3 normalEyeSpace = vec3( normalMat2 * vec4(gl_Normal, 0.0) );
 	normalOut = normalize(normalEyeSpace);
 
 	vec3 n = normalOut;
@@ -85,7 +87,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	vec3 vVertex = vec3(view * (model * gl_Vertex));
+	vec3 vVertex = vec3( view * model * gl_Vertex );
 
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;

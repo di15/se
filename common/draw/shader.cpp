@@ -121,6 +121,21 @@ void InitGLSL()
 	g_log<<szGLExtensions<<endl;
 	g_log.flush();
 
+	if(!strstr(szGLExtensions, "GL_ARB_debug_output"))
+	{
+		//ErrorMessage("Error", "GL_ARB_debug_output extension not supported!");
+		//g_quit = true;
+		//return;
+		g_log<<"GL_ARB_debug_output extension not supported"<<endl;
+	}
+	else
+	{
+		g_log<<"Reging debug handler"<<endl;
+		g_log.flush();
+		glDebugMessageCallbackARB(&GLMessageHandler, 0);
+		CheckGLError(__FILE__, __LINE__);
+	}
+
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
 	{
 		ErrorMessage("Error", "GL_ARB_shader_objects extension not supported!");
@@ -308,8 +323,9 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	CheckGLError(__FILE__, __LINE__);
     s->MapUniform(SSLOT_VIEWMAT, "view");
 	CheckGLError(__FILE__, __LINE__);
-    s->MapUniform(SSLOT_MVPMAT, "mvpmat");
+    s->MapUniform(SSLOT_MVP, "mvpmat");
 	CheckGLError(__FILE__, __LINE__);
+    s->MapUniform(SSLOT_MODELVIEW, "modelview");
 	//s->MapUniform(SSLOT_NORMALMAT, "normalMat");
 	//s->MapUniform(SSLOT_INVMODLVIEWMAT, "invModelView");
     s->MapUniform(SSLOT_COLOR, "color");

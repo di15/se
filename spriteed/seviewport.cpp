@@ -284,6 +284,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
+	g_camproj = projection;
+
 	//Vec3f viewvec = g_focus;	//g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view;
 	Vec3f focusvec = v->focus();
@@ -305,20 +307,25 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
+	g_camview = viewmat;
+
 	Matrix modelview;
 	Matrix modelmat;
 	float translation[] = {0, 0, 0};
 	modelview.setTranslation(translation);
 	modelmat.setTranslation(translation);
-	modelview.postMultiply(viewmat);
+	modelview.postmult(viewmat);
+
+	g_cammodelview = modelview;
+
+	Matrix mvpmat;
+	mvpmat.set(projection.m_matrix);
+	mvpmat.postmult(viewmat);
+	g_cammvp = mvpmat;
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
-
-	Matrix mvpmat;
-	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
 
 	float extentx = PROJ_RIGHT*aspect/g_zoom;
 	float extenty = PROJ_RIGHT/g_zoom;
@@ -641,7 +648,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
-	mvpmat.postMultiply(viewmat);
+	mvpmat.postmult(viewmat);
 
 	SelectDrag(&g_edmap, &mvpmat, width, height, relx, rely, posvec, persp);
 

@@ -39,6 +39,7 @@ Matrix g_lightmat;
 Matrix g_cammodelview;
 Matrix g_camproj;
 Matrix g_cammvp;
+Matrix g_camview;
 
 void (*DrawSceneDepthFunc)() = NULL;
 void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
@@ -258,7 +259,7 @@ bool gluInvertMatrix(const float m[16], float invOut[16])
     return true;
 }
 
-bool InverseMatrix2(Matrix mat, Matrix invMat)
+bool Inverse2(Matrix mat, Matrix& invMat)
 {
     double inv[16], det;
     int i;
@@ -393,7 +394,7 @@ bool InverseMatrix2(Matrix mat, Matrix invMat)
     return true;
 }
 
-void Transpose(Matrix mat, Matrix transpMat)
+void Transpose(Matrix mat, Matrix& transpMat)
 {
 	const float* m = mat.m_matrix;
 	float transp[16];
@@ -417,6 +418,14 @@ void Transpose(Matrix mat, Matrix transpMat)
 
 void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus)
 {
+    g_camproj = projection;
+    g_camview = viewmat;
+    //g_cammodelview = modelview;
+
+    Matrix oldproj = g_camproj;
+    Matrix oldview = g_camview;
+    Matrix oldmvp = g_cammvp;
+
 	glDisable(GL_CULL_FACE);
 
 	int viewport[4];
@@ -470,10 +479,20 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
 	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
 
+#endif
+
+	g_camproj = g_lightproj;
+	g_camview = g_lightview;
+
+	Matrix mvp;
+	mvp.set(g_lightproj.m_matrix);
+	mvp.postmult2(g_lightview);
+
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
+#if 0
 	if(DrawSceneDepthFunc != NULL)
 		DrawSceneDepthFunc();
 
@@ -487,6 +506,10 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	glEnable(GL_CULL_FACE);
+
+	g_camproj = oldproj;
+	g_camview = oldview;
+	g_cammvp = oldmvp;
 }
 
 void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
@@ -542,13 +565,13 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
 	scalem.setScale(scalef);
-	g_lightmat.postMultiply(scalem);
-	g_lightmat.postMultiply(g_lightproj);
-	g_lightmat.postMultiply(g_lightview);
-	//g_lightmat.postMultiply(g_caminvmv);
+	g_lightmat.postmult(scalem);
+	g_lightmat.postmult(g_lightproj);
+	g_lightmat.postmult(g_lightview);
+	//g_lightmat.postmult(g_caminvmv);
 
 	Matrix modelviewinv;
-	InverseMatrix2(modelview, modelviewinv);
+	Inverse2(modelview, modelviewinv);
 	Transpose(modelviewinv, modelviewinv);
 
 	const float* mv = g_cammodelview.m_matrix;
