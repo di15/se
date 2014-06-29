@@ -204,7 +204,7 @@ void DrawMap2(Map* map)
 
 	Shader* pshader = &g_shader[g_curS];
 	Matrix modelmat;
-	modelmat.loadIdentity();
+	modelmat.reset();
     glUniformMatrix4fvARB(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Matrix mvp;

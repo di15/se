@@ -31,7 +31,7 @@ void DrawEdMap(EdMap* map, bool showsky)
 	//glUniformMatrix4fv(s->m_slot[SSLOT_VIEWMAT], 1, 0, g_camview.m_matrix);
 
 	Matrix modelmat;
-	modelmat.loadIdentity();
+	modelmat.reset();
     glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
     CheckGLError(__FILE__, __LINE__);
 
@@ -131,7 +131,7 @@ void DrawEdMapDepth(EdMap* map, bool showsky)
 	Shader* shader = &g_shader[g_curS];
 
 	Matrix modelmat;
-	modelmat.loadIdentity();
+	modelmat.reset();
     glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
@@ -155,6 +155,10 @@ void DrawEdMapDepth(EdMap* map, bool showsky)
 	glBindTexture(GL_TEXTURE_2D, atex);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_TEXTURE0], 0);
 	*/
+
+			glActiveTextureARB(GL_TEXTURE0);
+			glUniform1iARB(shader->m_slot[SSLOT_TEXTURE0], 0);
+
 			VertexArray* va = &side->m_drawva;
 
 			//glVertexAttribPointer(shader->m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, va->vertices);

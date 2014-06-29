@@ -136,6 +136,13 @@ void InitGLSL()
 		CheckGLError(__FILE__, __LINE__);
 	}
 
+	if(!strstr(szGLExtensions, "GL_ARB_framebuffer_object"))
+	{
+		ErrorMessage("Error", "GL_ARB_framebuffer_object extension not supported!");
+		g_quit = true;
+		return;
+	}
+
 	if(!strstr(szGLExtensions, "GL_ARB_shader_objects"))
 	{
 		ErrorMessage("Error", "GL_ARB_shader_objects extension not supported!");

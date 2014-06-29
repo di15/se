@@ -8,6 +8,7 @@
 class ListBox : public Widget
 {
 public:
+	ListBox();
 	ListBox(Widget* parent, const char* n, int f, void (*reframef)(Widget* thisw), void (*change)());
 
 	void draw();

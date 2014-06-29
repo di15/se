@@ -279,7 +279,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	}
 	else
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
 	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
@@ -356,7 +356,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	}
 	else
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
 #ifdef DEBUG
@@ -805,7 +805,7 @@ void UpdateRender()
 		else if(g_projtype == PROJ_ORTHO || v->m_type != VIEWPORT_ANGLE45O)
 #endif
 		{
-			projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+			projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 		}
 
 		//Vec3f viewvec = g_focus;	//g_camera.m_view;

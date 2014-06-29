@@ -15,6 +15,31 @@
 #include "textblock.h"
 #include "touchlistener.h"
 
+Button::Button() : Widget()
+{
+	m_parent = NULL;
+	m_type = WIDGET_BUTTON;
+	m_name = "";
+    m_text = "";
+	m_label = "";
+    m_font = MAINFONT8;
+    //float length = 0;
+    //for(int i=0; i<strlen(t); i++)
+    //    length += g_font[f].glyph[t[i]].w;
+	//m_tpos[0] = (left+right)/2.0f - length/2.0f;
+	//m_tpos[1] = (top+bottom)/2.0f - g_font[f].gheight/2.0f;
+	m_over = false;
+	m_ldown = false;
+	CreateTexture(m_tex, "gui/trans.png", true, false);
+	CreateTexture(m_bgtex, "gui/buttonbg.png", true, false);
+	CreateTexture(m_bgovertex, "gui/buttonbgover.png", true, false);
+	reframefunc = NULL;
+	clickfunc = NULL;
+	overfunc = NULL;
+	clickfunc2 = NULL;
+	overfunc2 = NULL;
+	outfunc = NULL;
+}
 
 Button::Button(Widget* parent, const char* n, const char* filepath, const char* label, const char* t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Widget()
 {

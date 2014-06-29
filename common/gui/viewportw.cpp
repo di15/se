@@ -20,16 +20,16 @@
 #include "../draw/shader.h"
 #include "gui.h"
 
-ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw), 
-					 void (*drawf)(int p, int x, int y, int w, int h), 
-					 bool (*ldownf)(int p, int x, int y, int w, int h), 
-					 bool (*lupf)(int p, int x, int y, int w, int h), 
-					 bool (*mousemovef)(int p, int x, int y, int w, int h), 
-					bool (*rdownf)(int p, int relx, int rely, int w, int h), 
-					bool (*rupf)(int p, int relx, int rely, int w, int h), 
+ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
+					 void (*drawf)(int p, int x, int y, int w, int h),
+					 bool (*ldownf)(int p, int x, int y, int w, int h),
+					 bool (*lupf)(int p, int x, int y, int w, int h),
+					 bool (*mousemovef)(int p, int x, int y, int w, int h),
+					bool (*rdownf)(int p, int relx, int rely, int w, int h),
+					bool (*rupf)(int p, int relx, int rely, int w, int h),
 					bool (*mousewf)(int p, int d),
-					bool (*mdownf)(int p, int relx, int rely, int w, int h), 
-					bool (*mupf)(int p, int relx, int rely, int w, int h), 
+					bool (*mdownf)(int p, int relx, int rely, int w, int h),
+					bool (*mupf)(int p, int relx, int rely, int w, int h),
 					 int parm)
 {
 	m_parent = parent;
@@ -52,7 +52,7 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 
 void ViewportW::draw()
 {
-	//g_log<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
+	//g_log<<"vpw "<<m_pos[0]<<","<<m_pos[1]<<","<<m_pos[2]<<","<<m_pos[3]<<endl;
 
 	int w = m_pos[2] - m_pos[0];
 	int h = m_pos[3] - m_pos[1];
@@ -65,7 +65,7 @@ void ViewportW::draw()
 
 	if(drawfunc != NULL)
 		drawfunc(m_param,m_pos[0], m_pos[1], w, h);
-	
+
 	//glViewport(0, 0, g_width, g_height);
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	EndS();

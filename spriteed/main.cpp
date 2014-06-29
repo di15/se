@@ -134,6 +134,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     CheckGLError(__FILE__, __LINE__);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);
+    //glBindTexture(GL_TEXTURE_2D, g_texture[0].texname);
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
     CheckGLError(__FILE__, __LINE__);
     DrawEdMap(&g_edmap, g_showsky);
@@ -161,8 +162,6 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 
 void DrawSceneDepth()
 {
-    return;
-
     //g_model[themodel].draw(0, Vec3f(0,0,0), 0);
 
 #ifdef DEBUG
@@ -212,6 +211,7 @@ void UpdateLoading()
         OpenSoleView("editor");
         //g_mode = LOGO;
         //OpenSoleView("logo");
+        OpenAnotherView("choose file");
         break;
     }
 }

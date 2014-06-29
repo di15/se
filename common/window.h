@@ -12,6 +12,7 @@
 #define FRAME_RATE			30
 #define MIN_DISTANCE		1.0f
 #define MAX_DISTANCE		1000000.0f
+//#define MAX_DISTANCE		1000.0f
 #define FIELD_OF_VIEW		45.0f
 #define PROJ_RIGHT			(500)	//(30*12.5f)
 

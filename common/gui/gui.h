@@ -24,6 +24,7 @@
 #include "touchlistener.h"
 #include "frame.h"
 #include "viewportw.h"
+#include "choosefile.h"
 
 class GUI
 {

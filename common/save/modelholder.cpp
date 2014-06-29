@@ -118,7 +118,7 @@ void ModelHolder::retransform()
 	rotrads.y = DEGTORAD(rotdegrees.y);
 	rotrads.z = DEGTORAD(rotdegrees.z);
 	//rotquat.fromAngles((float*)&rotrads);
-	rotationmat.loadIdentity();
+	rotationmat.reset();
 	rotationmat.setRotationRadians((float*)&rotrads);
 
 	for(int frameidx = 0; frameidx < nframes; frameidx++)

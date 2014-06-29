@@ -15,11 +15,13 @@ void main(void)
 	//gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1.0);
 
 
-	vec4 texel0 = texture2D(texture0, texCoordOut0);
+	vec4 texel0 = texture2D(texture0, gl_TexCoord[0].xy);
 	//gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, texel0.w);
 
-	if(texel0.w < 0.8)
-		discard;
+	//if(texel0.w < 0.8)
+	//	discard;
 
 	gl_FragColor = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, 1.0);
+	//gl_FragColor = vec4(0, 0, 1, 1.0);
+	//gl_FragDepth = gl_FragCoord.z;
 }

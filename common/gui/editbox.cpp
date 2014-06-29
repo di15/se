@@ -17,6 +17,26 @@
 #include "touchlistener.h"
 #include "gui.h"
 
+EditBox::EditBox() : Widget()
+{
+	m_parent = NULL;
+	m_type = WIDGET_EDITBOX;
+	m_name = "";
+	m_font = MAINFONT8;
+	m_value = "";
+	m_caret = strlen(m_value.c_str());
+	m_opened = false;
+	m_passw = false;
+	m_maxlen = 10;
+	reframefunc = NULL;
+	m_scroll[0] = 0;
+	m_highl[0] = 0;
+	m_highl[1] = 0;
+	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
+	m_param = -1;
+	changefunc2 = NULL;
+}
+
 EditBox::EditBox(Widget* parent, const char* n, const char* t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
 {
 	m_parent = parent;

@@ -66,7 +66,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	Shader* shader = &g_shader[g_curS];
 
 	Matrix modelmat;
-	modelmat.loadIdentity();
+	modelmat.reset();
     glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	//glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, 0.75f);
@@ -193,7 +193,7 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, 0.75f);
 
 	Matrix modelmat;
-	modelmat.loadIdentity();
+	modelmat.reset();
     glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	for(auto bi=g_selB.begin(); bi!=g_selB.end(); bi++)

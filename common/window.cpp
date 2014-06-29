@@ -293,7 +293,7 @@ bool MakeWindow(const char* title)
 		startx = SDL_WINDOWPOS_UNDEFINED;
 		starty = SDL_WINDOWPOS_UNDEFINED;
 #endif
-		flags = SDL_WINDOW_OPENGL;
+		flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
 	}
 
 	// Create an application window with the following settings:

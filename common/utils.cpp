@@ -230,23 +230,17 @@ void BackSlashes(char* corrected)
 
 void ErrorMessage(const char* title, const char* message)
 {
-	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, message, NULL);
-	SDL_ShowCursor(false);
 }
 
 void InfoMessage(const char* title, const char* message)
 {
-	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title, message, NULL);
-	SDL_ShowCursor(false);
 }
 
 void WarningMessage(const char* title, const char* message)
 {
-	SDL_ShowCursor(true);
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title, message, NULL);
-	SDL_ShowCursor(false);
 }
 
 void OutOfMem(const char* file, int line)

@@ -8,6 +8,7 @@
 class Button : public Widget
 {
 public:
+	Button();
 	Button(Widget* parent, const char* n, const char* filepath, const char* label, const char* t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
 	Button(Widget* parent, const char* filepath, const char* t, int f, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)());
 	Button(Widget* parent, const char* filepath, const char* t, int f, void (*reframef)(Widget* thisw), void (*click2)(int p), int parm);
@@ -32,7 +33,7 @@ public:
 
 			return true;	// intercept mouse event
 		}
-		
+
 		if(m_ldown)
 		{
 			m_ldown = false;

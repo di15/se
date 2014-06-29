@@ -47,14 +47,14 @@ Vec3f RotateAround(Vec3f v, Vec3f around, float rad, float x, float y, float z);
 float Clipf(float n, float lower, float upper);
 int Clipi(int n, int lower, int upper);
 float GetYaw(float dx, float dz);
-Matrix gluLookAt2(float eyex, float eyey, float eyez,
+Matrix LookAt(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
 Matrix gluLookAt3(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
 Matrix BuildPerspProjMat(float fov, float aspect, float znear, float zfar);
-Matrix setorthographicmat(float l, float r, float t, float b, float n, float f);
+Matrix OrthoProj(float l, float r, float t, float b, float n, float f);
 Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp);
 float Snap(float base, float value);
 float SnapNearest(float base, float value);

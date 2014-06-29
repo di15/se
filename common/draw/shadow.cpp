@@ -20,10 +20,8 @@
 #include "../math/camera.h"
 
 unsigned int g_depth;
-const int g_depthSizeX = 2048;	//512;	//4096;
-const int g_depthSizeY = 2048;	//512;	//4096;
-unsigned int g_rbDepth;
-unsigned int g_fbDepth;
+unsigned int g_rbdepth;
+unsigned int g_fbdepth;
 
 //1000000.0f/300 = 3333.3333333333333333333333333333 cm =
 
@@ -48,6 +46,7 @@ Vec3f g_viewInter;
 
 void InitShadows()
 {
+#if 0	//OpenGL 3.0 way
 	CheckGLError(__FILE__, __LINE__);
 
 	glGenTextures(1, &g_depth);
@@ -59,7 +58,7 @@ void InitShadows()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, g_depthSizeX, g_depthSizeY, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, DEPTH_SIZE, DEPTH_SIZE, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
 
 
 	CheckGLError(__FILE__, __LINE__);
@@ -68,20 +67,71 @@ void InitShadows()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glGenRenderbuffersEXT(1, &g_rbDepth);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, g_rbDepth);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, g_depthSizeX, g_depthSizeY);
+	glGenRenderbuffersEXT(1, &g_rbdepth);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, g_rbdepth);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, DEPTH_SIZE, DEPTH_SIZE);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
 	CheckGLError(__FILE__, __LINE__);
 
-	glGenFramebuffersEXT(1, &g_fbDepth);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
+	glGenFramebuffersEXT(1, &g_fbdepth);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbdepth);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, g_depth, 0);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_rbDepth);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_rbdepth);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	CheckGLError(__FILE__, __LINE__);
+#else	//OpenGL 1.4 way
+    glGenTextures(1, &g_depth);
+    glBindTexture(GL_TEXTURE_2D, g_depth);
+    GLfloat v_bc[] = {1.0f,1.0f,1.0f,1.0f};
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, v_bc);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_DEPTH_COMPONENT32, // tried 16 and 24
+                 //GL_RGBA,
+                 DEPTH_SIZE, DEPTH_SIZE,
+                 0,
+                 GL_DEPTH_COMPONENT,
+                 //GL_RGBA,
+                 GL_UNSIGNED_BYTE, // tried GL_FLOAT and GL_UNSIGNED_BYTE
+                 NULL);
+
+	//glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenFramebuffers(1, &g_fbdepth);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbdepth);
+    glDrawBuffer(GL_NONE); // No color buffer is drawn
+    glReadBuffer(GL_NONE);
+
+    //-------------------------
+    //Attach depth texture to FBO
+    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT,
+                              GL_TEXTURE_2D, g_depth, 0/*mipmap level*/);
+
+
+    //-------------------------
+    //Does the GPU support current FBO configuration?
+    GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+    if(status != GL_FRAMEBUFFER_COMPLETE)
+    {
+    	ErrorMessage("Error", "GPU doesn't support required FBO configuration.");
+        return;
+    }
+
+    glClearColor(0, 0, 0, 1);
+
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+#endif
 }
 
 void Inverse(Matrix* dstm, Matrix& srcm)
@@ -431,14 +481,19 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
-#if 0
+#if 0	//OpenGL 3.0 way
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
 #endif
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbDepth);
-	glViewport(0, 0, g_depthSizeX, g_depthSizeY);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbdepth);
+#else	//OpenGL 1.4 way
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbdepth);
+    glDrawBuffersARB(0, NULL);
+#endif
+
+	glViewport(0, 0, DEPTH_SIZE, DEPTH_SIZE);
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
@@ -450,7 +505,6 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(2.0, 500.0);
-#endif
 
 	g_lightPos = focus + g_lightOff;
 	g_lightEye = focus;
@@ -459,8 +513,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	//g_lightPos = g_lightEye + g_lightOff;
 
 	//g_lightproj = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
-	g_lightproj = setorthographicmat(-PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, -PROJ_RIGHT*2/g_zoom, MIN_DISTANCE, MAX_DISTANCE/300);
-	g_lightview = gluLookAt2(g_lightPos.x, g_lightPos.y, g_lightPos.z,
+	g_lightproj = OrthoProj(-PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, -PROJ_RIGHT*2/g_zoom, MIN_DISTANCE, MAX_DISTANCE/300);
+	g_lightview = LookAt(g_lightPos.x, g_lightPos.y, g_lightPos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z,
 		g_lightUp.x, g_lightUp.y, g_lightUp.z);
 
@@ -469,15 +523,15 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	LastNum(__FILE__, __LINE__);
 #endif
 
-#if 0
+#if 1
 
 	UseS(SHADER_DEPTH);
 	glUniformMatrix4fvARB(g_shader[SHADER_DEPTH].m_slot[SSLOT_PROJECTION], 1, 0, g_lightproj.m_matrix);
 	glUniformMatrix4fvARB(g_shader[SHADER_DEPTH].m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 	glUniformMatrix4fvARB(g_shader[SHADER_DEPTH].m_slot[SSLOT_VIEWMAT], 1, 0, g_lightview.m_matrix);
 	//glUniform4f(g_shader[SHADER_MODEL].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
-	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
-	glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(g_shader[SHADER_DEPTH].m_slot[SSLOT_TEXCOORD0]);
 
 #endif
 
@@ -492,7 +546,7 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-#if 0
+#if 1
 	if(DrawSceneDepthFunc != NULL)
 		DrawSceneDepthFunc();
 
@@ -537,6 +591,16 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 
 void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview)
 {
+
+#if 0
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_fbdepth);
+    glDrawBuffersARB(0, NULL);
+	glViewport(0, 0, DEPTH_SIZE, DEPTH_SIZE);
+#endif
+
+	//return;
 	//glViewport(0, 0, g_width, g_height);
 	//glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -560,7 +624,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	Inverse(&g_caminvmv, modelview);
 
 	float trans[] = { 0.5f, 0.5f, 0.5f };
-	g_lightmat.loadIdentity();
+	g_lightmat.reset();
 	g_lightmat.setTranslation(trans);
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
@@ -610,6 +674,11 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 
 	//TurnOffShader();
 	//g_camera.Look();
+#endif
+
+#if 0
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 #endif
 }
 

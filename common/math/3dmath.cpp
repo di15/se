@@ -331,7 +331,7 @@ Matrix lookAt(Vec3f eye, Vec3f target, Vec3f up)
 }
 */
 
-Matrix gluLookAt2(float eyex, float eyey, float eyez,
+Matrix LookAt(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz)
 {
@@ -515,7 +515,7 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 // http://www.songho.ca/opengl/gl_projectionmatrix.html
 // http://www.scratchapixel.com/lessons/3d-advanced-lessons/perspective-and-orthographic-projection-matrix/orthographic-projection/
 // http://www.opengl.org/discussion_boards/showthread.php/172280-Constructing-an-orthographic-matrix-for-2D-drawing
-Matrix setorthographicmat(float l, float r, float t, float b, float n, float f)
+Matrix OrthoProj(float l, float r, float t, float b, float n, float f)
 {
     float m[16];
 

@@ -5,6 +5,9 @@
 
 #include "../math/vec3f.h"
 
+//#define DEPTH_SIZE		2048	//512	//4096
+#define DEPTH_SIZE		128
+
 extern unsigned int g_depth;
 extern Vec3f g_lightOff;
 extern Vec3f g_lightPos;

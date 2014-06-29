@@ -17,7 +17,7 @@ void LogMat(const float* m)
 
 Matrix::Matrix()
 {
-	loadIdentity();
+	reset();
 }
 
 Matrix::Matrix(Vec4f a, Vec4f b, Vec4f c, Vec4f d)
@@ -36,7 +36,7 @@ void Matrix::set( const float *matrix )
 	memcpy( m_matrix, matrix, sizeof( float )*16 );
 }
 
-void Matrix::loadIdentity()
+void Matrix::reset()
 {
 	memset( m_matrix, 0, sizeof( float )*16 );
 	m_matrix[0] = m_matrix[5] = m_matrix[10] = m_matrix[15] = 1;
@@ -229,7 +229,7 @@ void Matrix::setInverseTranslation( const float *translation )
 
 void Matrix::setScale( const float *scale )
 {
-	loadIdentity();
+	reset();
 
 	m_matrix[0] = scale[0];
 	m_matrix[5] = scale[1];

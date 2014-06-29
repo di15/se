@@ -259,7 +259,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #endif
 
 	EndS();
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	Viewport* v = &g_viewport[which];
@@ -281,7 +281,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	}
 	else if(g_projtype == PROJ_ORTHO || v->m_type != VIEWPORT_ANGLE45O)
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
 	g_camproj = projection;
@@ -620,7 +620,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	}
 	else
 	{
-		projection = setorthographicmat(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
+		projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
 	//Vec3f viewvec = g_focus; //g_camera.m_view;

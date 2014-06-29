@@ -1937,6 +1937,18 @@ void Click_CompileModel()
 #endif
 }
 
+void Resize_ChooseFile(Widget *thisw)
+{
+	thisw->m_pos[0] = g_width/2 - 200;
+	thisw->m_pos[1] = g_height/2 - 200;
+	thisw->m_pos[2] = g_width/2 + 200;
+	thisw->m_pos[3] = g_height/2 + 200;
+}
+
+void Callback_ChooseFile(const char* fullpath)
+{
+}
+
 void FillGUI()
 {
 	DrawSceneDepthFunc = &DrawSceneDepth;
@@ -2122,6 +2134,9 @@ void FillGUI()
 	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL));
 	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
 	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL));
+
+	View* choosefileview = AddView("choose file");
+	choosefileview->widget.push_back(new ChooseFile(NULL, "choose file", Resize_ChooseFile, Callback_ChooseFile));
 
 #if 0
 	View* dooreditview = AddView("door edit");

@@ -15,7 +15,7 @@ class Matrix
 		Matrix();
 		Matrix(Vec4f a, Vec4f b, Vec4f c, Vec4f d);
 		~Matrix();
-		void loadIdentity();
+		void reset();
 		void set( const float *matrix );
 
 		void postmult( const Matrix& matrix );
