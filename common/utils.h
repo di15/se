@@ -9,7 +9,7 @@ extern std::ofstream g_applog;
 const std::string DateTime();
 const std::string FileDateTime();
 void FullPath(const char* filename, char* full);
-std::string MakePathRelative(const char* full);
+std::string MakeRelative(const char* full);
 void ExePath(char* exepath);
 std::string StripFile(std::string filepath);
 void StripPathExtension(const char* n, char* o);

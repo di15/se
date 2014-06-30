@@ -48,5 +48,5 @@ void CheckGLError(const char* file, int line)
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
    //ErrorMessage("GL Error", message);
-   g_applog<<"GL Error: "<<message<<std::endl;
+   g_applog<<"GL Message: "<<message<<std::endl;
 }

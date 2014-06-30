@@ -104,6 +104,9 @@ void EditBox::draw()
 	//glColor4f(1, 1, 1, 1);
 	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
+	//if(m_highl[0] != m_highl[1])
+	//	g_applog<<"highl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
+
 	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], val.c_str(), m_highl[0], m_highl[1]);
 }
 

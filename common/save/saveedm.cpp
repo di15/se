@@ -390,7 +390,7 @@ void SaveModelHolder(FILE* fp, ModelHolder* pmh)
 {
 	Model* m = &g_model[pmh->model];
 
-	std::string relative = MakePathRelative(m->m_fullpath.c_str());
+	std::string relative = MakeRelative(m->m_fullpath.c_str());
 	int nrelative = relative.size() + 1;
 
 	fwrite(&nrelative, sizeof(int), 1, fp);

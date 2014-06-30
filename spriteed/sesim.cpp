@@ -929,7 +929,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			{
 				g_selB.clear();
 				g_selB.push_back(*i);
-				g_GUI.closeall();
+				//g_GUI.closeall();
 				g_GUI.open("brush edit");
 				return;
 			}

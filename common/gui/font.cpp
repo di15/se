@@ -445,6 +445,9 @@ void HighlGlyphF(float left, float top, float right, float bottom)
 	float newright = right;
 	float newbottom = bottom;
 
+	//g_applog<<"hihglg "<<newleft<<","<<newtop<<","<<newright<<","<<newbottom<<std::endl;
+
+#if 1
 	if(newleft < frame[0])
 		newleft = frame[0];
 	else if(newleft > frame[2])
@@ -464,6 +467,7 @@ void HighlGlyphF(float left, float top, float right, float bottom)
 		newbottom = frame[1];
 	else if(newbottom > frame[3])
 		newbottom = frame[3];
+#endif
 
     float vertices[] =
     {
@@ -478,7 +482,7 @@ void HighlGlyphF(float left, float top, float right, float bottom)
     };
 
     //glVertexAttribPointer(g_shader[SHADER_COLOR2D].m_slot[SSLOT_POSITION], 3, GL_FLOAT, GL_FALSE, 0, &vertices[0]);
-    glVertexPointer(3, GL_FLOAT, sizeof(float) * 5, &vertices[0]);
+    glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -624,6 +628,9 @@ void HighlightF(int fnt, float startx, float starty, float framex1, float framey
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_currw);
     glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_currh);
 	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 1, 1, 1, 0.5f);
+
+	//if(starti != endi)
+	//	g_applog<<"g_currwh "<<g_currw<<","<<g_currh<<std::endl;
 
 	StartTextF(text, fnt, g_currw*2, g_currh*2, 0, startx, framex1, framey1, framex2, framey2);
 

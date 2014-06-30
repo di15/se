@@ -27,5 +27,7 @@ void RedoBSideGUI();
 void CloseSideView();
 int GetNumFrames();
 void SetNumFrames(int nframes);
+bool SaveFileDialog(char* initdir, char* filepath);
+bool OpenFileDialog(char* initdir, char* filepath);
 
 #endif

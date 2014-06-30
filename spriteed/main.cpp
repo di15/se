@@ -113,7 +113,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     LastNum(__FILE__, __LINE__);
 #endif
 
-#if 0
+#if 1
     UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);

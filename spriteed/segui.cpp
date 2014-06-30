@@ -219,13 +219,7 @@ void Click_NewBrush()
 
 void Click_LoadEdMap()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("projects\\", initdir);
 	CorrectSlashes(initdir);
@@ -233,21 +227,7 @@ void Click_LoadEdMap()
 	FullPath("projects\\project", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
-
-	if(!GetOpenFileName(&ofn))
+	if(!OpenFileDialog(initdir, filepath))
 		return;
 
 	//CorrectSlashes(filepath);
@@ -260,18 +240,11 @@ void Click_LoadEdMap()
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 	ClearUndo();
-#endif
 }
 
 void Click_SaveEdMap()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("projects\\", initdir);
 	CorrectSlashes(initdir);
@@ -279,27 +252,12 @@ void Click_SaveEdMap()
 	FullPath("projects\\project", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_OVERWRITEPROMPT;
-
-	if(!GetSaveFileName(&ofn))
+	if(!SaveFileDialog(initdir, filepath))
 		return;
 
 	//CorrectSlashes(filepath);
 	SaveEdMap(filepath, &g_edmap);
 	strcpy(g_lastsave, filepath);
-#endif
 }
 
 void Click_QSaveEdMap()
@@ -315,13 +273,7 @@ void Click_QSaveEdMap()
 
 void Click_CompileMap()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("maps\\", initdir);
 	CorrectSlashes(initdir);
@@ -329,26 +281,11 @@ void Click_CompileMap()
 	FullPath("maps\\map", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_OVERWRITEPROMPT;
-
-	if(!GetSaveFileName(&ofn))
+	if(!SaveFileDialog(initdir, filepath))
 		return;
 
 	//CorrectSlashes(filepath);
 	CompileMap(filepath, &g_edmap);
-#endif
 }
 
 void Click_ExportBuildingSprite()
@@ -356,13 +293,7 @@ void Click_ExportBuildingSprite()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("renders\\", initdir);
 	CorrectSlashes(initdir);
@@ -370,27 +301,12 @@ void Click_ExportBuildingSprite()
 	FullPath("renders\\building base name", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_OVERWRITEPROMPT;
-
-	if(!GetSaveFileName(&ofn))
+	if(!SaveFileDialog(initdir, filepath))
 		return;
 
 	//CorrectSlashes(filepath);
 	//CompileMap(filepath, &g_edmap);
 	PrepareRender(filepath, RENDER_BUILDING);
-#endif
 #endif
 }
 
@@ -399,13 +315,7 @@ void Click_ExportUnitSprites()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("renders\\", initdir);
 	CorrectSlashes(initdir);
@@ -413,27 +323,12 @@ void Click_ExportUnitSprites()
 	FullPath("renders\\unit base name", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_OVERWRITEPROMPT;
-
-	if(!GetSaveFileName(&ofn))
+	if(!SaveFileDialog(initdir, filepath))
 		return;
 
 	//CorrectSlashes(filepath);
 	//CompileMap(filepath, &g_edmap);
 	PrepareRender(filepath, RENDER_UNIT);
-#endif
 #endif
 }
 
@@ -498,13 +393,7 @@ void Click_CompileRunMap()
 
 void Click_BChooseTex()
 {
-#ifdef PLATFORM_WIN
-	OPENFILENAME ofn;
-
 	char filepath[MAX_PATH+1];
-
-	ZeroMemory( &ofn , sizeof( ofn));
-
 	char initdir[MAX_PATH+1];
 	FullPath("textures\\", initdir);
 	CorrectSlashes(initdir);
@@ -512,28 +401,14 @@ void Click_BChooseTex()
 	FullPath("textures\\texture", filepath);
 	CorrectSlashes(filepath);
 
-	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL;
-	ofn.lpstrInitialDir = initdir;
-	ofn.lpstrFile = filepath;
-	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
-	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
-	ofn.lpstrFilter = "All\0*.*\0";
-	ofn.nFilterIndex =1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = MAX_PATH;	//0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
-
-	if(!GetOpenFileName(&ofn))
+	if(!OpenFileDialog(initdir, filepath))
 		return;
 
 	LinkPrevUndo();
 
 	unsigned int diffuseindex;
-	string relativepath = MakePathRelative(filepath);
-	CreateTexture(diffuseindex, relativepath.c_str(), false);
+	string relativepath = MakeRelative(filepath);
+	CreateTexture(diffuseindex, relativepath.c_str(), false, true);
 	unsigned int texname = g_texture[diffuseindex].texname;
 
 	if(diffuseindex == 0)
@@ -541,7 +416,7 @@ void Click_BChooseTex()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load diffuse texture %s", relativepath.c_str());
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 	}
 
 	char specpath[MAX_PATH+1];
@@ -550,14 +425,14 @@ void Click_BChooseTex()
 	strcat(specpath, ".spec.jpg");
 
 	unsigned int specindex;
-	CreateTexture(specindex, specpath, false);
+	CreateTexture(specindex, specpath, false, true);
 
 	if(specindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load specular texture %s", specpath);
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 	}
 
 	char normpath[MAX_PATH+1];
@@ -566,30 +441,30 @@ void Click_BChooseTex()
 	strcat(normpath, ".norm.jpg");
 
 	unsigned int normindex;
-	CreateTexture(normindex, normpath, false);
+	CreateTexture(normindex, normpath, false, true);
 
 	if(normindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load normal texture %s", normpath);
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 	}
 
 	char ownpath[MAX_PATH+1];
 	strcpy(ownpath, relativepath.c_str());
 	StripExtension(ownpath);
-	strcat(ownpath, ".team.jpg");
+	strcat(ownpath, ".team.png");
 
 	unsigned int ownindex;
-	CreateTexture(ownindex, ownpath, false);
+	CreateTexture(ownindex, ownpath, false, true);
 
 	if(ownindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load team color texture %s", normpath);
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 	}
 
 	if(g_sel1b == NULL)
@@ -636,7 +511,6 @@ void Click_BChooseTex()
 			}
 		}
 	}
-#endif
 }
 
 void Click_FitToFace()
@@ -764,21 +638,11 @@ void Click_CutBrush()
 	g_edtool = EDTOOL_CUT;
 }
 
-void Click_AddMS3D()
+bool OpenFileDialog(char* initdir, char* filepath)
 {
 #ifdef PLATFORM_WIN
 	OPENFILENAME ofn;
-
-	char filepath[MAX_PATH+1];
-
 	ZeroMemory( &ofn , sizeof( ofn));
-
-	char initdir[MAX_PATH+1];
-	FullPath("models\\", initdir);
-	CorrectSlashes(initdir);
-	//strcpy(filepath, initdir);
-	FullPath("models\\model", filepath);
-	CorrectSlashes(filepath);
 
 	ofn.lStructSize = sizeof ( ofn );
 	ofn.hwndOwner = NULL;
@@ -795,11 +659,154 @@ void Click_AddMS3D()
 	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
 
 	if(!GetOpenFileName(&ofn))
+		return false;
+
+	return true;
+#elif defined( PLATFORM_LINUX )
+    GtkWidget *dialog;
+
+    dialog = gtk_file_chooser_dialog_new ("Open File",
+    NULL,
+    GTK_FILE_CHOOSER_ACTION_OPEN,
+    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+    GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+    NULL);
+
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), initdir);
+
+    char initfile[MAX_PATH+1];
+    strcpy(initfile, filepath);
+    StripPath(initfile);
+
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), initfile);
+
+    //gtk_widget_show_all (dialog);
+    //gtk_dialog_run (GTK_DIALOG (dialog));
+
+#if 1
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+    {
+        char *filename;
+
+        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+        //open_file (filename);
+
+        strcpy(filepath, filename);
+
+        g_free (filename);
+
+		gtk_widget_destroy (dialog);
+
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
+
+        return true;
+    }
+#endif
+    //gtk_widget_hide(dialog);
+    gtk_widget_destroy (dialog);
+
+    while (gtk_events_pending ())
+        gtk_main_iteration ();
+
+	return false;
+#endif
+}
+
+bool SaveFileDialog(char* initdir, char* filepath)
+{
+#ifdef PLATFORM_WIN
+	OPENFILENAME ofn;
+	ZeroMemory( &ofn , sizeof( ofn));
+
+	ofn.lStructSize = sizeof ( ofn );
+	ofn.hwndOwner = NULL  ;
+	ofn.lpstrInitialDir = initdir;
+	ofn.lpstrFile = filepath;
+	//ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = sizeof( filepath );
+	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
+	ofn.lpstrFilter = "All\0*.*\0";
+	ofn.nFilterIndex =1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = MAX_PATH;	//0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_OVERWRITEPROMPT;
+
+	if(!GetSaveFileName(&ofn))
 		return;
 
-	string relative = MakePathRelative(filepath);
+	return true;
+#elif defined( PLATFORM_LINUX )
+    GtkWidget *dialog;
 
-	//g_applog<<"relative "<<relative<<std::endl;
+    dialog = gtk_file_chooser_dialog_new ("Save File",
+    NULL,
+    GTK_FILE_CHOOSER_ACTION_OPEN,
+    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+    GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+    NULL);
+
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER(dialog), TRUE);
+
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), initdir);
+
+    char initfile[MAX_PATH+1];
+    strcpy(initfile, filepath);
+    StripPath(initfile);
+
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), initfile);
+
+    //gtk_widget_show_all (dialog);
+    //gtk_dialog_run (GTK_DIALOG (dialog));
+
+#if 1
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+    {
+        char *filename;
+
+        filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+        //open_file (filename);
+
+        strcpy(filepath, filename);
+
+        g_free (filename);
+
+		gtk_widget_destroy (dialog);
+
+		while (gtk_events_pending ())
+			gtk_main_iteration ();
+
+        return true;
+    }
+#endif
+    //gtk_widget_hide(dialog);
+    gtk_widget_destroy (dialog);
+
+    while (gtk_events_pending ())
+        gtk_main_iteration ();
+
+	return false;
+#endif
+}
+
+void Click_AddMS3D()
+{
+	char filepath[MAX_PATH+1];
+
+	char initdir[MAX_PATH+1];
+	FullPath("models\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("models\\model", filepath);
+	CorrectSlashes(filepath);
+
+	if(!OpenFileDialog(initdir, filepath))
+		return;
+
+	string relative = MakeRelative(filepath);
+
+	g_applog<<"relative "<<relative<<std::endl;
 
 	int modelid = LoadModel(relative.c_str(), Vec3f(1,1,1), Vec3f(0,0,0), true);
 
@@ -808,7 +815,7 @@ void Click_AddMS3D()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load model %s", relative.c_str());
 
-		MessageBox(g_hWnd, msg, "Error", NULL);
+		ErrorMessage("Error", msg);
 
 		return;
 	}
@@ -817,38 +824,6 @@ void Click_AddMS3D()
 
 	ModelHolder mh(modelid, Vec3f(0,0,0));
 	g_modelholder.push_back(mh);
-#elif defined( PLATFORM_LINUX )
-	GtkWidget *dialog;
-
-     dialog = gtk_file_chooser_dialog_new ("Open File",
-     				      NULL,
-     				      GTK_FILE_CHOOSER_ACTION_OPEN,
-     				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-     				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-     				      NULL);
-	//gtk_main ();
-
-  //gtk_widget_show_all (dialog);
-  //gtk_dialog_run (GTK_DIALOG (dialog));
-
-#if 1
-     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-       {
-#if 0
-         char *filename;
-
-         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-         //open_file (filename);
-         g_free (filename);
-#endif
-       }
-#endif
-	gtk_widget_hide(dialog);
-     gtk_widget_destroy (dialog);
-
-    while (gtk_events_pending ())
-        gtk_main_iteration ();
-#endif
 }
 
 void RotateModels(float degrees, float xaxis, float yaxis, float zaxis)

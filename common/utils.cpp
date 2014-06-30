@@ -48,7 +48,7 @@ void OpenLog(const char* filename, int version)
 	g_applog.flush();
 }
 
-std::string MakePathRelative(const char* full)
+std::string MakeRelative(const char* full)
 {
 	char full2c[MAX_PATH+1];
 	strcpy(full2c, full);
@@ -56,6 +56,8 @@ std::string MakePathRelative(const char* full)
 	std::string full2(full2c);
 	char exepath[MAX_PATH+1];
 	ExePath(exepath);
+	std::string strexepath = StripFile(std::string(exepath));
+	strcpy(exepath, strexepath.c_str());
 	CorrectSlashes(exepath);
 
 	//g_applog<<"exepath: "<<exepath<<std::endl;
@@ -70,7 +72,7 @@ std::string MakePathRelative(const char* full)
 
 	//g_applog<<"posposp: "<<pos<<std::endl;
 
-	std::string sub = std::string( full2 ).substr(strlen(exepath)+1, strlen(full)-strlen(exepath)-1);
+	std::string sub = std::string( full2 ).substr(strlen(exepath), strlen(full)-strlen(exepath));
 
 	//g_applog<<"subpath: "<<sub<<std::endl;
 

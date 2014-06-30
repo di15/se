@@ -50,9 +50,7 @@ void DrawEdMap(EdMap* map, bool showsky)
 	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelview;
-#ifdef SPECBUMPSHADOW
     modelview.set(g_camview.m_matrix);
-#endif
     modelview.postmult(modelmat);
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELVIEW], 1, 0, modelview.m_matrix);
 
