@@ -620,7 +620,7 @@ void Down_C()
 	if(g_mode != EDITOR)
 		return;
 
-	//if(g_keys[SDL_SCANCODE_CONTROL])
+	if(g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL])
 		CopyBrush();
 }
 
@@ -629,7 +629,7 @@ void Down_V()
 	if(g_mode != EDITOR)
 		return;
 
-	//if(g_keys[SDL_SCANCODE_CONTROL])
+	if(g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL])
 		PasteBrush();
 }
 

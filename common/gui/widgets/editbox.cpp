@@ -181,6 +181,8 @@ void EditBox::inev(InEv* ev)
 	//g_applog.flush();
 //#endif
 
+	//InfoMessage("e", "e");
+
 	if(ev->type == INEV_MOUSEMOVE)
 	{
 		if(!ev->intercepted)
@@ -283,6 +285,7 @@ void EditBox::inev(InEv* ev)
 	}
 	else if(ev->type == INEV_KEYDOWN && !ev->intercepted)
 	{
+		//InfoMessage("k0", "k0");
 		if(!m_opened)
 			return;
 
@@ -290,6 +293,9 @@ void EditBox::inev(InEv* ev)
 
 		if(m_caret > len)
 			m_caret = len;
+
+
+		//InfoMessage("k1", "k1");
 
 		if(ev->key == SDLK_F1)
 			return;
@@ -416,10 +422,37 @@ void EditBox::inev(InEv* ev)
 		}
 #endif
 
+		//InfoMessage("k", "k");
+
+        if(ev->scancode == SDL_SCANCODE_C && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+        //if(ev->key == SDLK_c && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+            //if(ev->key == 3)	//copy
+        {
+            copyval();
+			ev->intercepted = true;
+			return;
+        }
+        else if(ev->scancode == SDL_SCANCODE_V && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+        //else if(ev->key == SDLK_v && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+            //else if(ev->key == 22)	//paste
+        {
+            pasteval();
+			ev->intercepted = true;
+			return;
+        }
+        else if(ev->scancode == SDL_SCANCODE_A && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+        //else if(ev->key == SDLK_a && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+            //else if(ev->key == 1)	//select all
+        {
+            selectall();
+			ev->intercepted = true;
+			return;
+        }
+
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
 
-		ev->intercepted = true;
+		//ev->intercepted = true;
 	}
 	else if(ev->type == INEV_KEYUP && !ev->intercepted)
 	{
@@ -459,18 +492,18 @@ void EditBox::inev(InEv* ev)
 #endif
 
 #if 0
-			//if(ev->key == 'C' && g_keys[SDLK_CONTROL])
-			if(ev->key == 3)	//copy
+			if(ev->scancode == SDL_SCANCODE_C && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+			//if(ev->key == 3)	//copy
 			{
 				copyval();
 			}
-			//else if(ev->key == 'V' && g_keys[SDLK_CONTROL])
-			else if(ev->key == 22)	//paste
+			else if(ev->scancode == SDL_SCANCODE_V && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+			//else if(ev->key == 22)	//paste
 			{
 				pasteval();
 			}
-			//else if(ev->key == 'A' && g_keys[SDLK_CONTROL])
-			else if(ev->key == 1)	//select all
+			else if(ev->scancode == SDL_SCANCODE_A && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
+			//else if(ev->key == 1)	//select all
 			{
 				selectall();
 			}
@@ -654,7 +687,7 @@ void EditBox::copyval()
 	g_applog.flush();
 #endif
 
-#ifdef PLATFORM_WIN
+#if 0
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		std::string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
@@ -680,14 +713,27 @@ void EditBox::copyval()
 		SetClipboardData(CF_TEXT, hMem);
 		CloseClipboard();
 	}
-#endif // PLATFORM_WIN
+#else
+	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
+	{
+		std::string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
+		//std::string rawhighl = highl.rawstr();
+		//const size_t len = strlen(rawhighl.c_str())+1;
+		SDL_SetClipboardText( highl.c_str() );
+		//InfoMessage("g", "g");
+	}
+	else
+	{
+		return;
+	}
+#endif
 
 	//return true;
 }
 
 void EditBox::pasteval()
 {
-#ifdef PLATFORM_WIN
+#if 0
 #ifdef PASTE_DEBUG
 	g_applog<<"paste"<<std::endl;
 #endif
@@ -725,7 +771,42 @@ void EditBox::pasteval()
 	CloseClipboard();
 
 	//return true;
-#endif // PLATFORM_WIN
+#else
+#ifdef PASTE_DEBUG
+	g_applog<<"paste"<<std::endl;
+#endif
+
+	//InfoMessage("p", "p");
+
+	//HANDLE h = GlobalLock(clip0);
+	//placestr((char*)clip0);
+	char* str = SDL_GetClipboardText();
+#ifdef PASTE_DEBUG
+	g_applog<<"paste3"<<std::endl;
+	g_applog<<str<<std::endl;
+#endif
+	std::string sstr(str);
+
+	placestr(&sstr);
+
+
+#ifdef PASTE_DEBUG
+	g_applog<<"place str ";
+	g_applog<<str<<std::endl;
+	g_applog.flush();
+	g_applog.flush();
+#endif
+
+	SDL_free(str);
+
+	//if(!m_passw)
+	//	m_value = ParseTags(m_value, &m_caret);
+
+	//GlobalUnlock(clip0);
+	//CloseClipboard();
+
+	//return true;
+#endif
 }
 
 void EditBox::selectall()
