@@ -12,8 +12,8 @@
 
 BrushSide& BrushSide::operator=(const BrushSide &original)
 {
-	//g_log<<"edbrushside assignment operator "<<endl;
-	//g_log.flush();
+	//g_applog<<"edbrushside assignment operator "<<std::endl;
+	//g_applog.flush();
 
 	m_plane = original.m_plane;
 	m_diffusem = original.m_diffusem;
@@ -34,8 +34,8 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	}
 	m_outline = original.m_outline;
 
-	//g_log<<"copy vindices m_ntris="<<m_ntris<<endl;
-	//g_log.flush();
+	//g_applog<<"copy vindices m_ntris="<<m_ntris<<std::endl;
+	//g_applog.flush();
 
 	m_vindices = NULL;
 	if(m_ntris > 0)
@@ -45,8 +45,8 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 		memcpy(m_vindices, original.m_vindices, sizeof(int)*(m_ntris+2));
 	}
 
-	//g_log<<"end copy vindices"<<endl;
-	//g_log.flush();
+	//g_applog<<"end copy vindices"<<std::endl;
+	//g_applog.flush();
 
 	m_centroid = original.m_centroid;
 
@@ -55,7 +55,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 
 BrushSide::BrushSide(const BrushSide& original)
 {
-	//g_log<<"edbrushside copy constructor"<<endl;
+	//g_applog<<"edbrushside copy constructor"<<std::endl;
 
 	m_ntris = 0;
 	m_tris = NULL;
@@ -86,17 +86,17 @@ BrushSide::BrushSide(const BrushSide& original)
 	//	m_tris[i] = original.m_tris[i];
 
 
-	g_log<<"copy edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<endl;
-	g_log<<"\tueq=n("<<m_tceq[0].m_normal.x<<","<<m_tceq[0].m_normal.y<<","<<m_tceq[0].m_normal.z<<endl;
-	g_log<<"\tveq=n("<<m_tceq[1].m_normal.x<<","<<m_tceq[1].m_normal.y<<","<<m_tceq[1].m_normal.z<<endl;
-	g_log.flush();
+	g_applog<<"copy edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<std::endl;
+	g_applog<<"\tueq=n("<<m_tceq[0].m_normal.x<<","<<m_tceq[0].m_normal.y<<","<<m_tceq[0].m_normal.z<<std::endl;
+	g_applog<<"\tveq=n("<<m_tceq[1].m_normal.x<<","<<m_tceq[1].m_normal.y<<","<<m_tceq[1].m_normal.z<<std::endl;
+	g_applog.flush();
 	*/
 }
 
 BrushSide::BrushSide()
 {
-	//g_log<<"edbrushside constructor default "<<endl;
-	//g_log.flush();
+	//g_applog<<"edbrushside constructor default "<<std::endl;
+	//g_applog.flush();
 
 	m_ntris = 0;
 	m_tris = NULL;
@@ -109,7 +109,7 @@ BrushSide::BrushSide()
 
 BrushSide::~BrushSide()
 {
-	//g_log<<"edbrushsid destructor "<<endl;
+	//g_applog<<"edbrushsid destructor "<<std::endl;
 
 	if(m_tris)
 	{
@@ -174,8 +174,8 @@ void BrushSide::fittex()
 	//Vec3f vaxis = Normalize(Cross(uaxis, m_plane.m_normal)) / STOREY_HEIGHT;
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 1"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 1"<<std::endl;
+	g_applog.flush();
 #endif
 
 	Vec3f texaxis[2];
@@ -183,8 +183,8 @@ void BrushSide::fittex()
 	texaxis[1] = Normalize(m_tceq[1].m_normal);
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 2"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 2"<<std::endl;
+	g_applog.flush();
 #endif
 
 	Vec3f newaxis[2];
@@ -194,8 +194,8 @@ void BrushSide::fittex()
 	for(int i=0; i<m_outline.m_edv.size(); i++)
 	{
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 3 vertex="<<i<<"/"<<m_outline.m_edv.size()<<endl;
-	g_log.flush();
+	g_applog<<"fittex 3 vertex="<<i<<"/"<<m_outline.m_edv.size()<<std::endl;
+	g_applog.flush();
 #endif
 
 		Vec3f thisv = m_outline.m_drawoutva[i];
@@ -231,8 +231,8 @@ void BrushSide::fittex()
 	}
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 4"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 4"<<std::endl;
+	g_applog.flush();
 #endif
 
 	float mind[2];
@@ -257,8 +257,8 @@ void BrushSide::fittex()
 	}
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 5"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 5"<<std::endl;
+	g_applog.flush();
 #endif
 
 	for(int i=0; i<2; i++)
@@ -269,15 +269,15 @@ void BrushSide::fittex()
 	}
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 6"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 6"<<std::endl;
+	g_applog.flush();
 #endif
 
 	remaptex();
 
 #ifdef FITTEX_DEBUG
-	g_log<<"fittex 7"<<endl;
-	g_log.flush();
+	g_applog<<"fittex 7"<<std::endl;
+	g_applog.flush();
 #endif
 }
 
@@ -300,18 +300,18 @@ void BrushSide::remaptex()
 			tc->x = un->x*v->x + un->y*v->y + un->z*v->z + ud;
 			tc->y = vn->x*v->x + vn->y*v->y + vn->z*v->z + vd;
 
-			//g_log<<"-----------rebldg tex side"<<i<<" tri"<<j<<" vert"<<k<<"------------"<<endl;
-			//g_log<<"remaptex u = "<<un->x<<"*"<<v->x<<" + "<<un->y<<"*"<<v->y<<" + "<<un->z<<"*"<<v->z<<" + "<<ud<<" = "<<tc->x<<endl;
-			//g_log<<"remaptex v = "<<vn->x<<"*"<<v->x<<" + "<<vn->y<<"*"<<v->y<<" + "<<vn->z<<"*"<<v->z<<" + "<<vd<<" = "<<tc->y<<endl;
+			//g_applog<<"-----------rebldg tex side"<<i<<" tri"<<j<<" vert"<<k<<"------------"<<std::endl;
+			//g_applog<<"remaptex u = "<<un->x<<"*"<<v->x<<" + "<<un->y<<"*"<<v->y<<" + "<<un->z<<"*"<<v->z<<" + "<<ud<<" = "<<tc->x<<std::endl;
+			//g_applog<<"remaptex v = "<<vn->x<<"*"<<v->x<<" + "<<vn->y<<"*"<<v->y<<" + "<<vn->z<<"*"<<v->z<<" + "<<vd<<" = "<<tc->y<<std::endl;
 		}
 
 		//for(int j=0; j<va->numverts; j++)
 		for(int j=0; j<3; j++)
 		{
 			Vec2f* tc = &t->m_texcoord[j];
-			//g_log<<"u "<<va->texcoords[j].x<<"\t	v "<<va->texcoords[j].y<<endl;
-			//g_log<<"u "<<tc->x<<"\t	v "<<tc->y<<endl;
-			//g_log.flush();
+			//g_applog<<"u "<<va->texcoords[j].x<<"\t	v "<<va->texcoords[j].y<<std::endl;
+			//g_applog<<"u "<<tc->x<<"\t	v "<<tc->y<<std::endl;
+			//g_applog.flush();
 		}
 	}
 
@@ -329,8 +329,8 @@ BrushSide::BrushSide(Vec3f normal, Vec3f point)
 
 	gentexeq();
 
-	//g_log<<"new edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<endl;
-	//g_log.flush();
+	//g_applog<<"new edbrushside plane=n("<<m_plane.m_normal.x<<","<<m_plane.m_normal.y<<","<<m_plane.m_normal.z<<")d="<<m_plane.m_d<<std::endl;
+	//g_applog.flush();
 
 	CreateTexture(m_diffusem, "textures/notex.jpg", false, true);
 	m_specularm = m_diffusem;
@@ -408,7 +408,7 @@ void BrushSide::makeva()
 			//m_drawva.tangents[i*3+j] = Normalize(m_tceq[0].m_normal);
 			//m_drawva.tangents[i*3+j] = tangent;
 
-			//g_log<<"makeva uv="<<m_drawva.texcoords[i*3+j].x<<","<<m_drawva.texcoords[i*3+j].y<<endl;
+			//g_applog<<"makeva uv="<<m_drawva.texcoords[i*3+j].x<<","<<m_drawva.texcoords[i*3+j].y<<std::endl;
 		}
 	}
 

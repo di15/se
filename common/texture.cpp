@@ -488,9 +488,9 @@ LoadedTex *LoadPNG(const char *fullpath)
 	fread(header, sizeof(png_byte), 8, fp);
 	fclose(fp);
 
-	g_log<<"PNG header "<<relative<<" "
+	g_applog<<"PNG header "<<relative<<" "
 		<<(int)header[0]<<","<<(int)header[1]<<","<<(int)header[2]<<","<<(int)header[3]<<","
-		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<endl;
+		<<(int)header[4]<<","<<(int)header[5]<<","<<(int)header[6]<<","<<(int)header[7]<<std::endl;
 	*/
 	if ((fp = fopen(fullpath, "rb")) == NULL)
 		return NULL;
@@ -592,8 +592,8 @@ LoadedTex *LoadPNG(const char *fullpath)
 		pImageData->channels = 3;
 		break;
 	default:
-		g_log<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<endl;
-		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
+		g_applog<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<std::endl;
+		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::std::endl;
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
 		free(pImageData);
@@ -668,7 +668,7 @@ void FreeTexture(const char* relative)
 		{
 			t->loaded = false;
 			glDeleteTextures(1, &t->texname);
-			//g_log<<"Found texture "<<filepath<<" ("<<texture<<")"<<endl;
+			//g_applog<<"Found texture "<<filepath<<" ("<<texture<<")"<<std::endl;
 			return;
 		}
 	}
@@ -908,8 +908,8 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 	// Make sure valid image data was given to pImage, otherwise return false
 	if(pImage == NULL)
 	{
-		g_log<<"Failed to load "<<relative<<endl;
-		g_log.flush();
+		g_applog<<"Failed to load "<<relative<<std::endl;
+		g_applog.flush();
 
 		if(!reload)
 			texindex = 0;	// Give a harmless texture index
@@ -946,7 +946,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 #if 1
 
-	//g_log<<"mipmaps:"<<(int)mipmaps<<" :"<<relative<<endl;
+	//g_applog<<"mipmaps:"<<(int)mipmaps<<" :"<<relative<<std::endl;
 
 	if(mipmaps)
 	{
@@ -1013,8 +1013,8 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 		delete pImage;								// Free the image structure
 
-		g_log<<relative<<"\n\r";
-		g_log.flush();
+		g_applog<<relative<<"\n\r";
+		g_applog.flush();
 	}
 
 	TextureLoaded(texname, relative, transp, clamp, mipmaps, texindex, reload);

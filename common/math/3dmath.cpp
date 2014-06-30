@@ -149,8 +149,8 @@ bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
 	float denom = Dot(l, p.m_normal);
 
 #ifdef MATH_DEBUG
-	g_log<<"intersection denom="<<denom<<" (plane=n("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<")d="<<p.m_d<<") (line=("<<l.x<<","<<l.y<<","<<l.z<<"))"<<endl;
-	g_log.flush();
+	g_applog<<"intersection denom="<<denom<<" (plane=n("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<")d="<<p.m_d<<") (line=("<<l.x<<","<<l.y<<","<<l.z<<"))"<<std::endl;
+	g_applog.flush();
 #endif
 
 	if(fabs(denom) <= EPSILON/2.0f)
@@ -160,8 +160,8 @@ bool Intersection(Vec3f l0, Vec3f l, Plane p, Vec3f& inter)
 	Vec3f p0 = PointOnPlane(p);
 
 #ifdef MATH_DEBUG
-	g_log<<"intersection pointonplane="<<p0.x<<","<<p0.y<<","<<p0.z<<endl;
-	g_log.flush();
+	g_applog<<"intersection pointonplane="<<p0.x<<","<<p0.y<<","<<p0.z<<std::endl;
+	g_applog.flush();
 #endif
 
 	float num = Dot(p0 - l0, p.m_normal);
@@ -492,21 +492,21 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 	//Matrix mat2;
 	//mat2.set(m);
 /*
-	g_log<<"------------------------"<<endl;
-	g_log<<"gluLookAt3 "<<endl;
-	g_log<<"eye="<<eyex<<","<<eyey<<","<<eyez<<" center="<<centerx<<","<<centery<<","<<centerz<<" up="<<upx<<","<<upy<<","<<upz<<endl;
+	g_applog<<"------------------------"<<std::endl;
+	g_applog<<"gluLookAt3 "<<std::endl;
+	g_applog<<"eye="<<eyex<<","<<eyey<<","<<eyez<<" center="<<centerx<<","<<centery<<","<<centerz<<" up="<<upx<<","<<upy<<","<<upz<<std::endl;
 	for(int i=0; i<16; i++)
-		g_log<<"before translation["<<i<<"] = "<<m[i]<<endl;
+		g_applog<<"before translation["<<i<<"] = "<<m[i]<<std::endl;
 	for(int i=0; i<16; i++)
-		g_log<<"the translation["<<i<<"] = "<<mat2.m_matrix[i]<<endl;*/
+		g_applog<<"the translation["<<i<<"] = "<<mat2.m_matrix[i]<<std::endl;*/
 
     mat.postmult(mat2);
     /*
 	for(int i=0; i<16; i++)
-		g_log<<"final view matrix, after translation["<<i<<"] = "<<mat.m_matrix[i]<<endl;
-	g_log<<"------------------------"<<endl;
+		g_applog<<"final view matrix, after translation["<<i<<"] = "<<mat.m_matrix[i]<<std::endl;
+	g_applog<<"------------------------"<<std::endl;
 
-	g_log.flush();
+	g_applog.flush();
 	*/
 
     return mat;
@@ -546,13 +546,13 @@ Matrix OrthoProj(float l, float r, float t, float b, float n, float f)
     Matrix mat;
     mat.set(m);
 	/*
-	g_log<<"------------------------"<<endl;
-	g_log<<"set orthographic matrix "<<endl;
-	g_log<<"left="<<l<<" right="<<r<<" top="<<t<<" bottom="<<b<<" near="<<n<<" far="<<f<<endl;
+	g_applog<<"------------------------"<<std::endl;
+	g_applog<<"set orthographic matrix "<<std::endl;
+	g_applog<<"left="<<l<<" right="<<r<<" top="<<t<<" bottom="<<b<<" near="<<n<<" far="<<f<<std::endl;
 	for(int i=0; i<16; i++)
-		g_log<<"m["<<i<<"] = "<<m[i]<<endl;
-	g_log<<"------------------------"<<endl;
-	g_log.flush();*/
+		g_applog<<"m["<<i<<"] = "<<m[i]<<std::endl;
+	g_applog<<"------------------------"<<std::endl;
+	g_applog.flush();*/
 
 	return mat;
 }
@@ -714,10 +714,10 @@ Vec3f OnNear(int x, int y, int width, int height, Vec3f posvec, Vec3f sidevec, V
 	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
 	Vec3f result = posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
-	//g_log<<"--------------"<<endl;
-	//g_log<<"onnear x,y="<<x<<","<<y<<" w,h="<<width<<","<<height<<" halfw,h="<<halfWidth<<","<<halfHeight<<" ratiox,y="<<ratiox<<","<<ratioy<<" aspect="<<aspect<<" W,Hnear="<<Wnear<<","<<Hnear<<endl;
-	//g_log<<"onnear resultx,y,z="<<result.x<<","<<result.y<<","<<result.z<<endl;
-	//g_log<<"--------------"<<endl;
+	//g_applog<<"--------------"<<std::endl;
+	//g_applog<<"onnear x,y="<<x<<","<<y<<" w,h="<<width<<","<<height<<" halfw,h="<<halfWidth<<","<<halfHeight<<" ratiox,y="<<ratiox<<","<<ratioy<<" aspect="<<aspect<<" W,Hnear="<<Wnear<<","<<Hnear<<std::endl;
+	//g_applog<<"onnear resultx,y,z="<<result.x<<","<<result.y<<","<<result.z<<std::endl;
+	//g_applog<<"--------------"<<std::endl;
 
 	return posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 }
@@ -739,10 +739,10 @@ Vec3f OnNearPersp(int x, int y, int width, int height, Vec3f posvec, Vec3f sidev
 	//return ( g_camera.m_pos + g_camera.m_strafe * ratioX * Wnear + g_camera.up2() * ratioY * Hnear );
 	Vec3f result = viewdir * mind + posvec + sidevec * ratiox * Wnear + upvec * ratioy * Hnear;
 
-	//g_log<<"--------------"<<endl;
-	//g_log<<"onnear x,y="<<x<<","<<y<<" w,h="<<width<<","<<height<<" halfw,h="<<halfWidth<<","<<halfHeight<<" ratiox,y="<<ratiox<<","<<ratioy<<" aspect="<<aspect<<" W,Hnear="<<Wnear<<","<<Hnear<<endl;
-	//g_log<<"onnear resultx,y,z="<<result.x<<","<<result.y<<","<<result.z<<endl;
-	//g_log<<"--------------"<<endl;
+	//g_applog<<"--------------"<<std::endl;
+	//g_applog<<"onnear x,y="<<x<<","<<y<<" w,h="<<width<<","<<height<<" halfw,h="<<halfWidth<<","<<halfHeight<<" ratiox,y="<<ratiox<<","<<ratioy<<" aspect="<<aspect<<" W,Hnear="<<Wnear<<","<<Hnear<<std::endl;
+	//g_applog<<"onnear resultx,y,z="<<result.x<<","<<result.y<<","<<result.z<<std::endl;
+	//g_applog<<"--------------"<<std::endl;
 
 	return result;
 }

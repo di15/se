@@ -96,7 +96,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
         //SwapBuffers(g_hDC);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_renderfb);
-        g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
+        g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
         CheckGLError(__FILE__, __LINE__);
         glViewport(0, 0, g_width, g_height);
         CheckGLError(__FILE__, __LINE__);
@@ -104,8 +104,8 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
         CheckGLError(__FILE__, __LINE__);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         CheckGLError(__FILE__, __LINE__);
-        g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
-        g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<endl;
+        g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
+        g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<std::endl;
     }
 #endif
 
@@ -208,10 +208,11 @@ void UpdateLoading()
     case 2:
         //Status("logo");
         g_mode = EDITOR;
-        OpenSoleView("editor");
+        g_GUI.closeall();
+        g_GUI.open("editor");
         //g_mode = LOGO;
         //OpenSoleView("logo");
-        OpenAnotherView("choose file");
+        //g_GUI.open("choose file");
         break;
     }
 }
@@ -225,7 +226,8 @@ void UpdateReloading()
         if(Load1Texture())
         {
             g_mode = EDITOR;
-            OpenSoleView("editor");
+            g_GUI.closeall();
+            g_GUI.open("editor");
         }
         break;
     }
@@ -370,8 +372,8 @@ void WriteConfig()
     else
         fulls = 0;
 
-    config<<fulls<<endl;
-    config<<g_selectedRes.width<<" "<<g_selectedRes.height<<endl;
+    config<<fulls<<std::endl;
+    config<<g_selectedRes.width<<" "<<g_selectedRes.height<<std::endl;
     config<<g_bpp;
 }
 #endif
@@ -413,7 +415,7 @@ void ScoreFPS()
         char msg[128];
         //sprintf(msg, "FPS: %f, %fs", (float)g_framesPerSecond, (float)(g_currentTime - g_lastTime)/(float)g_framesPerSecond);
         sprintf(msg, "FPS: %f, %fs", (float)g_instantFPS, (float)(1.0f/g_instantFPS));
-        g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("fps", WIDGET_TEXT)->m_text = msg;
+        g_GUI.get("editor")->get("top panel")->get("fps")->m_text = msg;
     }
 }
 
@@ -522,6 +524,9 @@ void EventLoop()
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
+            InEv ev;
+            ev.intercepted = false;
+
             switch(e.type)
             {
             case SDL_WINDOWEVENT:
@@ -531,8 +536,8 @@ void EventLoop()
                     if(g_mode == PREREND_ADJFRAME)
                     {
 #ifdef DEBUG
-                        g_log<<"to r"<<endl;
-                        g_log<<"rf"<<g_renderframe<<" rsz "<<g_deswidth<<","<<g_desheight<<endl;
+                        g_applog<<"to r"<<std::endl;
+                        g_applog<<"rf"<<g_renderframe<<" rsz "<<g_deswidth<<","<<g_desheight<<std::endl;
 #endif
                         Resize(g_deswidth, g_desheight);
                         g_mode = RENDERING;
@@ -540,7 +545,7 @@ void EventLoop()
                     else
                     {
 #if 0
-                        g_log<<"rf"<<g_renderframe<<" rsz "<<(LOWORD(lParam))<<","<<(HIWORD(lParam))<<endl;
+                        g_applog<<"rf"<<g_renderframe<<" rsz "<<(LOWORD(lParam))<<","<<(HIWORD(lParam))<<std::endl;
 #endif
                         Resize(e.window.data1, e.window.data2);
                     }
@@ -553,58 +558,140 @@ void EventLoop()
                 g_quit = true;
                 break;
             case SDL_KEYDOWN:
-                if(!g_GUI.keydown(e.key.keysym.scancode))
+                ev.type = INEV_KEYDOWN;
+                ev.key = e.key.keysym.sym;
+                ev.scancode = e.key.keysym.scancode;
+
+                gui->inev(&ev);
+
+                if(!ev.intercepted)
                     g_keys[e.key.keysym.scancode] = true;
+
+                g_keyintercepted = ev.intercepted;
                 break;
             case SDL_KEYUP:
-                if(!g_GUI.keyup(e.key.keysym.scancode))
+                ev.type = INEV_KEYUP;
+                ev.key = e.key.keysym.sym;
+                ev.scancode = e.key.keysym.scancode;
+
+                gui->inev(&ev);
+
+                if(!ev.intercepted)
                     g_keys[e.key.keysym.scancode] = false;
+
+                g_keyintercepted = ev.intercepted;
                 break;
             case SDL_TEXTINPUT:
-                g_GUI.charin((unsigned int)*e.text.text);
+                //g_GUI.charin(e.text.text);	//UTF8
+                ev.type = INEV_TEXTIN;
+                ev.text = e.text.text;
+
+                g_applog<<"SDL_TEXTINPUT:";
+                for(int i=0; i<strlen(e.text.text); i++)
+                {
+                    g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
+                }
+                g_applog<<std::endl;
+                g_applog.flush();
+
+                gui->inev(&ev);
                 break;
             case SDL_TEXTEDITING:
-#if 0
                 //g_GUI.charin(e.text.text);	//UTF8
                 ev.type = INEV_TEXTED;
                 ev.text = e.text.text;
                 ev.cursor = e.edit.start;
                 ev.sellen = e.edit.length;
 
-                g_log<<"SDL_TEXTEDITING:";
+                g_applog<<"SDL_TEXTEDITING:";
                 for(int i=0; i<strlen(e.text.text); i++)
                 {
-                    g_log<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
+                    g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
                 }
-                g_log<<endl;
-                g_log.flush();
+                g_applog<<std::endl;
+                g_applog.flush();
 
-                g_log<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<endl;
-                g_log.flush();
+                g_applog<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<std::endl;
+                g_applog.flush();
+
+                gui->inev(&ev);
+#if 0
+                ev.intercepted = false;
+                ev.type = INEV_TEXTIN;
+                ev.text = e.text.text;
 
                 gui->inev(&ev);
 #endif
                 break;
-            case SDL_MOUSEWHEEL:
-                g_GUI.mousewheel(e.wheel.y);
+#if 0
+            case SDL_TEXTINPUT:
+                /* Add new text onto the end of our text */
+                strcat(text, event.text.text);
+#if 0
+                ev.type = INEV_CHARIN;
+                ev.key = wParam;
+                ev.scancode = 0;
+
+                gui->inev(&ev);
+#endif
                 break;
+            case SDL_TEXTEDITING:
+                /*
+                   Update the composition text.
+                   Update the cursor position.
+                   Update the selection length (if any).
+                 */
+                composition = event.edit.text;
+                cursor = event.edit.start;
+                selection_len = event.edit.length;
+                break;
+#endif
+                //else if(e.type == SDL_BUTTONDOWN)
+                //{
+                //}
+            case SDL_MOUSEWHEEL:
+                ev.type = INEV_MOUSEWHEEL;
+                ev.amount = e.wheel.y;
+
+                gui->inev(&ev);
             case SDL_MOUSEBUTTONDOWN:
                 switch (e.button.button)
                 {
                 case SDL_BUTTON_LEFT:
-                    g_mousekeys[0] = true;
+                    g_mousekeys[MOUSE_LEFT] = true;
                     g_moved = false;
-                    g_GUI.lbuttondown();
+
+                    ev.type = INEV_MOUSEDOWN;
+                    ev.key = MOUSE_LEFT;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
+
+                    g_keyintercepted = ev.intercepted;
                     break;
                 case SDL_BUTTON_RIGHT:
-                    g_mousekeys[2] = true;
-                    g_moved = false;
-                    g_GUI.rbuttondown();
+                    g_mousekeys[MOUSE_RIGHT] = true;
+
+                    ev.type = INEV_MOUSEDOWN;
+                    ev.key = MOUSE_RIGHT;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                     break;
                 case SDL_BUTTON_MIDDLE:
-                    g_mousekeys[1] = true;
-                    g_moved = false;
-                    g_GUI.mbuttondown();
+                    g_mousekeys[MOUSE_MIDDLE] = true;
+
+                    ev.type = INEV_MOUSEDOWN;
+                    ev.key = MOUSE_MIDDLE;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                     break;
                 }
                 break;
@@ -612,22 +699,43 @@ void EventLoop()
                 switch (e.button.button)
                 {
                 case SDL_BUTTON_LEFT:
-                    g_mousekeys[0] = false;
-                    g_GUI.lbuttonup(g_moved);
+                    g_mousekeys[MOUSE_LEFT] = false;
+
+                    ev.type = INEV_MOUSEUP;
+                    ev.key = MOUSE_LEFT;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                     break;
                 case SDL_BUTTON_RIGHT:
-                    g_mousekeys[2] = false;
-                    g_GUI.rbuttonup(g_moved);
+                    g_mousekeys[MOUSE_RIGHT] = false;
+
+                    ev.type = INEV_MOUSEUP;
+                    ev.key = MOUSE_RIGHT;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                     break;
                 case SDL_BUTTON_MIDDLE:
-                    g_mousekeys[1] = false;
-                    g_GUI.mbuttonup(g_moved);
+                    g_mousekeys[MOUSE_MIDDLE] = false;
+
+                    ev.type = INEV_MOUSEUP;
+                    ev.key = MOUSE_MIDDLE;
+                    ev.amount = 1;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                     break;
                 }
                 break;
             case SDL_MOUSEMOTION:
-                //py->mouse.x = e.motion.x;
-                //py->mouse.y = e.motion.y;
+                //g_mouse.x = e.motion.x;
+                //g_mouse.y = e.motion.y;
 
                 if(g_mouseout)
                 {
@@ -637,7 +745,12 @@ void EventLoop()
                 if(MousePosition())
                 {
                     g_moved = true;
-                    g_GUI.mousemove();
+
+                    ev.type = INEV_MOUSEMOVE;
+                    ev.x = g_mouse.x;
+                    ev.y = g_mouse.y;
+
+                    gui->inev(&ev);
                 }
                 break;
             }
@@ -713,35 +826,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 int main(int argc, char* argv[])
 #endif
 {
-	g_log << "Log start"    << endl; /* TODO, include date */
-	g_log << "Init: "       << endl;
-	g_log.flush();
+	g_applog << "Log start"    << std::endl; /* TODO, include date */
+	g_applog << "Init: "       << std::endl;
+	g_applog.flush();
 
 	Init();
 
-	g_log << "MakeWindow: " << endl;
-	g_log.flush();
+#ifdef PLATFORM_LINUX
+	gtk_init(&argc, &argv);	//after sdl init
+#endif
+
+	g_applog << "MakeWindow: " << std::endl;
+	g_applog.flush();
 
 	MakeWindow(TITLE);
 
-	g_log << "Queue: "      << endl;
-	g_log.flush();
+	g_applog << "Queue: "      << std::endl;
+	g_applog.flush();
 
 	//SDL_ShowCursor(false);
 	Queue();
 
-	g_log << "FillGUI: "    << endl;
-	g_log.flush();
+	g_applog << "FillGUI: "    << std::endl;
+	g_applog.flush();
 
 	FillGUI();
 
-	g_log << "EventLoop: "  << endl;
-	g_log.flush();
+	g_applog << "EventLoop: "  << std::endl;
+	g_applog.flush();
 
 	EventLoop();
 
-	g_log << "Deinit: "     << endl;
-	g_log.flush();
+	g_applog << "Deinit: "     << std::endl;
+	g_applog.flush();
 
 	Deinit();
 	//SDL_ShowCursor(true);

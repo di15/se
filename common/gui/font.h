@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define MAX_CHARS	256	
+#define MAX_CHARS	256
 #define CODE_POINTS	110000
 
 class Glyph
@@ -45,7 +45,7 @@ public:
     float height;   //image height
     float gheight;  //glyph height
     Glyph glyph[CODE_POINTS];
-    
+
 	Font()
 	{
 		width = 0;
@@ -77,6 +77,7 @@ void DrawShadowedText(int fnt, float startx, float starty, const char* text, con
 void DrawShadowedTextF(int fnt, float startx, float starty, float framex1, float framey1, float framex2, float framey2, const char* text, const float* color=NULL, int caret=-1);
 void DrawCenterShadText(int fnt, float startx, float starty, const char* text, const float* color=NULL, int caret=-1);
 void DrawBoxShadText(int fnt, float startx, float starty, float width, float height, const char* text, const float* color, int ln, int caret);
+void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float height, const char* text, const float* color, int ln, int caret, float framex1, float framey1, float framex2, float framey2);;
 int CountLines(const char* text, int fnt, float startx, float starty, float width, float height);
 int EndX(const char* text, int lastc, int fnt, float startx, float starty);
 int MatchGlyphF(const char* text, int fnt, int matchx, float startx, float starty, float framex1, float framey1, float framex2, float framey2);

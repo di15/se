@@ -63,10 +63,10 @@ Vec2i TileTimes(Vec2f* tc)
 	Vec2f tc1 = tc[1];
 	Vec2f tc2 = tc[2];
 
-	float minu = min(tc0.x, min(tc1.x, tc2.x));
-	float minv = min(tc0.y, min(tc1.y, tc2.y));
-	float maxu = max(tc0.x, max(tc1.x, tc2.x));
-	float maxv = max(tc0.y, max(tc1.y, tc2.y));
+	float minu = std::min(tc0.x, std::min(tc1.x, tc2.x));
+	float minv = std::min(tc0.y, std::min(tc1.y, tc2.y));
+	float maxu = std::max(tc0.x, std::max(tc1.x, tc2.x));
+	float maxv = std::max(tc0.y, std::max(tc1.y, tc2.y));
 
 	float rangeu = maxu - minu;
 	float rangev = maxv - minv;
@@ -90,16 +90,16 @@ Vec2i TileTimes(Vec2f* tc)
 #ifdef COMPILEB_DEBUG
 	if(tiletimes.x == 11 || tiletimes.y == 11)
 	{
-		g_log<<"--------------11 or 11 tile times---------------"<<endl;
-		g_log<<"ceilrange = "<<ceilrangeu<<","<<ceilrangev<<endl;
-		g_log<<"range = "<<rangeu<<","<<rangev<<endl;
-		g_log<<"min = "<<minu<<","<<minv<<endl;
-		g_log<<"max = "<<maxu<<","<<maxv<<endl;
-		g_log<<"[0] = "<<tc0.x<<","<<tc0.y<<endl;
-		g_log<<"[1] = "<<tc1.x<<","<<tc1.y<<endl;
-		g_log<<"[2] = "<<tc2.x<<","<<tc2.y<<endl;
-		g_log<<"--------------11 or 11 tile times---------------"<<endl;
-		g_log.flush();
+		g_applog<<"--------------11 or 11 tile times---------------"<<std::endl;
+		g_applog<<"ceilrange = "<<ceilrangeu<<","<<ceilrangev<<std::endl;
+		g_applog<<"range = "<<rangeu<<","<<rangev<<std::endl;
+		g_applog<<"min = "<<minu<<","<<minv<<std::endl;
+		g_applog<<"max = "<<maxu<<","<<maxv<<std::endl;
+		g_applog<<"[0] = "<<tc0.x<<","<<tc0.y<<std::endl;
+		g_applog<<"[1] = "<<tc1.x<<","<<tc1.y<<std::endl;
+		g_applog<<"[2] = "<<tc2.x<<","<<tc2.y<<std::endl;
+		g_applog<<"--------------11 or 11 tile times---------------"<<std::endl;
+		g_applog.flush();
 	}
 #endif
 
@@ -127,22 +127,22 @@ Vec2i TileTimes(VertexArray* va)
 void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 {
 #ifdef COMPILEB_DEBUG
-	g_log<<"resample...?"<<endl;
-	g_log.flush();
+	g_applog<<"resample...?"<<std::endl;
+	g_applog.flush();
 #endif
 
 	if(original == NULL || original->data == NULL || original->sizeX <= 0 || original->sizeY <= 0)
 	{
 #ifdef COMPILEB_DEBUG
-		g_log<<"resample NULL 1"<<endl;
-		g_log.flush();
+		g_applog<<"resample NULL 1"<<std::endl;
+		g_applog.flush();
 #endif
 
 		empty->data = NULL;
 
 #ifdef COMPILEB_DEBUG
-		g_log<<"resample NULL 2"<<endl;
-		g_log.flush();
+		g_applog<<"resample NULL 2"<<std::endl;
+		g_applog.flush();
 #endif
 
 		empty->sizeX = 0;
@@ -155,8 +155,8 @@ void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 	}
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"resample "<<original->sizeX<<","<<original->sizeY<<" to "<<newdim.x<<","<<newdim.y<<endl;
-	g_log.flush();
+	g_applog<<"resample "<<original->sizeX<<","<<original->sizeY<<" to "<<newdim.x<<","<<newdim.y<<std::endl;
+	g_applog.flush();
 #endif
 
 	AllocTex(empty, newdim.x, newdim.y, original->channels);
@@ -181,18 +181,18 @@ void Resample(LoadedTex* original, LoadedTex* empty, Vec2i newdim)
 	}
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"\t done resample"<<endl;
-	g_log.flush();
+	g_applog<<"\t done resample"<<std::endl;
+	g_applog.flush();
 #endif
 }
 
 static bool transparency = false;
 static unsigned int notexindex;
 static int ntris = 0;
-static list<unsigned int> uniquetexs;
+static std::list<unsigned int> uniquetexs;
 static TexFitInfo texfitinfo[TEXTURES];
 
-void CountTrisModel(list<ModelHolder> &modelholders)
+void CountTrisModel(std::list<ModelHolder> &modelholders)
 {
 	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
 	{
@@ -204,7 +204,7 @@ void CountTrisModel(list<ModelHolder> &modelholders)
 	}
 }
 
-void ListUniqueTexsModel(list<ModelHolder> &modelholders)
+void ListUniqueTexsModel(std::list<ModelHolder> &modelholders)
 {
 	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
 	{
@@ -319,7 +319,7 @@ void ListUniqueTexsBrush(EdMap* map)
 
 static VertexArray fullva;
 
-void AllocFinalVerts(EdMap* map, list<ModelHolder> &modelholders)
+void AllocFinalVerts(EdMap* map, std::list<ModelHolder> &modelholders)
 {
 	fullva.free();
 	fullva.alloc(ntris*3);
@@ -381,8 +381,8 @@ void LoadAllRGBData()
 
 #ifdef COMPILEB_DEBUG
 		TexFitInfo* tfi = &texfitinfo[ *ut ];
-		g_log<<"tile times "<<texref[ *ut ].filepath<<" "<<tfi->tiletimes.x<<","<<tfi->tiletimes.y<<endl;
-		g_log.flush();
+		g_applog<<"tile times "<<texref[ *ut ].filepath<<" "<<tfi->tiletimes.x<<","<<tfi->tiletimes.y<<std::endl;
+		g_applog.flush();
 #endif
 
 		i++;
@@ -411,21 +411,21 @@ void LoadAllRGBData()
 		tr->ownindex = i;
 
 #ifdef COMPILEB_DEBUG
-		g_log<<"------"<<endl;
+		g_applog<<"------"<<std::endl;
 		if(images[tr->diffindex])
-			g_log<<fulldiffusepath<<" ("<<images[tr->diffindex]->sizeX<<","<<images[tr->diffindex]->sizeY<<")"<<endl;
+			g_applog<<fulldiffusepath<<" ("<<images[tr->diffindex]->sizeX<<","<<images[tr->diffindex]->sizeY<<")"<<std::endl;
 		if(images[tr->specindex])
-			g_log<<fullspecularpath<<" ("<<images[tr->specindex]->sizeX<<","<<images[tr->specindex]->sizeY<<")"<<endl;
+			g_applog<<fullspecularpath<<" ("<<images[tr->specindex]->sizeX<<","<<images[tr->specindex]->sizeY<<")"<<std::endl;
 		if(images[tr->normindex])
-			g_log<<fullnormalpath<<" ("<<images[tr->normindex]->sizeX<<","<<images[tr->normindex]->sizeY<<")"<<endl;
-		g_log<<i<<endl;
-		g_log<<"------"<<endl;
-		g_log.flush();
+			g_applog<<fullnormalpath<<" ("<<images[tr->normindex]->sizeX<<","<<images[tr->normindex]->sizeY<<")"<<std::endl;
+		g_applog<<i<<std::endl;
+		g_applog<<"------"<<std::endl;
+		g_applog.flush();
 #endif
 	}
 }
 
-static list<unsigned int> heightsorted;
+static std::list<unsigned int> heightsorted;
 
 void HeightSort()
 {
@@ -466,8 +466,8 @@ void HeightSort()
 			if(thisheight >= lastheight || nextadd < 0)
 			{
 #ifdef COMPILEB_DEBUG
-				g_log<<thisheight<<" >= "<<lastheight<<endl;
-				g_log.flush();
+				g_applog<<thisheight<<" >= "<<lastheight<<std::endl;
+				g_applog.flush();
 #endif
 
 				lastheight = thisheight;
@@ -483,7 +483,7 @@ void HeightSort()
 }
 
 static Vec2i maxdim(0, 0);
-static list<TexFitRow> rows;
+static std::list<TexFitRow> rows;
 
 void FitImages()
 {
@@ -498,11 +498,11 @@ void FitImages()
 		LoadedTex* lt = images[ tr->diffindex ];
 
 #ifdef COMPILEB_DEBUG
-		g_log<<"------height sorted-----"<<endl;
-		g_log<<"\t "<<tr->filepath<<endl;
-		g_log<<"\t ("<<lt->sizeX<<","<<lt->sizeY<<")"<<endl;
-		g_log<<"------height sorted-----"<<endl;
-		g_log.flush();
+		g_applog<<"------height sorted-----"<<std::endl;
+		g_applog<<"\t "<<tr->filepath<<std::endl;
+		g_applog<<"\t ("<<lt->sizeX<<","<<lt->sizeY<<")"<<std::endl;
+		g_applog<<"------height sorted-----"<<std::endl;
+		g_applog.flush();
 #endif
 
 		//if(maxdim.x < lt->sizeX)
@@ -533,8 +533,8 @@ void FitImages()
 			maxdim.y += lt->sizeY * tfi->tiletimes.y;
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"\tfit1 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-			g_log.flush();
+			g_applog<<"\tfit1 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<std::endl;
+			g_applog.flush();
 #endif
 
 			continue;
@@ -584,8 +584,8 @@ void FitImages()
 			rows.push_back(row);
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"\tfit2 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-			g_log.flush();
+			g_applog<<"\tfit2 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<std::endl;
+			g_applog.flush();
 #endif
 
 			continue;
@@ -608,8 +608,8 @@ void FitImages()
 			maxdim.x = addto->bounds[1].x;
 
 #ifdef COMPILEB_DEBUG
-		g_log<<"\tfit3 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<endl;
-		g_log.flush();
+		g_applog<<"\tfit3 to "<<fit.bounds[0].x<<","<<fit.bounds[0].y<<"->"<<fit.bounds[1].x<<","<<fit.bounds[1].y<<std::endl;
+		g_applog.flush();
 #endif
 	}
 }
@@ -626,8 +626,8 @@ void ResizeImages()
 	scaley = (float)finaldim.y / (float)maxdim.y;
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"dimensions = ("<<maxdim.x<<","<<maxdim.y<<")->("<<finaldim.x<<","<<finaldim.y<<")"<<endl;
-	g_log.flush();
+	g_applog<<"dimensions = ("<<maxdim.x<<","<<maxdim.y<<")->("<<finaldim.x<<","<<finaldim.y<<")"<<std::endl;
+	g_applog.flush();
 #endif
 
 	resizedimages = new LoadedTex[ uniquetexs.size()*TEXTYPES ];
@@ -650,8 +650,8 @@ void ResizeImages()
 			tfi->newdim.y = (f->bounds[1].y - f->bounds[0].y) / (float)tfi->tiletimes.y * scaley;
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"compile 6 image ("<<(f->bounds[1].x - f->bounds[0].x)<<","<<(f->bounds[1].y - f->bounds[0].y)<<")->("<<tfi->newdim.x<<","<<tfi->newdim.y<<")"<<counter<<endl;
-			g_log.flush();
+			g_applog<<"compile 6 image ("<<(f->bounds[1].x - f->bounds[0].x)<<","<<(f->bounds[1].y - f->bounds[0].y)<<")->("<<tfi->newdim.x<<","<<tfi->newdim.y<<")"<<counter<<std::endl;
+			g_applog.flush();
 			counter ++;
 #endif
 
@@ -660,22 +660,22 @@ void ResizeImages()
 			Resample(images[ tr->diffindex ], &resizedimages[ tr->diffindex ], newdim);
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"\t done compile 6 image diff"<<endl;
-			g_log.flush();
+			g_applog<<"\t done compile 6 image diff"<<std::endl;
+			g_applog.flush();
 #endif
 
 			Resample(images[ tr->specindex ], &resizedimages[ tr->specindex ], newdim);
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"\t done compile 6 image spec"<<endl;
-			g_log.flush();
+			g_applog<<"\t done compile 6 image spec"<<std::endl;
+			g_applog.flush();
 #endif
 
 			Resample(images[ tr->normindex ], &resizedimages[ tr->normindex ], newdim);
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"\t done compile 6 image norm"<<endl;
-			g_log.flush();
+			g_applog<<"\t done compile 6 image norm"<<std::endl;
+			g_applog.flush();
 #endif
 
 			Resample(images[ tr->ownindex ], &resizedimages[ tr->ownindex ], newdim);
@@ -691,8 +691,8 @@ static LoadedTex finalown;
 void CombineImages()
 {
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7a"<<endl;
-	g_log.flush();
+	g_applog<<"compile 7a"<<std::endl;
+	g_applog.flush();
 #endif
 
 	AllocTex(&finaldiff, finaldim.x, finaldim.y, transparency ? 4 : 3);
@@ -701,8 +701,8 @@ void CombineImages()
 	AllocTex(&finalown, finaldim.x, finaldim.y, 4);
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7b"<<endl;
-	g_log.flush();
+	g_applog<<"compile 7b"<<std::endl;
+	g_applog.flush();
 #endif
 
 	for(auto r=rows.begin(); r!=rows.end(); r++)
@@ -716,8 +716,8 @@ void CombineImages()
 			tfi->bounds[1] = f->bounds[2];
 
 #ifdef COMPILEB_DEBUG
-			g_log<<"compile 7b1"<<endl;
-			g_log.flush();
+			g_applog<<"compile 7b1"<<std::endl;
+			g_applog.flush();
 #endif
 
 			for(int x=0; x<tfi->tiletimes.x; x++)
@@ -728,8 +728,8 @@ void CombineImages()
 					newpos.y = f->bounds[0].y * scaley + y * tfi->newdim.y;
 
 #ifdef COMPILEB_DEBUG
-					g_log<<"compile 7b2 to "<<newpos.x<<","<<newpos.y<<endl;
-					g_log.flush();
+					g_applog<<"compile 7b2 to "<<newpos.x<<","<<newpos.y<<std::endl;
+					g_applog.flush();
 #endif
 
 					Blit( &resizedimages[ tr->diffindex ], &finaldiff, newpos );
@@ -737,15 +737,15 @@ void CombineImages()
 					Blit( &resizedimages[ tr->normindex ], &finalnorm, newpos );
 				}
 #ifdef COMPILEB_DEBUG
-				g_log<<"compile 7b3"<<endl;
-				g_log.flush();
+				g_applog<<"compile 7b3"<<std::endl;
+				g_applog.flush();
 #endif
 		}
 	}
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7c"<<endl;
-	g_log.flush();
+	g_applog<<"compile 7c"<<std::endl;
+	g_applog.flush();
 #endif
 
 #if 1
@@ -753,8 +753,8 @@ void CombineImages()
 	{
 
 #ifdef COMPILEB_DEBUG
-		g_log<<"compile 7c free image "<<i<<endl;
-		g_log.flush();
+		g_applog<<"compile 7c free image "<<i<<std::endl;
+		g_applog.flush();
 #endif
 
 #if 0
@@ -766,23 +766,23 @@ void CombineImages()
 #endif
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 7d"<<endl;
-	g_log.flush();
+	g_applog<<"compile 7d"<<std::endl;
+	g_applog.flush();
 #endif
 
 	delete [] resizedimages;
 
 #ifdef COMPILEB_DEBUG
-	g_log<<"compile 8"<<endl;
-	g_log.flush();
+	g_applog<<"compile 8"<<std::endl;
+	g_applog.flush();
 #endif
 }
 
-static string difffull;
-static string difffullpng;
-static string specfull;
-static string normfull;
-static string ownfull;
+static std::string difffull;
+static std::string difffullpng;
+static std::string specfull;
+static std::string normfull;
+static std::string ownfull;
 
 void WriteImages()
 {
@@ -799,7 +799,7 @@ void WriteImages()
 	//SavePNG(normfull.c_str(), &finalnorm);
 }
 
-void CalcTexCoords(EdMap* map, list<ModelHolder> &modelholders)
+void CalcTexCoords(EdMap* map, std::list<ModelHolder> &modelholders)
 {
 	int vindex = 0;
 
@@ -832,10 +832,10 @@ void CalcTexCoords(EdMap* map, list<ModelHolder> &modelholders)
 				tc[1] = va->texcoords[j + 1];
 				tc[2] = va->texcoords[j + 2];
 
-				float minu = min(tc[0].x, min(tc[1].x, tc[2].x));
-				float minv = min(tc[0].y, min(tc[1].y, tc[2].y));
-				float maxu = max(tc[0].x, max(tc[1].x, tc[2].x));
-				float maxv = max(tc[0].y, max(tc[1].y, tc[2].y));
+				float minu = std::min(tc[0].x, std::min(tc[1].x, tc[2].x));
+				float minv = std::min(tc[0].y, std::min(tc[1].y, tc[2].y));
+				float maxu = std::max(tc[0].x, std::max(tc[1].x, tc[2].x));
+				float maxv = std::max(tc[0].y, std::max(tc[1].y, tc[2].y));
 
 				float rangeu = maxu - minu;
 				float rangev = maxv - minv;
@@ -878,10 +878,10 @@ void CalcTexCoords(EdMap* map, list<ModelHolder> &modelholders)
 			tc[1] = va->texcoords[j + 1];
 			tc[2] = va->texcoords[j + 2];
 
-			float minu = min(tc[0].x, min(tc[1].x, tc[2].x));
-			float minv = min(tc[0].y, min(tc[1].y, tc[2].y));
-			float maxu = max(tc[0].x, max(tc[1].x, tc[2].x));
-			float maxv = max(tc[0].y, max(tc[1].y, tc[2].y));
+			float minu = std::min(tc[0].x, std::min(tc[1].x, tc[2].x));
+			float minv = std::min(tc[0].y, std::min(tc[1].y, tc[2].y));
+			float maxu = std::max(tc[0].x, std::max(tc[1].x, tc[2].x));
+			float maxv = std::max(tc[0].y, std::max(tc[1].y, tc[2].y));
 
 			float rangeu = maxu - minu;
 			float rangev = maxv - minv;
@@ -961,20 +961,20 @@ void CleanupModelCompile()
 	fullva.free();
 }
 
-void CompileModel(const char* fullfile, EdMap* map, list<ModelHolder> &modelholders)
+void CompileModel(const char* fullfile, EdMap* map, std::list<ModelHolder> &modelholders)
 {
 	char basename[MAX_PATH+1];
 	strcpy(basename, fullfile);
 	StripPath(basename);
 	StripExtension(basename);
 
-	string fullpath = StripFile(fullfile);
+	std::string fullpath = StripFile(fullfile);
 
-	difffull = fullpath + string(basename) + ".jpg";
-	difffullpng = fullpath + string(basename) + ".png";
-	specfull = fullpath + string(basename) + ".spec.jpg";
-	normfull = fullpath + string(basename) + ".norm.jpg";
-	ownfull = fullpath + string(basename) + ".team.png";
+	difffull = fullpath + std::string(basename) + ".jpg";
+	difffullpng = fullpath + std::string(basename) + ".png";
+	specfull = fullpath + std::string(basename) + ".spec.jpg";
+	normfull = fullpath + std::string(basename) + ".norm.jpg";
+	ownfull = fullpath + std::string(basename) + ".team.png";
 
 	//string diffpath = string(basename) + ".jpg";
 	//string diffpathpng = string(basename) + ".png";

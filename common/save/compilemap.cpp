@@ -206,7 +206,7 @@ void CutBrushes()
 		}
 	}
 
-	g_log<<"num touches: "<<ntouch<<endl;
+	g_applog<<"num touches: "<<ntouch<<std::endl;
 
 	// For each brush, see which other brush
 	//it touches, and remove any hidden fragments
@@ -274,12 +274,12 @@ void CompileMap(const char* full, EdMap* map)
 {
 	cmap = map;
 
-	g_log<<"Compiling map "<<full<<endl;
-	g_log<<"num brushes: "<<map->m_brush.size()<<endl;
+	g_applog<<"Compiling map "<<full<<std::endl;
+	g_applog<<"num brushes: "<<map->m_brush.size()<<std::endl;
 
 	CutBrushes();
 
-	g_log<<"frags removed: "<<g_fragerased<<endl;
+	g_applog<<"frags removed: "<<g_fragerased<<std::endl;
 
 	MakeFinalBrushes();
 
@@ -315,9 +315,9 @@ void ResetView()
 	//if(g_mode == EDITOR)
 	else
 	{
-		View* edview = g_GUI.getview("editor");
-		Widget* viewportsframe = edview->getwidget("viewports frame", WIDGET_FRAME);
-		Widget* toprightviewport = viewportsframe->getsubwidg("top right viewport", WIDGET_VIEWPORT);
+		ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
+		Widget* viewportsframe = edview->get("viewports frame");
+		Widget* toprightviewport = viewportsframe->get("top right viewport");
 		width = toprightviewport->m_pos[2] - toprightviewport->m_pos[0];
 		height = toprightviewport->m_pos[3] - toprightviewport->m_pos[1];
 	}
@@ -327,7 +327,7 @@ void ResetView()
 
 #ifdef DEBUG
 	{
-		g_log<<"rv"<<aspect<<","<<width<<","<<height<<" r-l:"<<(PROJ_RIGHT*aspect/g_zoom)<<","<<(-PROJ_RIGHT*aspect/g_zoom)<<" gwh:"<<g_width<<","<<g_height<<endl;
+		g_applog<<"rv"<<aspect<<","<<width<<","<<height<<" r-l:"<<(PROJ_RIGHT*aspect/g_zoom)<<","<<(-PROJ_RIGHT*aspect/g_zoom)<<" gwh:"<<g_width<<","<<g_height<<std::endl;
 	}
 #endif
 
@@ -345,10 +345,10 @@ void ResetView()
 
 #ifdef DEBUG
 	{
-		g_log<<"rf"<<g_renderframe<<" rv pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv pmat2:"<<projection.m_matrix[8]<<","<<projection.m_matrix[9]<<","<<projection.m_matrix[10]<<","<<projection.m_matrix[11]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv pmat3:"<<projection.m_matrix[12]<<","<<projection.m_matrix[13]<<","<<projection.m_matrix[14]<<","<<projection.m_matrix[15]<<endl;
+		g_applog<<"rf"<<g_renderframe<<" rv pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv pmat2:"<<projection.m_matrix[8]<<","<<projection.m_matrix[9]<<","<<projection.m_matrix[10]<<","<<projection.m_matrix[11]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv pmat3:"<<projection.m_matrix[12]<<","<<projection.m_matrix[13]<<","<<projection.m_matrix[14]<<","<<projection.m_matrix[15]<<std::endl;
 	}
 #endif
 
@@ -384,10 +384,10 @@ void ResetView()
 
 #ifdef DEBUG
 	{
-		g_log<<"rf"<<g_renderframe<<" rv vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv vmat1:"<<viewmat.m_matrix[4]<<","<<viewmat.m_matrix[5]<<","<<viewmat.m_matrix[6]<<","<<viewmat.m_matrix[7]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv vmat2:"<<viewmat.m_matrix[8]<<","<<viewmat.m_matrix[9]<<","<<viewmat.m_matrix[10]<<","<<viewmat.m_matrix[11]<<endl;
-		g_log<<"rf"<<g_renderframe<<" rv vmat3:"<<viewmat.m_matrix[12]<<","<<viewmat.m_matrix[13]<<","<<viewmat.m_matrix[14]<<","<<viewmat.m_matrix[15]<<endl;
+		g_applog<<"rf"<<g_renderframe<<" rv vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv vmat1:"<<viewmat.m_matrix[4]<<","<<viewmat.m_matrix[5]<<","<<viewmat.m_matrix[6]<<","<<viewmat.m_matrix[7]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv vmat2:"<<viewmat.m_matrix[8]<<","<<viewmat.m_matrix[9]<<","<<viewmat.m_matrix[10]<<","<<viewmat.m_matrix[11]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" rv vmat3:"<<viewmat.m_matrix[12]<<","<<viewmat.m_matrix[13]<<","<<viewmat.m_matrix[14]<<","<<viewmat.m_matrix[15]<<std::endl;
 	}
 #endif
 
@@ -413,6 +413,6 @@ void ResetView()
 	g_zoom *= zoomscale;
 
 #ifdef DEBUG
-	g_log<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<endl;
+	g_applog<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<std::endl;
 #endif
 }

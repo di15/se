@@ -43,8 +43,8 @@ Vec3f PointOnPlane(Plane p)
 	//z = -D/C	if(C != 0)
 
 #ifdef PLANE_DEBUG
-	g_log<<"point on plane ("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<"),"<<p.m_d<<endl;
-	g_log.flush();
+	g_applog<<"point on plane ("<<p.m_normal.x<<","<<p.m_normal.y<<","<<p.m_normal.z<<"),"<<p.m_d<<std::endl;
+	g_applog.flush();
 #endif
 
 	int greatest = -1;
@@ -77,12 +77,12 @@ Vec3f PointOnPlane(Plane p)
 	if(fabs(p.m_normal.z) > EPSILON)
 	//if(greatest == 2)
 		return Vec3f(0, 0, - p.m_d / p.m_normal.z);
-	
+
 	return Vec3f(0, 0, 0);
 }
 
 float PlaneDistance(Vec3f normal, Vec3f point)
-{	
+{
 	float distance = 0; // This variable holds the distance from the plane to the origin
 
 	// Use the plane equation to find the distance (Ax + By + Cz + D = 0)  We want to find D.
@@ -146,13 +146,13 @@ bool LineInterPlane(const Vec3f* line, const Vec3f norm, const float d, Vec3f* i
 
 	if(fabs(denom) <= EPSILON)
 		return false;
-		
+
 	float SegScalar = (d - Dot(norm, line[0])) / denom;
-		
+
 	//TODO: Check if SegScalar is [0.0, 1.0]?
 	if(SegScalar < 0.0f)
 		return false;
-		
+
 	*inter = change * SegScalar + line[0];
 
 	return true;

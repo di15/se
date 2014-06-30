@@ -22,6 +22,7 @@
 #include "../common/save/savesprite.h"
 #include "../common/tool/rendersprite.h"
 #include "../common/draw/screenshot.h"
+#include "../common/gui/widgets/choosefile.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -84,8 +85,8 @@ void Delete()
 	g_sel1m = NULL;
 
 	//LinkLatestUndo();
-	//g_log<<"delete b"<<endl;
-	//g_log.flush();
+	//g_applog<<"delete b"<<std::endl;
+	//g_applog.flush();
 }
 
 void MouseLeftButtonDown()
@@ -108,7 +109,7 @@ void Change_RotDeg(int dummy)
 
 void Change_Zoom(int dummy)
 {
-	Widget* zoombox = g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("zoom", WIDGET_EDITBOX);
+	Widget* zoombox = g_GUI.get("editor")->get("top panel")->get("zoom");
 
 	//if(zoombox->m_value.c_str()[0] == '\0')
 	//	return;
@@ -122,7 +123,7 @@ void Change_Zoom(int dummy)
 //void Change_SnapGrid(int dummy)
 void Change_SnapGrid()
 {
-	Widget* snapgbox = g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("snapgrid", WIDGET_DROPDOWNSELECTOR);
+	Widget* snapgbox = g_GUI.get("editor")->get("top panel")->get("snapgrid");
 
 	//if(snapgbox->m_value.c_str()[0] == '\0')
 	//	return;
@@ -141,7 +142,7 @@ void Change_SnapGrid()
 
 void Change_MaxElev(int dummy)
 {
-	Widget* maxelevbox = g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("maxelev", WIDGET_EDITBOX);
+	Widget* maxelevbox = g_GUI.get("editor")->get("top panel")->get("maxelev");
 
 	g_maxelev = StrToFloat(maxelevbox->m_value.c_str());
 }
@@ -154,25 +155,26 @@ void SkipLogo()
 	//g_mode = LOADING;
 	//OpenSoleView("loading");
 	g_mode = EDITOR;
-	OpenSoleView("editor");
+	g_GUI.closeall();
+	g_GUI.open("editor");
 	//OpenAnotherView("brush edit");
 }
 
 void UpdateLogo()
 {
 	static int stage = 0;
-	//g_log<<"update logo "<<stage<<endl;
-	//g_log.flush();
+	//g_applog<<"update logo "<<stage<<std::endl;
+	//g_applog.flush();
 
 	if(stage < 60)
 	{
 		float a = (float)stage / 60.0f;
-		g_GUI.getview("logo")->getwidget("logo", WIDGET_IMAGE)->m_rgba[3] = a;
+		g_GUI.get("logo")->get("logo")->m_rgba[3] = a;
 	}
 	else if(stage < 120)
 	{
 		float a = 1.0f - (float)(stage-60) / 60.0f;
-		g_GUI.getview("logo")->getwidget("logo", WIDGET_IMAGE)->m_rgba[3] = a;
+		g_GUI.get("logo")->get("logo")->m_rgba[3] = a;
 	}
 	else
 		SkipLogo();
@@ -203,7 +205,7 @@ void Click_NewBrush()
 	b.add(back);	//5
 	b.collapse();
 	b.remaptex();
-	//g_log<<"---------push back brush-----------"<<endl;
+	//g_applog<<"---------push back brush-----------"<<std::endl;
 	g_edmap.m_brush.push_back(b);
 	//g_selB.clear();
 	//auto i = g_edmap.m_brush.rbegin();
@@ -669,9 +671,9 @@ void Click_FitToFace()
 
 void CloseSideView()
 {
-	CloseView("brush side edit");
-	CloseView("brush edit");
-	CloseView("door edit");
+	g_GUI.close("brush side edit");
+	g_GUI.close("brush edit");
+	g_GUI.close("door edit");
 }
 
 void Click_DoorView()
@@ -698,14 +700,14 @@ void CopyBrush()
 		g_copyB.m_nsides = 0;
 	}
 
-	//g_log<<"copy brush"<<endl;
-	//g_log.flush();
+	//g_applog<<"copy brush"<<std::endl;
+	//g_applog.flush();
 }
 
 void PasteBrush()
 {
-	//g_log<<"paste brush?"<<endl;
-	//g_log.flush();
+	//g_applog<<"paste brush?"<<std::endl;
+	//g_applog.flush();
 
 	if(g_copyB.m_nsides > 0)
 	{
@@ -723,13 +725,13 @@ void PasteBrush()
 		{
 			BrushSide* s = &b.m_sides[i];
 
-			g_log<<"side"<<i<<" plane="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<endl;
+			g_applog<<"side"<<i<<" plane="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<std::endl;
 		}
 		*/
 		g_edmap.m_brush.push_back(b);
 
-		//g_log<<"paste brush"<<endl;
-		//g_log.flush();
+		//g_applog<<"paste brush"<<std::endl;
+		//g_applog.flush();
 	}
 	else if(g_copyM.model >= 0)
 	{
@@ -797,7 +799,7 @@ void Click_AddMS3D()
 
 	string relative = MakePathRelative(filepath);
 
-	//g_log<<"relative "<<relative<<endl;
+	//g_applog<<"relative "<<relative<<std::endl;
 
 	int modelid = LoadModel(relative.c_str(), Vec3f(1,1,1), Vec3f(0,0,0), true);
 
@@ -815,6 +817,37 @@ void Click_AddMS3D()
 
 	ModelHolder mh(modelid, Vec3f(0,0,0));
 	g_modelholder.push_back(mh);
+#elif defined( PLATFORM_LINUX )
+	GtkWidget *dialog;
+
+     dialog = gtk_file_chooser_dialog_new ("Open File",
+     				      NULL,
+     				      GTK_FILE_CHOOSER_ACTION_OPEN,
+     				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+     				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+     				      NULL);
+	//gtk_main ();
+
+  //gtk_widget_show_all (dialog);
+  //gtk_dialog_run (GTK_DIALOG (dialog));
+
+#if 1
+     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+       {
+#if 0
+         char *filename;
+
+         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+         //open_file (filename);
+         g_free (filename);
+#endif
+       }
+#endif
+	gtk_widget_hide(dialog);
+     gtk_widget_destroy (dialog);
+
+    while (gtk_events_pending ())
+        gtk_main_iteration ();
 #endif
 }
 
@@ -930,7 +963,7 @@ void RotateBrushes(float radians, Vec3f axis)
 
 void Click_RotXCCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(1, 0, 0));
@@ -940,7 +973,7 @@ void Click_RotXCCW()
 
 void Click_RotXCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(1, 0, 0));
@@ -950,7 +983,7 @@ void Click_RotXCW()
 
 void Click_RotYCCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 1, 0));
@@ -960,7 +993,7 @@ void Click_RotYCCW()
 
 void Click_RotYCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 1, 0));
@@ -970,7 +1003,7 @@ void Click_RotYCW()
 
 void Click_RotZCCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 0, 1));
@@ -980,7 +1013,7 @@ void Click_RotZCCW()
 
 void Click_RotZCW()
 {
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 0, 1));
@@ -992,7 +1025,7 @@ void Click_RotateTex()
 {
 	LinkPrevUndo();
 
-	float degrees = StrToFloat(g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("rotdeg", WIDGET_EDITBOX)->m_value.c_str());
+	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1024,8 +1057,8 @@ void RedoBSideGUI()
 	if(g_dragS < 0)
 		return;
 
-	Widget* uwidg = g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("u equation", WIDGET_EDITBOX);
-	Widget* vwidg = g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("v equation", WIDGET_EDITBOX);
+	EditBox* uwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("u equation");
+	EditBox* vwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("v equation");
 
 	Plane* tceq = g_sel1b->m_sides[g_dragS].m_tceq;
 
@@ -1047,8 +1080,8 @@ void Change_TexEq(int c)
 	if(g_dragS < 0)
 		return;
 
-	Widget* uwidg = g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("u equation", WIDGET_EDITBOX);
-	Widget* vwidg = g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("v equation", WIDGET_EDITBOX);
+	EditBox* uwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("u equation");
+	EditBox* vwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("v equation");
 
 	float A = 0;
 	float B = 0;
@@ -1085,7 +1118,7 @@ void Change_SelComp()
 
 int GetComponent()
 {
-	int c = g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("select component", WIDGET_DROPDOWNSELECTOR)->m_selected;
+	int c = g_GUI.get("brush side edit")->get("left panel")->get("select component")->m_selected;
 
 	if(c != 0 && c != 1)
 		c = 0;
@@ -1103,7 +1136,7 @@ void Click_ScaleTex()
 
 	int c = GetComponent();
 
-	float scale = 1.0f/StrToFloat(g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("texture scale", WIDGET_EDITBOX)->m_value.c_str());
+	float scale = 1.0f/StrToFloat(g_GUI.get("brush side edit")->get("left panel")->get("texture scale")->m_value.c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1131,7 +1164,7 @@ void Click_ShiftTex()
 
 	int c = GetComponent();
 
-	float shift = StrToFloat(g_GUI.getview("brush side edit")->getwidget("left panel", WIDGET_FRAME)->getsubwidg("texture shift", WIDGET_EDITBOX)->m_value.c_str());
+	float shift = StrToFloat(g_GUI.get("brush side edit")->get("left panel")->get("texture shift")->m_value.c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1145,7 +1178,7 @@ void Click_ShiftTex()
 
 void Change_ShowSky()
 {
-	Widget* showskchbox = g_GUI.getview("editor")->getwidget("top panel", WIDGET_FRAME)->getsubwidg("showsky", WIDGET_CHECKBOX);
+	Widget* showskchbox = g_GUI.get("editor")->get("top panel")->get("showsky");
 
 	g_showsky = (bool)showskchbox->m_selected;
 }
@@ -1195,9 +1228,9 @@ void Click_SetDoor()
 
 	float opendeg = 90;
 
-	View* dooredview = g_GUI.getview("door edit");
-	Frame* leftpanel = (Frame*)dooredview->getwidget("left panel", WIDGET_FRAME);
-	EditBox* opendegedit = (EditBox*)leftpanel->getsubwidg("opendeg", WIDGET_EDITBOX);
+	ViewLayer* dooredview = (ViewLayer*)g_GUI.get("door edit");
+	Frame* leftpanel = (Frame*)dooredview->get("left panel");
+	EditBox* opendegedit = (EditBox*)leftpanel->get("opendeg");
 	opendeg = StrToFloat(opendegedit->m_value.c_str());
 
 	door->opendeg = opendeg;
@@ -1205,13 +1238,13 @@ void Click_SetDoor()
 	b->getsides(&door->m_nsides, &door->m_sides);
 
 #if 0
-	g_log<<"set ed door"<<endl;
+	g_applog<<"set ed door"<<std::endl;
 	for(int i=0; i<door->m_nsides; i++)
 	{
-		g_log<<"side "<<i<<endl;
+		g_applog<<"side "<<i<<std::endl;
 		Plane* p = &door->m_sides[i].m_plane;
 
-		g_log<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<endl;
+		g_applog<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<std::endl;
 	}
 #endif
 }
@@ -1786,7 +1819,7 @@ void Resize_FitToFaceButton(Widget* thisw)
 void Resize_BrushSideEditFrame(Widget* thisw)
 {
 	int j=1;
-	//leftpanel->m_subwidg.push_back(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
+	//leftpanel->add(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
 	int i=4;
 	//Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)
 	thisw->m_pos[0] = 0;
@@ -1933,6 +1966,26 @@ void Click_CompileModel()
         //CorrectSlashes(filepath);
         //SaveEdBuilding(filepath, &g_edbldg);
 		CompileModel(filepath, &g_edmap, g_modelholder);
+#elif defined( PLATFORM_LINUX )
+	GtkWidget *dialog;
+
+     dialog = gtk_file_chooser_dialog_new ("Open File",
+     				      NULL,
+     				      GTK_FILE_CHOOSER_ACTION_OPEN,
+     				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+     				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+     				      NULL);
+
+     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+       {
+         char *filename;
+
+         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+         //open_file (filename);
+         g_free (filename);
+       }
+
+     gtk_widget_destroy (dialog);
 #endif
 #endif
 }
@@ -1954,97 +2007,106 @@ void FillGUI()
 	DrawSceneDepthFunc = &DrawSceneDepth;
 	DrawSceneFunc = &DrawScene;
 
-	g_log<<"assign keys"<<endl;
-	g_log.flush();
+	g_applog<<"assign keys"<<std::endl;
+	g_applog.flush();
 
-	AssignAnyKey(&AnyKeyDown, &AnyKeyUp);
+	g_GUI.assignanykey(&AnyKeyDown, &AnyKeyUp);
 
-	g_log<<"1,";
-	g_log.flush();
+	g_applog<<"1,";
+	g_applog.flush();
 
-	AssignKey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
-	g_log<<"2,";
-	g_log.flush();
-	AssignKey(SDL_SCANCODE_ESCAPE, &Escape, NULL);
-	g_log<<"3,";
-	g_log.flush();
-	AssignKey(SDL_SCANCODE_DELETE, &Delete, NULL);
-	g_log<<"4,";
-	g_log.flush();
-	AssignKey(SDL_SCANCODE_C, Down_C, NULL);
-	g_log<<"5,";
-	g_log.flush();
-	AssignKey(SDL_SCANCODE_V, Down_V, NULL);
-	g_log<<"5,";
-	g_log.flush();
+	g_GUI.assignkey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
+	g_applog<<"2,";
+	g_applog.flush();
+	g_GUI.assignkey(SDL_SCANCODE_ESCAPE, &Escape, NULL);
+	g_applog<<"3,";
+	g_applog.flush();
+	g_GUI.assignkey(SDL_SCANCODE_DELETE, &Delete, NULL);
+	g_applog<<"4,";
+	g_applog.flush();
+	g_GUI.assignkey(SDL_SCANCODE_C, Down_C, NULL);
+	g_applog<<"5,";
+	g_applog.flush();
+	g_GUI.assignkey(SDL_SCANCODE_V, Down_V, NULL);
+	g_applog<<"5,";
+	g_applog.flush();
 	//AssignMouseWheel(&MouseWheel);
 	//AssignMouseMove(&MouseMove);
-	AssignLButton(&MouseLeftButtonDown, &MouseLeftButtonUp);
+	g_GUI.assignlbutton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	//AssignRButton(NULL, &MouseRightButtonUp);
-	g_log<<"6,"<<endl;
-	g_log.flush();
+	g_applog<<"6,"<<std::endl;
+	g_applog.flush();
 
 	Font* f = &g_font[MAINFONT8];
 
-	g_log<<"logo..."<<endl;
-	g_log.flush();
+	g_applog<<"logo..."<<std::endl;
+	g_applog.flush();
 
-	View* logoview = AddView("logo");
-	logoview->widget.push_back(new Image(NULL, "logo", "gui/dmd.jpg", Resize_Logo, 1,1,1,0));
+	g_GUI.add(new ViewLayer(&g_GUI, "logo"));
+	ViewLayer* logoview = (ViewLayer*)g_GUI.get("logo");
+	//Image::Image(Widget* parent, const char* nm, const char* filepath, bool clamp, void (*reframef)(Widget* thisw), float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
 
-	g_log<<"loading..."<<endl;
-	g_log.flush();
+	logoview->add(new Image(NULL, "logo", "gui/dmd.jpg", true, Resize_Logo, 1,1,1,0));
 
-	View* loadingview = AddView("loading");
-	loadingview->widget.push_back(new Text(NULL, "status", "Loading...", MAINFONT8, Resize_LoadingText));
+	g_applog<<"loading..."<<std::endl;
+	g_applog.flush();
 
-	View* edview = AddView("editor");
+	g_GUI.add(new ViewLayer(&g_GUI, "loading"));
+	ViewLayer* loadingview = (ViewLayer*)g_GUI.get("loading");
+	loadingview->add(new Text(NULL, "status", "Loading...", MAINFONT8, Resize_LoadingText));
 
-	edview->widget.push_back(new Frame(NULL, "top panel", Resize_TopPanel));
-	edview->widget.push_back(new Frame(NULL, "left panel", Resize_LeftPanel));
+	g_GUI.add(new ViewLayer(&g_GUI, "editor"));
+	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
 
-	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
-	Widget* leftpanel = edview->getwidget("left panel", WIDGET_FRAME);
+	edview->add(new Frame(NULL, "top panel", Resize_TopPanel));
+	edview->add(new Frame(NULL, "left panel", Resize_LeftPanel));
 
-	toppanel->m_subwidg.push_back(new Image(toppanel, "top panel bg", "gui/filled.jpg", Resize_TopPanel));
-	leftpanel->m_subwidg.push_back(new Image(leftpanel, "left panel bg", "gui/filled.jpg", Resize_LeftPanel));
+	Widget* toppanel = edview->get("top panel");
+	Widget* leftpanel = edview->get("left panel");
 
-	toppanel->m_subwidg.push_back(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, Resize_LoadButton, Click_LoadEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, Resize_SaveButton, Click_SaveEdMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL));
+	toppanel->add(new Image(toppanel, "top panel bg", "gui/filled.jpg", true, Resize_TopPanel));
+	leftpanel->add(new Image(leftpanel, "left panel bg", "gui/filled.jpg", true, Resize_LeftPanel));
+
+//Button(Widget* parent, const char* name, const char* filepath, const std::string label, const std::string tooltip, int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm) : Widget()
+
+	toppanel->add(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, BUTTON_BGIMAGE, Resize_LoadButton, Click_LoadEdMap, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, BUTTON_BGIMAGE, Resize_SaveButton, Click_SaveEdMap, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, BUTTON_BGIMAGE, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL, NULL, NULL, -1));
 #if 1
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, Resize_CompileMapButton, Click_CompileModel, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, BUTTON_BGIMAGE, Resize_CompileMapButton, Click_CompileModel, NULL, NULL, NULL, NULL, -1));
 #endif
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL, NULL, NULL, -1));
 #if 0
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
-	//toppanel->m_subwidg.push_back(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, BUTTON_BGIMAGE, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, BUTTON_BGIMAGE, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
 #endif
-	toppanel->m_subwidg.push_back(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, Resize_UndoButton, Undo, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, Resize_RedoButton, Redo, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",									MAINFONT8, Resize_CutBrushButton, Click_CutBrush, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "newent", "gui/newent.png", "", "Add milkshape3d model",							MAINFONT8, Resize_NewEntityButton, Click_AddMS3D, NULL, NULL));
-	//toppanel->m_subwidg.push_back(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, Resize_SelEntButton, NULL, NULL, NULL));
-	//toppanel->m_subwidg.push_back(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",						MAINFONT8, Resize_SelBrushButton, NULL, NULL, NULL));
-	//toppanel->m_subwidg.push_back(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, Resize_SelEntBrushButton, NULL, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",			MAINFONT8, Resize_RotXCCWButton, Click_RotXCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",					MAINFONT8, Resize_RotXCWButton, Click_RotXCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",			MAINFONT8, Resize_RotYCCWButton, Click_RotYCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",					MAINFONT8, Resize_RotYCWButton, Click_RotYCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",			MAINFONT8, Resize_RotZCCWButton, Click_RotZCCW, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",					MAINFONT8, Resize_RotZCWButton, Click_RotZCW, NULL, NULL));
+	toppanel->add(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, BUTTON_BGIMAGE, Resize_UndoButton, Undo, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, BUTTON_BGIMAGE, Resize_RedoButton, Redo, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, BUTTON_BGIMAGE, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",									MAINFONT8, BUTTON_BGIMAGE, Resize_CutBrushButton, Click_CutBrush, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "newent", "gui/newent.png", "", "Add milkshape3d model",							MAINFONT8, BUTTON_BGIMAGE, Resize_NewEntityButton, Click_AddMS3D, NULL, NULL, NULL, NULL, -1));
+	//toppanel->add(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, BUTTON_BGIMAGE, Resize_SelEntButton, NULL, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",						MAINFONT8, BUTTON_BGIMAGE, Resize_SelBrushButton, NULL, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, BUTTON_BGIMAGE, Resize_SelEntBrushButton, NULL, NULL, NULL));
+	toppanel->add(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotXCCWButton, Click_RotXCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotXCWButton, Click_RotXCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotYCCWButton, Click_RotYCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotYCWButton, Click_RotYCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotZCCWButton, Click_RotZCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotZCWButton, Click_RotZCW, NULL, NULL, NULL, NULL, -1));
 
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "rotdeg", "15",															MAINFONT8, Resize_RotDegEditBox, false, 6, &Change_RotDeg, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "rotdegtext", "degrees",													MAINFONT8, Resize_RotDegText));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "zoom", "1",															MAINFONT8, Resize_ZoomEditBox, false, 6, &Change_Zoom, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "zoomtext", "zoom",														MAINFONT8, Resize_ZoomText));
-	toppanel->m_subwidg.push_back(new DropDownS(toppanel, "snapgrid",															MAINFONT8, Resize_SnapGridEditBox, Change_SnapGrid));
-	Widget* snapgs = toppanel->getsubwidg("snapgrid", WIDGET_DROPDOWNSELECTOR);
+//EditBox::EditBox(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
+
+	toppanel->add(new EditBox(toppanel, "rotdeg", "15",															MAINFONT8, Resize_RotDegEditBox, false, 6, &Change_RotDeg, 0));
+	toppanel->add(new Text(toppanel, "rotdegtext", "degrees",													MAINFONT8, Resize_RotDegText));
+	toppanel->add(new EditBox(toppanel, "zoom", "1",															MAINFONT8, Resize_ZoomEditBox, false, 6, &Change_Zoom, 0));
+	toppanel->add(new Text(toppanel, "zoomtext", "zoom",														MAINFONT8, Resize_ZoomText));
+	toppanel->add(new DropDownS(toppanel, "snapgrid",															MAINFONT8, Resize_SnapGridEditBox, Change_SnapGrid));
+	DropDownS* snapgs = (DropDownS*)toppanel->get("snapgrid");
 	//snapgs->m_options.push_back("4 m");	//0
 	//snapgs->m_options.push_back("2 m");	//1
 	//snapgs->m_options.push_back("1 m");	//2
@@ -2064,34 +2126,47 @@ void FillGUI()
 		snapgs->m_options.push_back(cm_scales_txt[j].c_str());
 	}
 
-	snapgs->select(6);
+	//snapgs->select(6);
+	snapgs->m_selected = 6;
 
-	//toppanel->m_subwidg.push_back(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Resize_SnapGridText));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
-	toppanel->m_subwidg.push_back(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
-	toppanel->m_subwidg.push_back(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
+	//toppanel->add(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
+	toppanel->add(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Resize_SnapGridText));
+	toppanel->add(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
+	toppanel->add(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
+	toppanel->add(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
 
-	toppanel->m_subwidg.push_back(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL));
-	toppanel->m_subwidg.push_back(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, Resize_ResetViewButton, Click_ResetView, NULL, NULL));
+	toppanel->add(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, BUTTON_BGIMAGE, Resize_ResetViewButton, Click_ResetView, NULL, NULL, NULL, NULL, -1));
 
-	toppanel->m_subwidg.push_back(new Text(toppanel, "frames", "frames",														MAINFONT8, Resize_FramesText));
-	toppanel->m_subwidg.push_back(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
+	toppanel->add(new Text(toppanel, "frames", "frames",														MAINFONT8, Resize_FramesText));
+	toppanel->add(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
 
 #if 0
-	toppanel->m_subwidg.push_back(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, Resize_ExplodeButton, Click_Explode, NULL, NULL));
+	toppanel->add(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExplodeButton, Click_Explode, NULL, NULL));
 #endif
 
-	//toppanel->m_subwidg.push_back(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
+	//toppanel->add(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
 
-	edview->widget.push_back(new Frame(NULL, "viewports frame", Resize_ViewportsFrame));
-	Widget* viewportsframe = edview->getwidget("viewports frame", WIDGET_FRAME);
+	edview->add(new Frame(NULL, "viewports frame", Resize_ViewportsFrame));
+	Widget* viewportsframe = edview->get("viewports frame");
 
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom left viewport",	Resize_BottomLeftViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 0));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
-	viewportsframe->m_subwidg.push_back(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
+#if 0
+ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
+					 void (*drawf)(int p, int x, int y, int w, int h),
+					 bool (*ldownf)(int p, int x, int y, int w, int h),
+					 bool (*lupf)(int p, int x, int y, int w, int h),
+					 bool (*mousemovef)(int p, int x, int y, int w, int h),
+					 bool (*rdownf)(int p, int relx, int rely, int w, int h),
+					 bool (*rupf)(int p, int relx, int rely, int w, int h),
+					 bool (*mousewf)(int p, int d),
+					 int parm)
+#endif
+
+	viewportsframe->add(new ViewportW(viewportsframe, "bottom left viewport",	Resize_BottomLeftViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 0));
+	viewportsframe->add(new ViewportW(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
+	viewportsframe->add(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
+	viewportsframe->add(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
 
 	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/2), Vec3f(0, 1, 0), "Front");
 	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 0, -1), "Top");
@@ -2106,71 +2181,79 @@ void FillGUI()
 	g_viewport[2] = Viewport(VIEWPORT_LEFT);
 	g_viewport[3] = Viewport(VIEWPORT_ANGLE45O);
 
-	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "h divider", "gui/filled.jpg", Resize_HDivider));
-	viewportsframe->m_subwidg.push_back(new Image(viewportsframe, "v divider", "gui/filled.jpg", Resize_VDivider));
+	viewportsframe->add(new Image(viewportsframe, "h divider", "gui/filled.jpg", true, Resize_HDivider));
+	viewportsframe->add(new Image(viewportsframe, "v divider", "gui/filled.jpg", true, Resize_VDivider));
 
-	View* brusheditview = AddView("brush edit");
-	brusheditview->widget.push_back(new Frame(NULL, "left panel", Resize_BrushEditFrame));
+	g_GUI.add(new ViewLayer(&g_GUI, "brush edit"));
+	ViewLayer* brusheditview = (ViewLayer*)g_GUI.get("brush edit");
+	brusheditview->add(new Frame(NULL, "left panel", Resize_BrushEditFrame));
 
-	leftpanel = brusheditview->getwidget("left panel", WIDGET_FRAME);
-	//leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture path", "no texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), false, 64, NULL, -1));
+	leftpanel = brusheditview->get("left panel");
+	//leftpanel->add(new EditBox(leftpanel, "texture path", "no texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), false, 64, NULL, -1));
 	//i++;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, Resize_ChooseTexButton, Click_BChooseTex, NULL, NULL));
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, Resize_FitToFaceButton, Click_FitToFace, NULL, NULL));
-	//leftpanel->m_subwidg.push_back(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
+	leftpanel->add(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, BUTTON_BGIMAGE, Resize_ChooseTexButton, Click_BChooseTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, BUTTON_BGIMAGE, Resize_FitToFaceButton, Click_FitToFace, NULL, NULL, NULL, NULL, -1));
+	//leftpanel->add(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
 
-	View* brushsideeditview = AddView("brush side edit");
-	brushsideeditview->widget.push_back(new Frame(NULL, "left panel", Resize_BrushSideEditFrame));
+	g_GUI.add(new ViewLayer(&g_GUI, "brush side edit"));
+	ViewLayer* brushsideeditview = (ViewLayer*)g_GUI.get("brush edit");
+	brushsideeditview->add(new Frame(NULL, "left panel", Resize_BrushSideEditFrame));
 
-	leftpanel = brushsideeditview->getwidget("left panel", WIDGET_FRAME);
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, Resize_RotateTexButton, Click_RotateTex, NULL, NULL));
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, 0));
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Resize_TexEqEditBox2, false, 256, Change_TexEq, 1));
-	leftpanel->m_subwidg.push_back(new DropDownS(leftpanel, "select component", MAINFONT8, Resize_SelComponentDropDownS, Change_SelComp));
-	Widget* selcompwidg = leftpanel->getsubwidg("select component", WIDGET_DROPDOWNSELECTOR);
+	leftpanel = brushsideeditview->get("left panel");
+	leftpanel->add(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, BUTTON_BGIMAGE, Resize_RotateTexButton, Click_RotateTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, 0));
+	leftpanel->add(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Resize_TexEqEditBox2, false, 256, Change_TexEq, 1));
+	leftpanel->add(new DropDownS(leftpanel, "select component", MAINFONT8, Resize_SelComponentDropDownS, Change_SelComp));
+	Widget* selcompwidg = leftpanel->get("select component");
 	selcompwidg->m_options.push_back("u component");
 	selcompwidg->m_options.push_back("v component");
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, 0));
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL));
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL));
+	leftpanel->add(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, 0));
+	leftpanel->add(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
+	leftpanel->add(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL, NULL, NULL, -1));
 
-	View* choosefileview = AddView("choose file");
-	choosefileview->widget.push_back(new ChooseFile(NULL, "choose file", Resize_ChooseFile, Callback_ChooseFile));
+	g_GUI.add(new ViewLayer(&g_GUI, "choose file"));
+	ViewLayer* choosefileview = (ViewLayer*)g_GUI.get("choose file");
+	choosefileview->add(new ChooseFile(choosefileview, "choose file", Resize_ChooseFile, Callback_ChooseFile));
 
+#if 1
+	g_GUI.add(new ViewLayer(&g_GUI, "door edit"));
+	ViewLayer* dooreditview = (ViewLayer*)g_GUI.get("door edit");
 #if 0
-	View* dooreditview = AddView("door edit");
-	dooreditview->widget.push_back(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
+	dooreditview->add(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
 
-	leftpanel = dooreditview->getwidget("left panel", WIDGET_FRAME);
+	leftpanel = dooreditview->get("left panel", WIDGET_FRAME);
 	i=1;
 	j=0;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "set door", "gui/yesdoor.png", "", "Make door and set properties",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_SetDoor, NULL, NULL));
+	leftpanel->add(new Button(leftpanel, "set door", "gui/yesdoor.png", "", "Make door and set properties",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_SetDoor, NULL, NULL));
 	j++;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "unmake door", "gui/nodoor.png", "", "Unmake door",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_UnmakeDoor, NULL, NULL));
+	leftpanel->add(new Button(leftpanel, "unmake door", "gui/nodoor.png", "", "Unmake door",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_UnmakeDoor, NULL, NULL));
 	j=0;
 	i+=3;
-	leftpanel->m_subwidg.push_back(new Button(leftpanel, "open/close", "gui/transp.png", "Open / Close", "Open / Close door", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), Click_OpenCloseDoor, NULL, NULL));
+	leftpanel->add(new Button(leftpanel, "open/close", "gui/transp.png", "Open / Close", "Open / Close door", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), Click_OpenCloseDoor, NULL, NULL));
 	i++;
-	leftpanel->m_subwidg.push_back(new Text(leftpanel, "opendeg label", "Open degrees:", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i)));
-	leftpanel->m_subwidg.push_back(new EditBox(leftpanel, "opendeg", "90", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 70), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH-10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), false, 10, NULL, 0));
+	leftpanel->add(new Text(leftpanel, "opendeg label", "Open degrees:", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i)));
+	leftpanel->add(new EditBox(leftpanel, "opendeg", "90", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 70), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(LEFT_PANEL_WIDTH-10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*(i+1)), false, 10, NULL, 0));
+#endif
 #endif
 
-	View* renderview = AddView("render");
+	g_GUI.add(new ViewLayer(&g_GUI, "render"));
+	ViewLayer* renderview = (ViewLayer*)g_GUI.get("render");
 
-	renderview->widget.push_back(new ViewportW(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3));
+	renderview->add(new ViewportW(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3));
 
-	OpenSoleView("loading");
+	g_GUI.closeall();
+	g_GUI.open("loading");
 	//OpenAnotherView("brush edit view");
 }
 
 int GetNumFrames()
 {
-	View* edview = g_GUI.getview("editor");
+	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
 
-	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
+	Widget* toppanel = edview->get("top panel");
 
-	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);
+	Widget* frameseditbox = toppanel->get("frames");
 
 	int nframes = StrToInt(frameseditbox->m_value.c_str());
 
@@ -2179,11 +2262,11 @@ int GetNumFrames()
 
 void SetNumFrames(int nframes)
 {
-	View* edview = g_GUI.getview("editor");
+	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
 
-	Widget* toppanel = edview->getwidget("top panel", WIDGET_FRAME);
+	Widget* toppanel = edview->get("top panel");
 
-	Widget* frameseditbox = toppanel->getsubwidg("frames", WIDGET_EDITBOX);
+	EditBox* frameseditbox = (EditBox*)toppanel->get("frames");
 
 	char nframesstr[128];
 	sprintf(nframesstr, "%d", nframes);

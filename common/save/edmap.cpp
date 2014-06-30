@@ -9,14 +9,14 @@
 #include "../draw/shadow.h"
 
 EdMap g_edmap;
-vector<Brush*> g_selB;
+std::vector<Brush*> g_selB;
 Brush* g_sel1b = NULL;	//drag selected brush (brush being dragged or manipulated currently)
 int g_dragV = -1;	//drag vertex of selected brush?
 int g_dragS = -1;	//drag side of selected brush?
 bool g_dragW = false;	//drag whole brush or model?
 int g_dragD = -1;	// dragging DRAG_DOOR_POINT or DRAG_DOOR_AXIS ?
 int g_dragM = -1;	//dragging model holder?
-vector<ModelHolder*> g_selM;
+std::vector<ModelHolder*> g_selM;
 ModelHolder* g_sel1m = NULL;	//drag selected model (model being dragged or manipulated currently)
 
 void DrawEdMap(EdMap* map, bool showsky)

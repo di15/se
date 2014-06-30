@@ -1,4 +1,3 @@
-
 #ifndef WIDGET_H
 #define WIDGET_H
 
@@ -8,33 +7,10 @@
 #include "../draw/shader.h"
 #include "../window.h"
 #include "draw2d.h"
+#include "inevent.h"
+#include "../ustring.h"
 
-#define MAX_OPTIONS_SHOWN	5
-#define LBAR_WIDTH		100
-#define MMBAR_WIDTH		(LBAR_WIDTH*128.0f/110.0f)
-#define MMBAR_HEIGHT	(MMBAR_WIDTH*1.0f/1.0f)
-#define MINIMAP_X1		(MMBAR_WIDTH*6.0f/128.0f)
-#define MINIMAP_X2		(MMBAR_WIDTH*121.0f/128.0f)
-#define MINIMAP_Y1		(MMBAR_HEIGHT*6.0f/128.0f)
-#define MINIMAP_Y2		(MMBAR_HEIGHT*114.0f/128.0f)
-#define TBAR_HEIGHT		15
-
-#define HSCROLLER_SPACING	16
-#define HSCROLLER_OPTIONW	173
-#define HSCROLLER_SIDESP	(((14+17-7)+(20+18-11))/2)
-
-#define STATUS_ALPHA	(0.75f)
-
-#define MARGIN_SOURCE_WIDTH		0
-#define MARGIN_SOURCE_HEIGHT	1
-#define MARGIN_SOURCE_MIN		2
-#define MARGIN_SOURCE_MAX		3
-
-#define MARGIN_FUNC_RATIO		0
-#define MARGIN_FUNC_PIXELS		1
-#define MARGIN_FUNC_SUBTPIXELS	2
-
-class Widget;
+#define MAX_OPTIONS_SHOWN	7
 
 #define WIDGET_IMAGE				1
 #define WIDGET_BUTTON				2
@@ -52,13 +28,19 @@ class Widget;
 #define WIDGET_TEXTAREA				14
 #define WIDGET_VIEWPORT				15
 #define WIDGET_FRAME				16
-#define WIDGET_DROPDOWNMENU			17
-#define WIDGET_DROPDOWNLIST			18
-#define WIDGET_CHOOSEFILE           19
+#define WIDGET_RESTICKER			17
+#define WIDGET_BOTTOMPANEL			18
+#define WIDGET_BUILDPREVIEW			19
+#define WIDGET_CONSTRUCTIONVIEW		20
+#define WIDGET_GUI					21
+#define WIDGET_VIEWLAYER			22
+#define WIDGET_CHOOSEFILE			23
+#define WIDGET_VSCROLLBAR			24
+#define WIDGET_HSCROLLBAR			25
+#define WIDGET_WINDOW				26
 
-#define ALIGNMENT_LESSERSIDE		0
-#define ALIGNMENT_CENTER			1
-#define ALIGNMENT_GREATERSIDE		2
+#define CHCALL_VSCROLL				0
+#define CHCAlL_HSCROLL				1
 
 class Widget
 {
@@ -66,35 +48,36 @@ public:
 	int m_type;
 	Widget* m_parent;
 	float m_pos[4];
+	float m_frame[4];
 	float m_texc[4];	//texture coordinates
-    float m_tpos[4];	//text pos
+	float m_tpos[4];	//text pos
 	unsigned int m_tex;
 	unsigned int m_bgtex;
 	unsigned int m_bgovertex;
 	bool m_over;
 	bool m_ldown;	//was the left mouse button pressed while over this (i.e. drag)?
-	string m_name;
-	string m_text;
+	std::string m_name;
+	std::string m_text;
 	int m_font;
-	unsigned int m_frametex, m_filledtex, m_uptex, m_downtex;
+	unsigned int m_frametex, m_filledtex, m_uptex;
 	bool m_opened;
-	vector<string> m_options;
+	std::vector<std::string> m_options;
 	int m_selected;
 	float m_scroll[2];
 	bool m_mousescroll;
-	int m_mousedown[2];
 	float m_vel[2];
 	int m_param;
 	float m_rgba[4];
-	string m_value;
+	std::string m_value;
 	int m_caret;
 	bool m_passw;
 	int m_maxlen;
 	bool m_shadow;
-	list<Widget*> m_subwidg;
+	std::list<Widget*> m_subwidg;
 	int m_lines;
-	//int m_alignment;
-	string m_label;
+	int m_alignment;
+	std::string m_label;
+	bool m_popup;
 
 	void (*clickfunc)();
 	void (*clickfunc2)(int p);
@@ -130,38 +113,20 @@ public:
 	}
 
 	virtual void draw()	{}
-	virtual void draw2()	{}
-	//virtual void newover()	{}
-	virtual bool prelbuttonup(bool moved)	{ return false; }
-	virtual bool lbuttonup(bool moved)	{ return false; }
-	virtual bool prelbuttondown() { return false; }
-	virtual bool lbuttondown() { return false; }
-	virtual bool prerbuttonup(bool moved)	{ return false; }
-	virtual bool rbuttonup(bool moved)	{ return false; }
-	virtual bool prerbuttondown() { return false; }
-	virtual bool rbuttondown() { return false; }
-	virtual bool mbuttonup(bool moved)	{ return false; }
-	virtual bool mbuttondown() { return false; }
-	virtual void premousemove()	{}
+	virtual void drawover()	{}
+	virtual void inev(InEv* ev) {}
 	virtual void frameupd()	{}
-	virtual bool mousemove() { return false; }
-	virtual bool keyup(int k) { return false; }
-	virtual bool keydown(int k) { return false; }
-	virtual bool charin(int k) { return false; }
-	virtual bool mousewheel(int delta) { return false; }
-	virtual void changevalue(const char* newv);
-	virtual void placechar(int k);
-	virtual void select(int which);
-	virtual void clear();
-	virtual void erase(int which)	{}
-	//virtual void align();
 	virtual void reframe();	//resized or moved
-	virtual void changetext(const char* newt);
-	virtual int scrollframe(int i) const	{ return m_pos[i];	}
-	virtual int frame(int i)	const { return m_pos[i];	}
-	virtual Widget* getsubwidg(const char* name, int type);
+	virtual void subframe(float* fr)
+	{
+		memcpy((void*)fr, (void*)m_pos, sizeof(float)*4);
+	}
+	virtual Widget* get(const char* name);
+	virtual void add(Widget* neww);
+	virtual void close();
+	virtual void chcall(Widget* ch, int type, void* data);	//child callback
 };
 
 void CenterLabel(Widget* w);
-
+void SubFrame(float *a, float *b, float *c);
 #endif

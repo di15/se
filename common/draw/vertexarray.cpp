@@ -5,7 +5,7 @@
 
 VertexArray::VertexArray(const VertexArray& original)
 {
-	//g_log<<"vertex array copy constructor"<<endl;
+	//g_applog<<"vertex array copy constructor"<<std::endl;
 	/*
 	alloc(original.numverts);
 	memcpy(vertices, original.vertices, sizeof(Vec3f)*numverts);
@@ -19,7 +19,7 @@ VertexArray::VertexArray(const VertexArray& original)
 
 VertexArray& VertexArray::operator=(VertexArray const &original)
 {
-	//g_log<<"vertex array assignment op"<<endl;
+	//g_applog<<"vertex array assignment op"<<std::endl;
 
 	alloc(original.numverts);
 	memcpy(vertices, original.vertices, sizeof(Vec3f)*numverts);

@@ -5,7 +5,7 @@
 #include "window.h"
 #include "draw/shader.h"
 
-ofstream g_log;
+std::ofstream g_applog;
 
 const std::string DateTime()
 {
@@ -42,10 +42,10 @@ void OpenLog(const char* filename, int version)
 {
 	char fullpath[MAX_PATH+1];
 	FullPath(filename, fullpath);
-	g_log.open(fullpath, ios_base::out);
-	g_log<<DateTime()<<endl;
-	g_log<<"Version "<<version<<endl<<endl;
-	g_log.flush();
+	g_applog.open(fullpath, std::ios_base::out);
+	g_applog<<DateTime()<<std::endl;
+	g_applog<<"Version "<<version<<std::endl<<std::endl;
+	g_applog.flush();
 }
 
 std::string MakePathRelative(const char* full)
@@ -58,8 +58,8 @@ std::string MakePathRelative(const char* full)
 	ExePath(exepath);
 	CorrectSlashes(exepath);
 
-	//g_log<<"exepath: "<<exepath<<endl;
-	//g_log<<"fulpath: "<<full<<endl;
+	//g_applog<<"exepath: "<<exepath<<std::endl;
+	//g_applog<<"fulpath: "<<full<<std::endl;
 
 	std::string::size_type pos = full2.find(exepath, 0);
 
@@ -68,11 +68,11 @@ std::string MakePathRelative(const char* full)
 		return full2;
 	}
 
-	//g_log<<"posposp: "<<pos<<endl;
+	//g_applog<<"posposp: "<<pos<<std::endl;
 
 	std::string sub = std::string( full2 ).substr(strlen(exepath)+1, strlen(full)-strlen(exepath)-1);
 
-	//g_log<<"subpath: "<<sub<<endl;
+	//g_applog<<"subpath: "<<sub<<std::endl;
 
 	return sub;
 }
@@ -186,7 +186,7 @@ float StrToFloat(const char *s)
 		return 1.0f;
 
 	float x;
-	istringstream iss(s);
+	std::istringstream iss(s);
 	iss >> x;
 
 	if(_isnan(x))
@@ -198,7 +198,7 @@ float StrToFloat(const char *s)
 int HexToInt(const char* s)
 {
 	int x;
-	stringstream ss;
+	std::stringstream ss;
 	ss << std::hex << s;
 	ss >> x;
 	return x;
@@ -207,7 +207,7 @@ int HexToInt(const char* s)
 int StrToInt(const char *s)
 {
 	int x;
-	istringstream iss(s);
+	std::istringstream iss(s);
 	iss >> x;
 	return x;
 }

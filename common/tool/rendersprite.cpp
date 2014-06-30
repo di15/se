@@ -117,8 +117,8 @@ bool CallResize(int w, int h)
 #endif
 
 #ifdef DEBUG
-		g_log<<__FILE__<<":"<<__LINE__<<"create check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<endl;
-		g_log<<__FILE__<<":"<<__LINE__<<"create check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<endl;
+		g_applog<<__FILE__<<":"<<__LINE__<<"create check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<std::endl;
+		g_applog<<__FILE__<<":"<<__LINE__<<"create check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<std::endl;
 #endif
 	}
 	//w=2048;
@@ -158,8 +158,8 @@ bool CallResize(int w, int h)
 #endif
 
 #if 0
-	g_log<<"rf"<<g_renderframe<<" desired: "<<w<<","<<h<<", g_wh: "<<g_width<<","<<g_height<<" wr.rl: "<<(WindowRect.right-WindowRect.left)<<","<<(WindowRect.bottom-WindowRect.top)<<endl;
-	g_log.flush();
+	g_applog<<"rf"<<g_renderframe<<" desired: "<<w<<","<<h<<", g_wh: "<<g_width<<","<<g_height<<" wr.rl: "<<(WindowRect.right-WindowRect.left)<<","<<(WindowRect.bottom-WindowRect.top)<<std::endl;
+	g_applog.flush();
 #endif
 
 #if 0
@@ -227,7 +227,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 
 #ifdef DEBUG
-	g_log<<"rf"<<g_renderframe<<" o des wh "<<g_deswidth<<","<<g_desheight<<"  xyextn:"<<xextent<<","<<yextent<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<") gwh:"<<g_width<<","<<g_height<<" "<<endl;
+	g_applog<<"rf"<<g_renderframe<<" o des wh "<<g_deswidth<<","<<g_desheight<<"  xyextn:"<<xextent<<","<<yextent<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<") gwh:"<<g_width<<","<<g_height<<" "<<std::endl;
 #endif
 
 	//Sleep(10);
@@ -260,9 +260,9 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	//if(g_mode == EDITOR)
 	else
 	{
-		View* edview = g_GUI.getview("editor");
-		Widget* viewportsframe = edview->getwidget("viewports frame", WIDGET_FRAME);
-		Widget* toprightviewport = viewportsframe->getsubwidg("top right viewport", WIDGET_VIEWPORT);
+		View* edview = g_GUI.get("editor");
+		Widget* viewportsframe = edview->get("viewports frame", WIDGET_FRAME);
+		Widget* toprightviewport = viewportsframe->get("top right viewport", WIDGET_VIEWPORT);
 		width = toprightviewport->m_pos[2] - toprightviewport->m_pos[0];
 		height = toprightviewport->m_pos[3] - toprightviewport->m_pos[1];
 	}
@@ -333,7 +333,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 	g_zoom *= zoomscale;
 
-	//g_log<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<endl;
+	//g_applog<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<std::endl;
 
 	g_mode = PREREND_ADJFRAME;
 #endif
@@ -362,11 +362,11 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 #ifdef DEBUG
 	{
 
-		g_log<<"rf"<<g_renderframe<<" params:"<<aspect<<","<<width<<","<<height<<","<<g_zoom<<endl;
-		g_log<<"rf"<<g_renderframe<<" pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<endl;
-		g_log<<"rf"<<g_renderframe<<" pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<endl;
-		g_log<<"rf"<<g_renderframe<<" pmat2:"<<projection.m_matrix[8]<<","<<projection.m_matrix[9]<<","<<projection.m_matrix[10]<<","<<projection.m_matrix[11]<<endl;
-		g_log<<"rf"<<g_renderframe<<" pmat3:"<<projection.m_matrix[12]<<","<<projection.m_matrix[13]<<","<<projection.m_matrix[14]<<","<<projection.m_matrix[15]<<endl;
+		g_applog<<"rf"<<g_renderframe<<" params:"<<aspect<<","<<width<<","<<height<<","<<g_zoom<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" pmat0:"<<projection.m_matrix[0]<<","<<projection.m_matrix[1]<<","<<projection.m_matrix[2]<<","<<projection.m_matrix[3]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" pmat1:"<<projection.m_matrix[4]<<","<<projection.m_matrix[5]<<","<<projection.m_matrix[6]<<","<<projection.m_matrix[7]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" pmat2:"<<projection.m_matrix[8]<<","<<projection.m_matrix[9]<<","<<projection.m_matrix[10]<<","<<projection.m_matrix[11]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" pmat3:"<<projection.m_matrix[12]<<","<<projection.m_matrix[13]<<","<<projection.m_matrix[14]<<","<<projection.m_matrix[15]<<std::endl;
 	}
 #endif
 
@@ -408,10 +408,10 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 #ifdef DEBUG
 	{
-		g_log<<"rf"<<g_renderframe<<" vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<endl;
-		g_log<<"rf"<<g_renderframe<<" vmat1:"<<viewmat.m_matrix[4]<<","<<viewmat.m_matrix[5]<<","<<viewmat.m_matrix[6]<<","<<viewmat.m_matrix[7]<<endl;
-		g_log<<"rf"<<g_renderframe<<" vmat2:"<<viewmat.m_matrix[8]<<","<<viewmat.m_matrix[9]<<","<<viewmat.m_matrix[10]<<","<<viewmat.m_matrix[11]<<endl;
-		g_log<<"rf"<<g_renderframe<<" vmat3:"<<viewmat.m_matrix[12]<<","<<viewmat.m_matrix[13]<<","<<viewmat.m_matrix[14]<<","<<viewmat.m_matrix[15]<<endl;
+		g_applog<<"rf"<<g_renderframe<<" vmat0:"<<viewmat.m_matrix[0]<<","<<viewmat.m_matrix[1]<<","<<viewmat.m_matrix[2]<<","<<viewmat.m_matrix[3]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" vmat1:"<<viewmat.m_matrix[4]<<","<<viewmat.m_matrix[5]<<","<<viewmat.m_matrix[6]<<","<<viewmat.m_matrix[7]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" vmat2:"<<viewmat.m_matrix[8]<<","<<viewmat.m_matrix[9]<<","<<viewmat.m_matrix[10]<<","<<viewmat.m_matrix[11]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" vmat3:"<<viewmat.m_matrix[12]<<","<<viewmat.m_matrix[13]<<","<<viewmat.m_matrix[14]<<","<<viewmat.m_matrix[15]<<std::endl;
 	}
 #endif
 
@@ -446,7 +446,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 				Vec4f v4 = ScreenPos(&mvpmat, v, width, height, persp);
 
 #ifdef DEBUG
-				g_log<<"rf"<<g_renderframe<<" v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<endl;
+				g_applog<<"rf"<<g_renderframe<<" v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<std::endl;
 #endif
 
 #if 0
@@ -490,10 +490,10 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 #ifdef DEBUG
 	//for(int my=0; my<4; my++)
 	{
-		g_log<<"rf"<<g_renderframe<<" mat0:"<<mvpmat.m_matrix[0]<<","<<mvpmat.m_matrix[1]<<","<<mvpmat.m_matrix[2]<<","<<mvpmat.m_matrix[3]<<endl;
-		g_log<<"rf"<<g_renderframe<<" mat1:"<<mvpmat.m_matrix[4]<<","<<mvpmat.m_matrix[5]<<","<<mvpmat.m_matrix[6]<<","<<mvpmat.m_matrix[7]<<endl;
-		g_log<<"rf"<<g_renderframe<<" mat2:"<<mvpmat.m_matrix[8]<<","<<mvpmat.m_matrix[9]<<","<<mvpmat.m_matrix[10]<<","<<mvpmat.m_matrix[11]<<endl;
-		g_log<<"rf"<<g_renderframe<<" mat3:"<<mvpmat.m_matrix[12]<<","<<mvpmat.m_matrix[13]<<","<<mvpmat.m_matrix[14]<<","<<mvpmat.m_matrix[15]<<endl;
+		g_applog<<"rf"<<g_renderframe<<" mat0:"<<mvpmat.m_matrix[0]<<","<<mvpmat.m_matrix[1]<<","<<mvpmat.m_matrix[2]<<","<<mvpmat.m_matrix[3]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" mat1:"<<mvpmat.m_matrix[4]<<","<<mvpmat.m_matrix[5]<<","<<mvpmat.m_matrix[6]<<","<<mvpmat.m_matrix[7]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" mat2:"<<mvpmat.m_matrix[8]<<","<<mvpmat.m_matrix[9]<<","<<mvpmat.m_matrix[10]<<","<<mvpmat.m_matrix[11]<<std::endl;
+		g_applog<<"rf"<<g_renderframe<<" mat3:"<<mvpmat.m_matrix[12]<<","<<mvpmat.m_matrix[13]<<","<<mvpmat.m_matrix[14]<<","<<mvpmat.m_matrix[15]<<std::endl;
 	}
 #endif
 
@@ -514,8 +514,8 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 			Vec4f v4 = ScreenPos(&mvpmat, v, width, height, persp);
 
 #ifdef DEBUG
-			g_log<<"rf"<<g_renderframe<<" mdl v:"<<v.x<<","<<v.y<<","<<v.z<<endl;
-			g_log<<"rf"<<g_renderframe<<" mdl v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<endl;
+			g_applog<<"rf"<<g_renderframe<<" mdl v:"<<v.x<<","<<v.y<<","<<v.z<<std::endl;
+			g_applog<<"rf"<<g_renderframe<<" mdl v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<std::endl;
 #endif
 
 #if 0
@@ -554,7 +554,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 
 #ifdef DEBUG
-	g_log<<"rf"<<g_renderframe<<" setmm:"<<setmm[0]<<","<<setmm[1]<<","<<setmm[2]<<","<<setmm[3]<<endl;
+	g_applog<<"rf"<<g_renderframe<<" setmm:"<<setmm[0]<<","<<setmm[1]<<","<<setmm[2]<<","<<setmm[3]<<std::endl;
 #endif
 #endif
 }
@@ -564,7 +564,8 @@ void PrepareRender(const char* fullpath, int rendtype)
 	//g_mode = PREREND_ADJFRAME;
 	g_rendertype = rendtype;
 	strcpy(g_renderbasename, fullpath);
-	OpenSoleView("render");
+	g_GUI.closeall();
+	g_GUI.open("render");
 	//glClearColor(255.0f/255.0f, 127.0f/255.0f, 255.0f/255.0f, 1.0f);
 	g_renderframe = 0;
 	g_origlightpos = g_lightPos;
@@ -586,13 +587,13 @@ void AdjustFrame()
 	Vec2i vmax(g_width/2, g_height/2);
 
 #ifdef DEBUG
-	g_log<<"rf"<<g_renderframe<<" adjf1 gwh:"<<g_width<<","<<g_height<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<")"<<endl;
+	g_applog<<"rf"<<g_renderframe<<" adjf1 gwh:"<<g_width<<","<<g_height<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<")"<<std::endl;
 #endif
 
 	AllScreenMinMax(&vmin, &vmax, g_width, g_height);
 
 #ifdef DEBUG
-	g_log<<"rf"<<g_renderframe<<" asmm adjf2 gwh:"<<g_width<<","<<g_height<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<")"<<endl;
+	g_applog<<"rf"<<g_renderframe<<" asmm adjf2 gwh:"<<g_width<<","<<g_height<<" vminmax:("<<vmin.x<<","<<vmin.y<<")->("<<vmax.x<<","<<vmax.y<<")"<<std::endl;
 #endif
 
 	if(!FitFocus(vmin, vmax))
@@ -605,8 +606,8 @@ void SaveRender()
 #if 0
 	SaveScreenshot();
 
-	g_log<<"sv r"<<endl;
-	g_log.flush();
+	g_applog<<"sv r"<<std::endl;
+	g_applog.flush();
 #endif
 
 	LoadedTex screen;
@@ -643,11 +644,11 @@ void SaveRender()
 	int imageh = Max2Pow(clipsz.y);
 
 #ifdef DEBUG
-	g_log<<"rf"<<g_renderframe<<" gwh"<<g_width<<","<<g_height<<" clipxymm "<<g_clipmin.x<<","<<g_clipmin.y<<"->"<<g_clipmax.x<<","<<g_clipmax.y<<" clipsz "<<clipsz.x<<","<<clipsz.y<<" imgwh "<<imagew<<","<<imageh<<endl;
-	g_log.flush();
+	g_applog<<"rf"<<g_renderframe<<" gwh"<<g_width<<","<<g_height<<" clipxymm "<<g_clipmin.x<<","<<g_clipmin.y<<"->"<<g_clipmax.x<<","<<g_clipmax.y<<" clipsz "<<clipsz.x<<","<<clipsz.y<<" imgwh "<<imagew<<","<<imageh<<std::endl;
+	g_applog.flush();
 
-	g_log<<"sv r 4"<<endl;
-	g_log.flush();
+	g_applog<<"sv r 4"<<std::endl;
+	g_applog.flush();
 #endif
 
 	LoadedTex sprite;
@@ -662,9 +663,9 @@ void SaveRender()
 	//if(g_desheight != g_height)	yoff += (g_height-g_desheight)/2;
 
 #ifdef DEBUG
-	g_log<<"des wh "<<g_deswidth<<","<<g_desheight<<" actl "<<g_width<<","<<g_height<<endl;
-	g_log<<"xy off "<<xoff<<","<<yoff<<endl;
-	g_log.flush();
+	g_applog<<"des wh "<<g_deswidth<<","<<g_desheight<<" actl "<<g_width<<","<<g_height<<std::endl;
+	g_applog<<"xy off "<<xoff<<","<<yoff<<std::endl;
+	g_applog.flush();
 #endif
 
 #if 1
@@ -692,8 +693,8 @@ void SaveRender()
 			&& screen.data[index2+2] == transpkey[2])
 				continue;
 #endif
-			//g_log<<" access "<<(x+xoff)<<","<<(y+yoff)<<" of "<<g_width<<","<<g_height<<" "<<endl;
-			//g_log.flush();
+			//g_applog<<" access "<<(x+xoff)<<","<<(y+yoff)<<" of "<<g_width<<","<<g_height<<" "<<std::endl;
+			//g_applog.flush();
 
 			sprite.data[index+0] = screen.data[index2+0];
 			sprite.data[index+1] = screen.data[index2+1];
@@ -711,7 +712,7 @@ void SaveRender()
 
 	sprintf(fullpath, "%s_si%d_fr%03d.txt", g_renderbasename, g_rendside, g_renderframe);
 	ofstream ofs(fullpath, ios_base::out);
-	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<endl<<imagew<<" "<<imageh<<endl<<clipsz.x<<" "<<clipsz.y;
+	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<std::endl<<imagew<<" "<<imageh<<std::endl<<clipsz.x<<" "<<clipsz.y;
 
 #if 0
 	CheckGLError(__FILE__, __LINE__);
@@ -768,7 +769,7 @@ void UpdateRender()
 #else
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_renderfb);
 #ifdef DEBUG
-	g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
+	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
 	CheckGLError(__FILE__, __LINE__);
 #endif
 	glViewport(0, 0, g_width, g_height);
@@ -782,8 +783,8 @@ void UpdateRender()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
-	g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<endl;
-	g_log<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<endl;
+	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
+	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<std::endl;
 #endif
 	glEnable(GL_DEPTH_TEST);
 
@@ -901,7 +902,8 @@ void UpdateRender()
 void EndRender()
 {
 	g_mode = EDITOR;
-	OpenSoleView("editor");
+	g_GUI.closeall();
+	g_GUI.open("editor");
 	g_renderframe = 0;
 	g_lightPos = g_origlightpos;
 	g_camera = g_origcam;

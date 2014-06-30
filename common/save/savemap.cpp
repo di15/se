@@ -46,13 +46,13 @@ void BrushAttribTex(Brush* brush)
 // indexes into the written texture table based
 // on the diffuse texture index (which indexes into
 // g_texture, the global texture array).
-void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
+void SaveTexs(FILE* fp, int* texrefs, std::list<Brush>& brushes)
 {
 	for(int i=0; i<TEXTURES; i++)
 		texrefs[i] = -1;
 
 	// the compiled index of textures used in the map
-	list<TexRef> compilation;
+	std::list<TexRef> compilation;
 
 	for(auto b=brushes.begin(); b!=brushes.end(); b++)
 	{
@@ -61,7 +61,7 @@ void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 		//sides of the brush, but the door closed-state model
 		//sides too, which might theoretically have different
 		//textures if the door model/whatever wasn't updated.
-		list<BrushSide*> sides;
+		std::list<BrushSide*> sides;
 
 		for(int i=0; i<b->m_nsides; i++)
 			sides.push_back(&b->m_sides[i]);
@@ -125,8 +125,8 @@ void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 	fwrite(&nrefs, sizeof(int), 1, fp);
 
 #if 0
-	g_log<<"writing "<<nrefs<<" tex refs"<<endl;
-	g_log.flush();
+	g_applog<<"writing "<<nrefs<<" tex refs"<<std::endl;
+	g_applog.flush();
 #endif
 
 	int j=0;
@@ -137,8 +137,8 @@ void SaveTexs(FILE* fp, int* texrefs, list<Brush>& brushes)
 		fwrite(&strl, sizeof(int), 1, fp);
 
 #if 0
-		g_log<<"writing "<<strl<<"-long tex ref"<<endl;
-		g_log.flush();
+		g_applog<<"writing "<<strl<<"-long tex ref"<<std::endl;
+		g_applog.flush();
 #endif
 
 		fwrite(i->filepath.c_str(), sizeof(char), strl, fp);
@@ -151,13 +151,13 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 	fread(&nrefs, sizeof(int), 1, fp);
 
 #if 0
-	g_log<<"reading "<<nrefs<<" tex refs"<<endl;
-	g_log.flush();
+	g_applog<<"reading "<<nrefs<<" tex refs"<<std::endl;
+	g_applog.flush();
 #endif
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nrefs = "<<nrefs<<endl;
-	g_log.flush();
+	g_applog<<"nrefs = "<<nrefs<<std::endl;
+	g_applog.flush();
 #endif
 
 	(*texrefs) = new TexRef[nrefs];
@@ -169,15 +169,15 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 		fread(&strl, sizeof(int), 1, fp);
 
 #if 0
-		g_log<<"reading "<<strl<<"-long tex ref"<<endl;
-		g_log.flush();
+		g_applog<<"reading "<<strl<<"-long tex ref"<<std::endl;
+		g_applog.flush();
 #endif
 
 		char* filepath = new char[strl];
 		fread(filepath, sizeof(char), strl, fp);
 #ifdef LOADMAP_DEBUG
-	g_log<<"filepath = "<<filepath<<endl;
-	g_log.flush();
+	g_applog<<"filepath = "<<filepath<<std::endl;
+	g_applog.flush();
 #endif
 		tr->filepath = filepath;
 		delete [] filepath;
@@ -205,14 +205,14 @@ void ReadTexs(FILE* fp, TexRef** texrefs)
 	}
 }
 
-void SaveBrushes(FILE* fp, int* texrefs, list<Brush>& brushes)
+void SaveBrushes(FILE* fp, int* texrefs, std::list<Brush>& brushes)
 {
 	int nbrush = brushes.size();
 	fwrite(&nbrush, sizeof(int), 1, fp);
 
 #if 0
-	g_log<<"writing "<<nbrush<<" brushes at "<<ftell(fp)<<endl;
-	g_log.flush();
+	g_applog<<"writing "<<nbrush<<" brushes at "<<ftell(fp)<<std::endl;
+	g_applog.flush();
 
 	int i=0;
 #endif
@@ -222,7 +222,7 @@ void SaveBrushes(FILE* fp, int* texrefs, list<Brush>& brushes)
 		SaveBrush(fp, texrefs, &*b);
 
 #if 0
-		g_log<<"wrote brush "<<i<<" end at "<<ftell(fp)<<endl;
+		g_applog<<"wrote brush "<<i<<" end at "<<ftell(fp)<<std::endl;
 		i++;
 #endif
 	}
@@ -238,11 +238,11 @@ void SaveBrushes(FILE* fp, int* texrefs, list<Brush>& brushes)
 // we need to store the opaque ones.
 // This is because we draw the opaque ones first,
 // and then the transparent ones in the right order.
-void SaveBrushRefs(FILE* fp, list<Brush>& brushes)
+void SaveBrushRefs(FILE* fp, std::list<Brush>& brushes)
 {
-	list<int> opaqbrushrefs;
-	list<int> transpbrushrefs;
-	list<int> skybrushrefs;
+	std::list<int> opaqbrushrefs;
+	std::list<int> transpbrushrefs;
+	std::list<int> skybrushrefs;
 
 	int brushidx = 0;
 	for(auto brushitr=brushes.begin(); brushitr!=brushes.end(); brushitr++, brushidx++)
@@ -345,7 +345,7 @@ void ReadBrushRefs(FILE* fp, Map* map)
 	}
 }
 
-void SaveMap(const char* fullpath, list<Brush>& brushes)
+void SaveMap(const char* fullpath, std::list<Brush>& brushes)
 {
 	FILE* fp = fopen(fullpath, "wb");
 
@@ -356,15 +356,15 @@ void SaveMap(const char* fullpath, list<Brush>& brushes)
 	fwrite(&version, sizeof(float), 1, fp);
 
 #if 0
-	g_log<<"brushes to write: "<<brushes.size()<<endl;
+	g_applog<<"brushes to write: "<<brushes.size()<<std::endl;
 #endif
 
 	int texrefs[TEXTURES];
 	SaveTexs(fp, texrefs, brushes);
 
 #if 0
-	g_log<<"write brushes at "<<ftell(fp)<<endl;
-	g_log.flush();
+	g_applog<<"write brushes at "<<ftell(fp)<<std::endl;
+	g_applog.flush();
 #endif
 
 	SaveBrushes(fp, texrefs, brushes);
@@ -382,8 +382,8 @@ void ReadBrushes(FILE* fp, TexRef* texrefs, Map* map)
 	map->m_brush = new Brush[nbrush];
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nbrush = "<<nbrush<<endl;
-	g_log.flush();
+	g_applog<<"nbrush = "<<nbrush<<std::endl;
+	g_applog.flush();
 #endif
 
 	for(int i=0; i<nbrush; i++)
@@ -391,11 +391,11 @@ void ReadBrushes(FILE* fp, TexRef* texrefs, Map* map)
 		ReadBrush(fp, texrefs, &map->m_brush[i]);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"added b"<<endl;
-	g_log.flush();
+	g_applog<<"added b"<<std::endl;
+	g_applog.flush();
 #endif
 
-		g_log<<"read brush "<<i<<" end at "<<ftell(fp)<<endl;
+		g_applog<<"read brush "<<i<<" end at "<<ftell(fp)<<std::endl;
 	}
 }
 
@@ -407,7 +407,7 @@ bool LoadMap(const char* fullpath, Map* map)
 
 	if(!fp)
 	{
-		g_log<<"Failed to open map "<<fullpath<<endl;
+		g_applog<<"Failed to open map "<<fullpath<<std::endl;
 		return false;
 	}
 
@@ -436,21 +436,21 @@ bool LoadMap(const char* fullpath, Map* map)
 	}
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 1"<<endl;
-	g_log.flush();
+	g_applog<<"load map 1"<<std::endl;
+	g_applog.flush();
 #endif
 
 	TexRef* texrefs = NULL;
 
 	ReadTexs(fp, &texrefs);
 
-	g_log<<"read brushes at "<<ftell(fp)<<endl;
+	g_applog<<"read brushes at "<<ftell(fp)<<std::endl;
 
 	ReadBrushes(fp, texrefs, map);
 	ReadBrushRefs(fp, map);
 
-	g_log<<"loaded "<<map->m_nbrush<<" brushes "<<endl;
-	g_log.flush();
+	g_applog<<"loaded "<<map->m_nbrush<<" brushes "<<std::endl;
+	g_applog.flush();
 
 	if(texrefs)
 	{
@@ -459,15 +459,15 @@ bool LoadMap(const char* fullpath, Map* map)
 	}
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 2"<<endl;
-	g_log.flush();
+	g_applog<<"load map 2"<<std::endl;
+	g_applog.flush();
 #endif
 
 	fclose(fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 3"<<endl;
-	g_log.flush();
+	g_applog<<"load map 3"<<std::endl;
+	g_applog.flush();
 #endif
 
 	return true;

@@ -94,14 +94,14 @@ void Resize(int width, int height)
 		g_height = height;
 
 #ifdef DEBUG
-		g_log<<"!=rsz "<<g_width<<","<<g_height<<endl;
-		g_log.flush();
+		g_applog<<"!=rsz "<<g_width<<","<<g_height<<std::endl;
+		g_applog.flush();
 #endif
 
 		//if(g_fullscreen)
 			//Reload();
 			//ReloadTextures();
-		g_GUI.resize();
+		g_GUI.reframe();
 	}
 }
 
@@ -181,9 +181,9 @@ bool AnimateNextFrame(int desiredFrameRate)
 
 bool InitWindow()
 {
-	g_log<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<endl;
-	g_log<<"GL_VERSION1 = "<<(char*)glGetString(GL_VERSION)<<endl;
-	g_log.flush();
+	g_applog<<"Renderer1: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
+	g_applog<<"GL_VERSION1 = "<<(char*)glGetString(GL_VERSION)<<std::endl;
+	g_applog.flush();
 
 	char path[MAX_PATH+1];
 	FullPath("SpriteEd.png", path);
@@ -248,14 +248,14 @@ void DestroyWindow(const char* title)
 bool MakeWindow(const char* title)
 {
 
-	g_log<<"samw0"<<endl;
-	g_log.flush();
+	g_applog<<"samw0"<<std::endl;
+	g_applog.flush();
 
-	//g_log<<"GL_VERSION: "<<(char*)glGetString(GL_VERSION)<<endl;
-	//g_log.flush();
+	//g_applog<<"GL_VERSION: "<<(char*)glGetString(GL_VERSION)<<std::endl;
+	//g_applog.flush();
 
-	g_log<<"sa"<<endl;
-	g_log.flush();
+	g_applog<<"sa"<<std::endl;
+	g_applog.flush();
 
 	// Request compatibility because GLEW doesn't play well with core contexts.
 #if 1
@@ -332,12 +332,12 @@ bool MakeWindow(const char* title)
 
 	g_glcontext = SDL_GL_CreateContext(g_window);
 
-	g_log<<"GL_VERSION: "<<glGetString(GL_VERSION)<<endl;
-	//g_log<<"GL_MAX_TEXTURE_SIZE: "<<glGetString(GL_MAX_TEXTURE_SIZE)<<endl;
+	g_applog<<"GL_VERSION: "<<glGetString(GL_VERSION)<<std::endl;
+	//g_applog<<"GL_MAX_TEXTURE_SIZE: "<<glGetString(GL_MAX_TEXTURE_SIZE)<<std::endl;
 	int maxtex;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtex);
-    g_log<<"GL_MAX_TEXTURE_SIZE: "<<maxtex<<endl;
-	g_log.flush();
+    g_applog<<"GL_MAX_TEXTURE_SIZE: "<<maxtex<<std::endl;
+	g_applog.flush();
 
 	if(!g_glcontext)
 	{

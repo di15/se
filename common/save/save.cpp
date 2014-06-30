@@ -60,11 +60,11 @@ void SaveVertexArray(FILE* fp, VertexArray* va)
 	//fwrite(va->tangents, sizeof(Vec3f), va->numverts, fp);
 
 #if 0
-	g_log<<"write VA"<<endl;
+	g_applog<<"write VA"<<std::endl;
 	for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 	{
 		Vec3f vert = va->vertices[vertindex];
-		g_log<<"\twrite vert: "<<vert.x<<","<<vert.y<<","<<vert.z<<endl;
+		g_applog<<"\twrite vert: "<<vert.x<<","<<vert.y<<","<<vert.z<<std::endl;
 	}
 #endif
 }
@@ -75,8 +75,8 @@ void ReadVertexArray(FILE* fp, VertexArray* va)
 	fread(&nverts, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nverts = "<<nverts<<endl;
-	g_log.flush();
+	g_applog<<"nverts = "<<nverts<<std::endl;
+	g_applog.flush();
 #endif
 
 	va->alloc(nverts);

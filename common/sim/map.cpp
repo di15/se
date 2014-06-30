@@ -76,9 +76,9 @@ void LogBrush()
 			for(int j=0; j<3; j++)
 			{
 		Vec2f* tc = &t->m_texcoord[j];
-				//g_log<<"u "<<va->texcoords[j].x<<"\t	v "<<va->texcoords[j].y<<endl;
-				g_log<<"u "<<tc->x<<"\t	v "<<tc->y<<endl;
-				g_log.flush();
+				//g_applog<<"u "<<va->texcoords[j].x<<"\t	v "<<va->texcoords[j].y<<std::endl;
+				g_applog<<"u "<<tc->x<<"\t	v "<<tc->y<<std::endl;
+				g_applog.flush();
 			}
 		}
 
@@ -133,7 +133,7 @@ void DrawMap(Map* map)
 	{
 		int brushindex = *brushiterator;
 #if 0
-		g_log<<"draw brush "<<brushidx<<endl;
+		g_applog<<"draw brush "<<brushidx<<std::endl;
 #endif
 
 		Brush* b = &map->m_brush[brushindex];
@@ -146,7 +146,7 @@ void DrawMap(Map* map)
 		for(int sideindex = 0; sideindex < b->m_nsides; sideindex++)
 		{
 #if 0
-			g_log<<"\tdraw side "<<sideindex<<endl;
+			g_applog<<"\tdraw side "<<sideindex<<std::endl;
 #endif
 
 			BrushSide* pside = &b->m_sides[sideindex];
@@ -183,10 +183,10 @@ void DrawMap(Map* map)
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{
-				g_log<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<endl;
+				g_applog<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<std::endl;
 			}
 
-			g_log<<"\tdrew triangles: "<<(va->numverts/3)<<endl;
+			g_applog<<"\tdrew triangles: "<<(va->numverts/3)<<std::endl;
 #endif
 		}
 	}
@@ -242,7 +242,7 @@ void DrawMap2(Map* map)
 	{
 		int brushindex = *brushiterator;
 #if 0
-		g_log<<"draw brush "<<brushidx<<endl;
+		g_applog<<"draw brush "<<brushidx<<std::endl;
 #endif
 
 		Brush* b = &map->m_brush[brushindex];
@@ -255,7 +255,7 @@ void DrawMap2(Map* map)
 		for(int sideindex = 0; sideindex < b->m_nsides; sideindex++)
 		{
 #if 0
-			g_log<<"\tdraw side "<<sideindex<<endl;
+			g_applog<<"\tdraw side "<<sideindex<<std::endl;
 #endif
 
 			BrushSide* pside = &b->m_sides[sideindex];
@@ -292,10 +292,10 @@ void DrawMap2(Map* map)
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{
-				g_log<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<endl;
+				g_applog<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<std::endl;
 			}
 
-			g_log<<"\tdrew triangles: "<<(va->numverts/3)<<endl;
+			g_applog<<"\tdrew triangles: "<<(va->numverts/3)<<std::endl;
 #endif
 		}
 	}
@@ -315,7 +315,7 @@ void DrawMapDepth(Map* map)
 	{
 		int brushindex = *brushiterator;
 #if 0
-		g_log<<"draw brush "<<brushidx<<endl;
+		g_applog<<"draw brush "<<brushidx<<std::endl;
 #endif
 
 		Brush* b = &map->m_brush[brushindex];
@@ -328,7 +328,7 @@ void DrawMapDepth(Map* map)
 		for(int sideindex = 0; sideindex < b->m_nsides; sideindex++)
 		{
 #if 0
-			g_log<<"\tdraw side "<<sideindex<<endl;
+			g_applog<<"\tdraw side "<<sideindex<<std::endl;
 #endif
 
 			BrushSide* pside = &b->m_sides[sideindex];
@@ -361,10 +361,10 @@ void DrawMapDepth(Map* map)
 #if 0
 			for(int vertindex = 0; vertindex < va->numverts; vertindex++)
 			{
-				g_log<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<endl;
+				g_applog<<"\t\tvert: ("<<va->vertices[vertindex].x<<","<<va->vertices[vertindex].y<<","<<va->vertices[vertindex].z<<")"<<std::endl;
 			}
 
-			g_log<<"\tdrew triangles: "<<(va->numverts/3)<<endl;
+			g_applog<<"\tdrew triangles: "<<(va->numverts/3)<<std::endl;
 #endif
 		}
 	}

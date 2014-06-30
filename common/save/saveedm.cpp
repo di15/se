@@ -60,15 +60,15 @@ void ReadBrushSide(FILE* fp, BrushSide* s, TexRef* texrefs)
 	fread(&s->m_plane, sizeof(Plane), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"s->m_plane = "<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<endl;
-	g_log.flush();
+	g_applog<<"s->m_plane = "<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<","<<s->m_plane.m_d<<std::endl;
+	g_applog.flush();
 #endif
 
 	ReadVertexArray(fp, &s->m_drawva);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 1"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 1"<<std::endl;
+	g_applog.flush();
 #endif
 
 	int texrefindex;
@@ -80,8 +80,8 @@ void ReadBrushSide(FILE* fp, BrushSide* s, TexRef* texrefs)
 	fread(&s->m_ntris, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 2"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 2"<<std::endl;
+	g_applog.flush();
 #endif
 
 	s->m_tris = new Triangle2[ s->m_ntris ];
@@ -89,15 +89,15 @@ void ReadBrushSide(FILE* fp, BrushSide* s, TexRef* texrefs)
 	fread(s->m_tceq, sizeof(Plane), 2, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 3"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 3"<<std::endl;
+	g_applog.flush();
 #endif
 
 	ReadPolygon(fp, &s->m_outline);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 4"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 4"<<std::endl;
+	g_applog.flush();
 #endif
 
 	s->m_vindices = new int[ s->m_outline.m_edv.size() ];
@@ -111,8 +111,8 @@ void ReadBrushSides(FILE* fp, Brush* b, TexRef* texrefs)
 	fread(&nsides, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nsides = "<<nsides<<endl;
-	g_log.flush();
+	g_applog<<"nsides = "<<nsides<<std::endl;
+	g_applog.flush();
 #endif
 
 	if(b->m_sides)
@@ -129,15 +129,15 @@ void ReadBrushSides(FILE* fp, Brush* b, TexRef* texrefs)
 		ReadBrushSide(fp, &s, texrefs);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 5"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 5"<<std::endl;
+	g_applog.flush();
 #endif
 
 		b->add(s);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load ed brush side 6"<<endl;
-	g_log.flush();
+	g_applog<<"load ed brush side 6"<<std::endl;
+	g_applog.flush();
 #endif
 	}
 }
@@ -174,13 +174,13 @@ void SaveEdDoor(FILE* fp, EdDoor* door, int* texrefs)
 		SaveEdBrushSide(fp, &door->m_sides[i], texrefs);
 
 #if 0
-	g_log<<"save ed door"<<endl;
+	g_applog<<"save ed door"<<std::endl;
 	for(int i=0; i<door->m_nsides; i++)
 	{
-		g_log<<"side "<<i<<endl;
+		g_applog<<"side "<<i<<std::endl;
 		Plane* p = &door->m_sides[i].m_plane;
 
-		g_log<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<endl;
+		g_applog<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<std::endl;
 	}
 #endif
 }
@@ -218,13 +218,13 @@ void ReadEdDoor(FILE* fp, EdDoor* door, TexRef* texrefs)
 		ReadBrushSide(fp, &door->m_sides[i], texrefs);
 
 #if 0
-	g_log<<"read ed door"<<endl;
+	g_applog<<"read ed door"<<std::endl;
 	for(int i=0; i<door->m_nsides; i++)
 	{
-		g_log<<"side "<<i<<endl;
+		g_applog<<"side "<<i<<std::endl;
 		Plane* p = &door->m_sides[i].m_plane;
 
-		g_log<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<endl;
+		g_applog<<"plane = "<<p->m_normal.x<<","<<p->m_normal.y<<","<<p->m_normal.z<<",d="<<p->m_d<<std::endl;
 	}
 #endif
 }
@@ -278,8 +278,8 @@ void ReadBrush(FILE* fp, TexRef* texrefs, Brush* b)
 
 	fread(&b->m_nsharedv, sizeof(int), 1, fp);
 #ifdef LOADMAP_DEBUG
-	g_log<<"b.m_nsharedv = "<<b.m_nsharedv<<endl;
-	g_log.flush();
+	g_applog<<"b.m_nsharedv = "<<b.m_nsharedv<<std::endl;
+	g_applog.flush();
 #endif
 
 	b->m_sharedv = new Vec3f[ b->m_nsharedv ];
@@ -307,8 +307,8 @@ void ReadBrushes(FILE* fp, TexRef* texrefs, EdMap* map)
 	fread(&nbrush, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nbrush = "<<nbrush<<endl;
-	g_log.flush();
+	g_applog<<"nbrush = "<<nbrush<<std::endl;
+	g_applog.flush();
 #endif
 
 	for(int i=0; i<nbrush; i++)
@@ -318,8 +318,8 @@ void ReadBrushes(FILE* fp, TexRef* texrefs, EdMap* map)
 		map->m_brush.push_back(b);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"added b"<<endl;
-	g_log.flush();
+	g_applog<<"added b"<<std::endl;
+	g_applog.flush();
 #endif
 	}
 }
@@ -330,8 +330,8 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 	fread(&nrefs, sizeof(int), 1, fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"nrefs = "<<nrefs<<endl;
-	g_log.flush();
+	g_applog<<"nrefs = "<<nrefs<<std::endl;
+	g_applog.flush();
 #endif
 
 	(*texrefs) = new TexRef[nrefs];
@@ -345,8 +345,8 @@ void ReadEdTexs(FILE* fp, TexRef** texrefs)
 		char* filepath = new char[strl];
 		fread(filepath, sizeof(char), strl, fp);
 #ifdef LOADMAP_DEBUG
-	g_log<<"filepath = "<<filepath<<endl;
-	g_log.flush();
+	g_applog<<"filepath = "<<filepath<<std::endl;
+	g_applog.flush();
 #endif
 		tr->filepath = filepath;
 		delete [] filepath;
@@ -390,7 +390,7 @@ void SaveModelHolder(FILE* fp, ModelHolder* pmh)
 {
 	Model* m = &g_model[pmh->model];
 
-	string relative = MakePathRelative(m->m_fullpath.c_str());
+	std::string relative = MakePathRelative(m->m_fullpath.c_str());
 	int nrelative = relative.size() + 1;
 
 	fwrite(&nrelative, sizeof(int), 1, fp);
@@ -416,7 +416,7 @@ void ReadModelHolder(FILE* fp, ModelHolder* pmh)
 	fread(&pmh->scale, sizeof(Vec3f), 1, fp);
 }
 
-void SaveModelHolders(FILE* fp, list<ModelHolder>& modelholders)
+void SaveModelHolders(FILE* fp, std::list<ModelHolder>& modelholders)
 {
 	int nmh = modelholders.size();
 
@@ -428,7 +428,7 @@ void SaveModelHolders(FILE* fp, list<ModelHolder>& modelholders)
 	}
 }
 
-void ReadModelHolders(FILE* fp, list<ModelHolder>& modelholders)
+void ReadModelHolders(FILE* fp, std::list<ModelHolder>& modelholders)
 {
 	int nmh = 0;
 
@@ -471,8 +471,8 @@ void ScaleAll(float factor)
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
-		list<float> oldus;
-		list<float> oldvs;
+		std::list<float> oldus;
+		std::list<float> oldvs;
 
 		for(int i=0; i<b->m_nsides; i++)
 		{
@@ -550,8 +550,8 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	}
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 1"<<endl;
-	g_log.flush();
+	g_applog<<"load map 1"<<std::endl;
+	g_applog.flush();
 #endif
 
 	TexRef* texrefs = NULL;
@@ -574,15 +574,15 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	}
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 2"<<endl;
-	g_log.flush();
+	g_applog<<"load map 2"<<std::endl;
+	g_applog.flush();
 #endif
 
 	fclose(fp);
 
 #ifdef LOADMAP_DEBUG
-	g_log<<"load map 3"<<endl;
-	g_log.flush();
+	g_applog<<"load map 3"<<std::endl;
+	g_applog.flush();
 #endif
 
 	//ScaleAll(1.75f);

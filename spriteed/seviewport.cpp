@@ -371,8 +371,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	LastNum(__FILE__, __LINE__);
 #endif
 	//EndS();
-	//g_log<<"sh at t p:"<<g_curS<<endl;
-	//g_log.flush();
+	//g_applog<<"sh at t p:"<<g_curS<<std::endl;
+	//g_applog.flush();
 
 #if 1
 	if(v->m_type == VIEWPORT_FRONT || v->m_type == VIEWPORT_LEFT || v->m_type == VIEWPORT_TOP)
@@ -390,22 +390,22 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		for(int i=0; i<16; i+=4)
 		{
 			float* m = projection.m_matrix;
-			g_log<<"pr"<<endl;
-			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+			g_applog<<"pr"<<std::endl;
+			g_applog<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<std::endl;
 		}
 
 		for(int i=0; i<16; i+=4)
 		{
 			float* m = viewmat.m_matrix;
-			g_log<<"vm"<<endl;
-			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+			g_applog<<"vm"<<std::endl;
+			g_applog<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<std::endl;
 		}
 
 		for(int i=0; i<16; i+=4)
 		{
 			float* m = modelmat.m_matrix;
-			g_log<<"mm"<<endl;
-			g_log<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<endl;
+			g_applog<<"mm"<<std::endl;
+			g_applog<<"\t"<<m[i+0]<<","<<m[i+1]<<","<<m[i+2]<<","<<m[i+3]<<std::endl;
 		}
 #endif
 
@@ -535,10 +535,10 @@ void DrawViewport(int which, int x, int y, int width, int height)
 			//CheckGLError(__FILE__, __LINE__);
 			CheckGLError(__FILE__, __LINE__);
 #endif
-			//g_log<<"cut draw "<<v->m_lastmouse.x<<","<<v->m_lastmouse.y<<"->"<<v->m_curmouse.x<<","<<v->m_curmouse.y<<endl;
-			//g_log<<"cut draw2 "<<last4.x<<","<<last4.y<<"->"<<cur4.x<<","<<cur4.y<<endl;
-			//g_log<<"cut draw3 "<<last.x<<","<<last.y<<","<<last.z<<"->"<<cur.x<<","<<cur.y<<","<<cur.z<<endl;
-			//g_log.flush();
+			//g_applog<<"cut draw "<<v->m_lastmouse.x<<","<<v->m_lastmouse.y<<"->"<<v->m_curmouse.x<<","<<v->m_curmouse.y<<std::endl;
+			//g_applog<<"cut draw2 "<<last4.x<<","<<last4.y<<"->"<<cur4.x<<","<<cur4.y<<std::endl;
+			//g_applog<<"cut draw3 "<<last.x<<","<<last.y<<","<<last.z<<"->"<<cur.x<<","<<cur.y<<","<<cur.z<<std::endl;
+			//g_applog.flush();
 			EndS();
 		}
 #ifdef GLDEBUG
@@ -605,8 +605,8 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 
 	ViewportT* t = &g_viewportT[v->m_type];
 
-	//g_log<<"vp["<<which<<"] l down"<<endl;
-	//g_log.flush();
+	//g_applog<<"vp["<<which<<"] l down"<<std::endl;
+	//g_applog.flush();
 
 	float aspect = fabsf((float)width / (float)height);
 	Matrix projection;
@@ -827,8 +827,8 @@ void ViewportLUp_Explosion(int which, int relx, int rely, int width, int height)
 	Vec3f vmax = g_camera.m_view + Vec3f(extentx, extenty, extentx);
 
 	Vec3f line[2];
-	//g_log<<"==========="<<endl;
-	//g_log<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<endl;
+	//g_applog<<"==========="<<std::endl;
+	//g_applog<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<std::endl;
 	line[0] = OnNear(relx, rely, width, height, posvec, sidevec, up2vec);
 	line[1] = line[0] - t->m_offset*2.0f;
 
@@ -889,10 +889,10 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 	//Vec3f sidevec = Normalize(Cross(viewvec, upvec));
 	Vec3f sidevec = v->strafe();
 
-	//g_log<<"viewvec "<<viewvec.x<<","<<viewvec.y<<","<<viewvec.z<<endl;
-	//g_log<<"upvec "<<upvec.x<<","<<upvec.y<<","<<upvec.z<<endl;
-	//g_log<<"sidevec "<<sidevec.x<<","<<sidevec.y<<","<<sidevec.z<<endl;
-	//g_log.flush();
+	//g_applog<<"viewvec "<<viewvec.x<<","<<viewvec.y<<","<<viewvec.z<<std::endl;
+	//g_applog<<"upvec "<<upvec.x<<","<<upvec.y<<","<<upvec.z<<std::endl;
+	//g_applog<<"sidevec "<<sidevec.x<<","<<sidevec.y<<","<<sidevec.z<<std::endl;
+	//g_applog.flush();
 
 #if 0
 	// pass frustum to SelectBrush to cull possible selection?
@@ -904,8 +904,8 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 #endif
 
 	Vec3f line[2];
-	//g_log<<"==========="<<endl;
-	//g_log<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<endl;
+	//g_applog<<"==========="<<std::endl;
+	//g_applog<<"t->m_offset = "<<t->m_offset.x<<","<<t->m_offset.y<<","<<t->m_offset.z<<std::endl;
 	line[0] = OnNear(relx, rely, width, height, posvec, sidevec, up2vec);
 	line[1] = line[0] - t->m_offset*2.0f;
 
@@ -921,7 +921,7 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 	}
 
 	SelectBrush(&g_edmap, line, vmin, vmax);
-	//g_log<<"============"<<endl;
+	//g_applog<<"============"<<std::endl;
 }
 
 bool ViewportLUp(int which, int relx, int rely, int width, int height)
@@ -941,8 +941,8 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 			//LinkLatestUndo();
 		}
 
-		//g_log<<"vp["<<which<<"] l up = false"<<endl;
-		//g_log.flush();
+		//g_applog<<"vp["<<which<<"] l up = false"<<std::endl;
+		//g_applog.flush();
 
 		if(!g_keys[SDL_SCANCODE_LCTRL] && !g_keys[SDL_SCANCODE_RCTRL])
 		{
@@ -1042,8 +1042,8 @@ void ViewportRotate(int which, int dx, int dy)
 	g_camera.rotateabout(g_camera.m_view, dy / 100.0f, g_camera.m_strafe.x, g_camera.m_strafe.y, g_camera.m_strafe.z);
 	g_camera.rotateabout(g_camera.m_view, dx / 100.0f, g_camera.m_up.x, g_camera.m_up.y, g_camera.m_up.z);
 
-	//g_log<<"rotate "<<dx/10.0f<<","<<dy/10.0f<<endl;
-	//g_log.flush();
+	//g_applog<<"rotate "<<dx/10.0f<<","<<dy/10.0f<<std::endl;
+	//g_applog.flush();
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 }
@@ -1102,10 +1102,10 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, newv);
 
 #ifdef DRAGV_DEBUG
-		g_log<<"crossaxis = "<<crossaxis.x<<","<<crossaxis.y<<","<<crossaxis.z<<endl;
-		//g_log<<"midv = "<<midv.x<<","<<midv.y<<","<<midv.z<<endl;
-		//g_log<<"crossaxis2 = "<<crossaxis2.x<<","<<crossaxis2.y<<","<<crossaxis2.z<<endl;
-		g_log.flush();
+		g_applog<<"crossaxis = "<<crossaxis.x<<","<<crossaxis.y<<","<<crossaxis.z<<std::endl;
+		//g_applog<<"midv = "<<midv.x<<","<<midv.y<<","<<midv.z<<std::endl;
+		//g_applog<<"crossaxis2 = "<<crossaxis2.x<<","<<crossaxis2.y<<","<<crossaxis2.z<<std::endl;
+		g_applog.flush();
 #endif
 	}
 	else
@@ -1114,8 +1114,8 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		Vec3f farthestv[] = {movev, movev};
 
 #ifdef DRAGV_DEBUG
-		g_log<<"--------------move v side"<<(s-b->m_sides)<<"------------------"<<endl;
-		g_log.flush();
+		g_applog<<"--------------move v side"<<(s-b->m_sides)<<"------------------"<<std::endl;
+		g_applog.flush();
 #endif
 
 		for(int i=0; i<s->m_ntris+2; i++)
@@ -1140,16 +1140,16 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 				continue;
 
 #ifdef DRAGV_DEBUG
-			g_log<<"thisv="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
-			g_log<<"nearestd[0]="<<nearestd[0]<<endl;
-			g_log.flush();
+			g_applog<<"thisv="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<std::endl;
+			g_applog<<"nearestd[0]="<<nearestd[0]<<std::endl;
+			g_applog.flush();
 #endif
 
 			if(mag >= farthestd[0] || farthestd[0] <= 0)
 			{
 #ifdef DRAGV_DEBUG
-				g_log<<"closer vert0="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
-				g_log.flush();
+				g_applog<<"closer vert0="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<std::endl;
+				g_applog.flush();
 #endif
 
 				farthestd[0] = mag;
@@ -1182,16 +1182,16 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 				continue;
 
 #ifdef DRAGV_DEBUG
-			g_log<<"thisv="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
-			g_log<<"nearestd[]="<<nearestd[1]<<endl;
-			g_log.flush();
+			g_applog<<"thisv="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<std::endl;
+			g_applog<<"nearestd[]="<<nearestd[1]<<std::endl;
+			g_applog.flush();
 #endif
 
 			if(mag >= farthestd[1] || farthestd[1] <= 0)
 			{
 #ifdef DRAGV_DEBUG
-				g_log<<"closer vert1="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
-				g_log.flush();
+				g_applog<<"closer vert1="<<thisv.x<<","<<thisv.y<<","<<thisv.z<<std::endl;
+				g_applog.flush();
 #endif
 
 				farthestd[1] = mag;
@@ -1213,13 +1213,13 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 
 		Vec3f norm = Normal(tri);
 
-		//g_log<<"tri = ("<<tri[0].x<<","<<tri[0].y<<","<<tri[0].z<<"),("<<tri[1].x<<","<<tri[1].y<<","<<tri[1].z<<"),("<<tri[2].x<<","<<tri[2].y<<","<<tri[2].z<<")"<<endl;
-		//g_log<<"tri norm="<<norm.x<<","<<norm.y<<","<<norm.z<<"    plane norm="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<endl;
+		//g_applog<<"tri = ("<<tri[0].x<<","<<tri[0].y<<","<<tri[0].z<<"),("<<tri[1].x<<","<<tri[1].y<<","<<tri[1].z<<"),("<<tri[2].x<<","<<tri[2].y<<","<<tri[2].z<<")"<<std::endl;
+		//g_applog<<"tri norm="<<norm.x<<","<<norm.y<<","<<norm.z<<"    plane norm="<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<std::endl;
 
 		if(Magnitude( norm - s->m_plane.m_normal ) > Magnitude( Vec3f(0,0,0) - norm - s->m_plane.m_normal ))
 		{
-			//g_log<<"flip vertex order YES"<<endl;
-			//g_log.flush();
+			//g_applog<<"flip vertex order YES"<<std::endl;
+			//g_applog.flush();
 			Vec3f tempv = farthestv[0];
 			farthestv[0] = farthestv[1];
 			farthestv[1] = tempv;
@@ -1227,8 +1227,8 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		else
 		{
 #ifdef DRAGV_DEBUG
-			g_log<<"flip vertex order NO"<<endl;
-			g_log.flush();
+			g_applog<<"flip vertex order NO"<<std::endl;
+			g_applog.flush();
 #endif
 		}
 
@@ -1245,10 +1245,10 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 		s->m_plane.m_d = PlaneDistance(s->m_plane.m_normal, newv);
 
 #ifdef DRAGV_DEBUG
-		g_log<<"crossaxis = "<<crossaxis.x<<","<<crossaxis.y<<","<<crossaxis.z<<endl;
-		g_log<<"midv = "<<midv.x<<","<<midv.y<<","<<midv.z<<endl;
-		g_log<<"crossaxis2 = "<<crossaxis2.x<<","<<crossaxis2.y<<","<<crossaxis2.z<<endl;
-		g_log.flush();
+		g_applog<<"crossaxis = "<<crossaxis.x<<","<<crossaxis.y<<","<<crossaxis.z<<std::endl;
+		g_applog<<"midv = "<<midv.x<<","<<midv.y<<","<<midv.z<<std::endl;
+		g_applog<<"crossaxis2 = "<<crossaxis2.x<<","<<crossaxis2.y<<","<<crossaxis2.z<<std::endl;
+		g_applog.flush();
 #endif
 	}
 }
@@ -1469,10 +1469,10 @@ void Drag(int which, int dx, int dy, int width, int height)
 	newmove.z = Snap(g_snapgrid, move.z + accum.z);
 	accum = accum + move - newmove;
 
-	//g_log<<"move = "<<move.x<<","<<move.y<<","<<move.z<<endl;
-	//g_log<<"newmove = "<<newmove.x<<","<<newmove.y<<","<<newmove.z<<endl;
-	//g_log<<"accum = "<<accum.x<<","<<accum.y<<","<<accum.z<<endl;
-	//g_log.flush();
+	//g_applog<<"move = "<<move.x<<","<<move.y<<","<<move.z<<std::endl;
+	//g_applog<<"newmove = "<<newmove.x<<","<<newmove.y<<","<<newmove.z<<std::endl;
+	//g_applog<<"accum = "<<accum.x<<","<<accum.y<<","<<accum.z<<std::endl;
+	//g_applog.flush();
 
 	if(newmove != Vec3f(0,0,0))
 		g_changed = true;
@@ -1524,8 +1524,8 @@ bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 
 	if(v->m_ldown)
 	{
-		//g_log<<"vp["<<which<<"] down mouse move l"<<endl;
-		//g_log.flush();
+		//g_applog<<"vp["<<which<<"] down mouse move l"<<std::endl;
+		//g_applog.flush();
 
 		if(g_sel1b || g_sel1m)
 		{

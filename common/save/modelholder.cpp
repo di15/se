@@ -10,7 +10,7 @@
 #include "../utils.h"
 #include "../debug.h"
 
-list<ModelHolder> g_modelholder;
+std::list<ModelHolder> g_modelholder;
 
 ModelHolder::ModelHolder()
 {
@@ -145,9 +145,9 @@ void ModelHolder::regennormals()
 	Model* m = &g_model[model];
 	MS3DModel* ms3d = &m->m_ms3d;
 
-	vector<Vec3f>* normalweights;
+	std::vector<Vec3f>* normalweights;
 
-	normalweights = new vector<Vec3f>[ms3d->m_numVertices];
+	normalweights = new std::vector<Vec3f>[ms3d->m_numVertices];
 
 	for(int f = 0; f < nframes; f++)
 	{
@@ -257,7 +257,7 @@ Vec3f ModelHolder::traceray(Vec3f line[])
 #if 0
 	for(int i=0; i<6; i++)
 	{
-		g_log<<"mh pl ("<<planenorms[i].x<<","<<planenorms[i].y<<","<<planenorms[i].z<<"),"<<planedists[i]<<endl;
+		g_applog<<"mh pl ("<<planenorms[i].x<<","<<planenorms[i].y<<","<<planenorms[i].z<<"),"<<planedists[i]<<std::endl;
 	}
 #endif
 

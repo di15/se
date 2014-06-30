@@ -68,15 +68,15 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	CloseSideView();
 	//CloseView("brush edit");
 
-	//g_log<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<endl;
+	//g_applog<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<std::endl;
 	Brush* hitB = NULL;
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
 		Vec3f trace = b->traceray(line);
-		if(trace != line[1] && trace.y <= g_maxelev 
+		if(trace != line[1] && trace.y <= g_maxelev
 #if 1
-			&& 
+			&&
 			trace.x >= vmin.x && trace.x <= vmax.x &&
 			trace.y >= vmin.y && trace.y <= vmax.y &&
 			trace.z >= vmin.z && trace.z <= vmax.z
@@ -146,10 +146,10 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			Vec3f pop = PointOnPlane(*ep);
 			list<Brush> nextoutfrags;
 			list<Brush> nextinfrags;
-			
+
 			BrushSide news0(ep->m_normal, pop);
 			BrushSide news1(Vec3f(0,0,0)-ep->m_normal, pop);
-			
+
 			for(auto fragb=infrags.begin(); fragb!=infrags.end(); fragb++)
 			{
 				if(!BrushInCrater(&*fragb, crater))
@@ -169,7 +169,7 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 					if(PruneB(map, &*j))
 						nextinfrags.erase(--(j.base()));
 				}
-				
+
 				if(!PruneB2(&*fragb, &news1.m_plane))
 				{
 					Brush newfrag1 = *fragb;
@@ -202,7 +202,7 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 					if(PruneB(map, &*j))
 						nextoutfrags.erase(--(j.base()));
 				}
-				
+
 				if(!PruneB2(&*fragb, &news1.m_plane))
 				{
 					Brush newfrag1 = *fragb;
@@ -215,7 +215,7 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 						nextoutfrags.erase(--(j.base()));
 				}
 			}
-			
+
 			infrags = nextinfrags;
 			outfrags = nextoutfrags;
 		}

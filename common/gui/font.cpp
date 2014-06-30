@@ -153,7 +153,7 @@ void AdvanceGlyph()
     Font* f = &g_font[font];
     Glyph* g = &f->glyph[str[i]];
 
-	//g_log<<"Adv Glyph: "<<(char)str[i]<<endl;
+	//g_applog<<"Adv Glyph: "<<(char)str[i]<<std::endl;
 
     x += g->origsize[0];
 }
@@ -256,7 +256,7 @@ void LoadFont(int id, const char* fontname)
     FILE* fp = fopen(fullfontpath, "rb");
     if(!fp)
     {
-        g_log<<"Error loading font "<<fontfile<<endl;
+        g_applog<<"Error loading font "<<fontfile<<std::endl;
         return;
     }
 
@@ -310,7 +310,7 @@ void LoadFont(int id, const char* fontname)
 	f->gheight = f->glyph['A'].origsize[1];
 
     delete [] file;
-    g_log<<fontfile<<".fnt"<<endl;
+    g_applog<<fontfile<<".fnt"<<std::endl;
 }
 
 void DrawGlyph(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
@@ -327,7 +327,7 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
         left, top,0,          texleft, textop
     };
 
-	//g_log<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<endl;
+	//g_applog<<"draw glyph: "<<texleft<<","<<textop<<","<<texright<<","<<texbottom<<std::endl;
 
     //glVertexAttribPointer(g_slots[SHADER_ORTHO][POSITION], 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[0]);
     //glVertexAttribPointer(g_slots[SHADER_ORTHO][TEXCOORD], 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, &vertices[3]);
@@ -525,7 +525,7 @@ void DrawLine(int fnt, float startx, float starty, const char* text, const float
 
 void DrawShadowedText(int fnt, float startx, float starty, const char* text, const float* color, int caret)
 {
-	//g_log<<"text dst: "<<text<<endl;
+	//g_applog<<"text dst: "<<text<<std::endl;
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
@@ -779,6 +779,115 @@ void DrawBoxShadText(int fnt, float startx, float starty, float width, float hei
 	}
 }
 
+void DrawBoxShadTextF(int fnt, float startx, float starty, float width, float height, const char* text, const float* color, int ln, int caret, float framex1, float framey1, float framex2, float framey2)
+{
+	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0, 0, 0, 1);
+	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.3f, 0.3f, 0.3f, color ? color[3] : 1);
+#if 0
+	currcolor[0] = 0.3f;
+	currcolor[1] = 0.3f;
+	currcolor[2] = 0.3f;
+	currcolor[3] = color != NULL ? color[3] : 1;
+#endif
+
+	StartTextF(text, fnt, width, height, ln, startx, framex1, framey1, framex2, framey2);
+	UseFontTex();
+	TextLayer(startx+1, starty);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	TextLayer(startx, starty+1);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	TextLayer(startx+1, starty+1);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+
+	if(color == NULL)
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
+		//for(int c=0; c<4; c++) currcolor[c] = 1;
+	}
+	else
+	{
+		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], color[0], color[1], color[2], color[3]);
+		//for(int c=0; c<4; c++) currcolor[c] = color[c];
+	}
+
+	TextLayer(startx, starty);
+	if(caret == 0)
+		DrawCaretF();
+	for(; i<size; i++)
+	{
+		if(i == nextlb)
+			NextLineBreak();
+
+		if(caret == i)
+			DrawCaretF();
+
+		DrawGlyphF();
+		AdvanceGlyph();
+	}
+	if(caret == size)
+	{
+		//if(g_str[size-1] == '\n')
+		//	BreakLine();
+		DrawCaretF();
+	}
+}
+
 int CountLines(const char* text, int fnt, float startx, float starty, float width, float height)
 {
 	StartText(text, fnt, width, height, 0, startx);
@@ -802,12 +911,12 @@ int EndX(const char* text, int lastc, int fnt, float startx, float starty)
 	StartText(text, fnt, g_currw*100, g_currh*100, 0, startx);
 	TextLayer(startx, starty);
 
-	//g_log<<"size = "<<size<<endl;
-	//g_log<<"lastc = "<<lastc<<endl;
+	//g_applog<<"size = "<<size<<std::endl;
+	//g_applog<<"lastc = "<<lastc<<std::endl;
 
     for(i=0; i<size && i<lastc; i++)
     {
-		//g_log<<"str[i] = "<<str[i]<<endl;
+		//g_applog<<"str[i] = "<<str[i]<<std::endl;
 		AdvanceGlyph();
     }
 

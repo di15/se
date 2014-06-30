@@ -41,6 +41,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <dirent.h>
+#include <gtk/gtk.h>
 #endif
 
 
@@ -119,6 +120,9 @@
 #ifndef MAX_PATH
 #define MAX_PATH 260
 #endif
+
+#define DIRENT_FILE		0x8
+#define DIRENT_FOLDER	0x4
 
 #ifndef PLATFORM_WIN
 #define SOCKET int

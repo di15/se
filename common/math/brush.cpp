@@ -1,64 +1,64 @@
 
 /*
 
-Convex hulls or "brushes" are how first person shooters that derive from 
-Quake/Doom define geometry for use in collision detection and response. 
-Using a set of planes, 6 for all sides of a cube, we can define any convex 
-shape. This simplifies collision detection against axis-aligned bounding boxes 
-and spheres because all we have to do is check each plane/side of the brush 
-against the farthest and nearest point of the AA box or sphere, and check if 
-both points are on both sides of the plane or inside. If there's a point on 
-the inside side of each plane there's an overlap with the sphere or AA box 
+Convex hulls or "brushes" are how first person shooters that derive from
+Quake/Doom define geometry for use in collision detection and response.
+Using a set of planes, 6 for all sides of a cube, we can define any convex
+shape. This simplifies collision detection against axis-aligned bounding boxes
+and spheres because all we have to do is check each plane/side of the brush
+against the farthest and nearest point of the AA box or sphere, and check if
+both points are on both sides of the plane or inside. If there's a point on
+the inside side of each plane there's an overlap with the sphere or AA box
 and its not hard to get the exact distance we have to move to just be touching
 the surface using the dot product.
 
-To be drawn, brushes must be broken down into triangles. To do this I loop 
-through each plane/side of the brush "i". And for each side "i" I get another, 
-different side "j". I get the line intersection between them. This is the code 
+To be drawn, brushes must be broken down into triangles. To do this I loop
+through each plane/side of the brush "i". And for each side "i" I get another,
+different side "j". I get the line intersection between them. This is the code
 I used.
 
 http://devmaster.net/forums/topic/8676-2-plane-intersection/
 
-Then we need another side (each is a different side) "k" that I then get the 
-point intersection of the line with, and another side "l" that I get another point 
-intersection with. I use a for-loop to go through all the sides and for "l" I 
-started counting at "k+1" so we don't get any repeats (this becomes important 
-later when building a polygon for the brush side). The two point intersections 
-form a side edge for a polygon for the brush side. I store it in an array of STL 
-lists of lines. Each brush side has a list of lines. I store the line for side "i" 
+Then we need another side (each is a different side) "k" that I then get the
+point intersection of the line with, and another side "l" that I get another point
+intersection with. I use a for-loop to go through all the sides and for "l" I
+started counting at "k+1" so we don't get any repeats (this becomes important
+later when building a polygon for the brush side). The two point intersections
+form a side edge for a polygon for the brush side. I store it in an array of STL
+lists of lines. Each brush side has a list of lines. I store the line for side "i"
 because that is the brush side that the side edge belongs to and is along.
 
-Then I loop the side edges for each brush side, making a "polygon" - basically an 
-outline, with a point for each vertex. I use an epsilon value to check if two points 
-are within a certain distance, and use the side edge's other vertex as the next point 
-to check for proximity, starting over from the first side edge and making sure to 
+Then I loop the side edges for each brush side, making a "polygon" - basically an
+outline, with a point for each vertex. I use an epsilon value to check if two points
+are within a certain distance, and use the side edge's other vertex as the next point
+to check for proximity, starting over from the first side edge and making sure to
 exclude checking the last connecting edge.
 
-Then I check the polygon to be clockwise order (because that is how I cull my 
-polygons) by checking the normal of a triangle formed by the first three vertices 
-of the polygon and checking if its closer to the plane normal or if the opposite 
+Then I check the polygon to be clockwise order (because that is how I cull my
+polygons) by checking the normal of a triangle formed by the first three vertices
+of the polygon and checking if its closer to the plane normal or if the opposite
 normal is closer. If the opposite is closer I reverse the list of vertices.
 
-Oh before I make the polygon I discard any side edges with at least one point that 
-is not inside or on any one plane of the brush. This is necessary to cull away 
-bounding planes that are outside the brush, resulting from moving the other planes. 
-Later I remove these planes that have less than 3 side edges, the minimum to form 
+Oh before I make the polygon I discard any side edges with at least one point that
+is not inside or on any one plane of the brush. This is necessary to cull away
+bounding planes that are outside the brush, resulting from moving the other planes.
+Later I remove these planes that have less than 3 side edges, the minimum to form
 a triangle.
 
-Next I allocate (v-2) triangles where "v" is the number of vertices in the side's 
+Next I allocate (v-2) triangles where "v" is the number of vertices in the side's
 polygon. I construct the triangles in a fan pattern.
 
-There's probably some improvements that can be made like storing shared edges and 
-not having to reconnect them by checking distance, which I will probably learn as 
+There's probably some improvements that can be made like storing shared edges and
+not having to reconnect them by checking distance, which I will probably learn as
 I follow in the footsteps of q3map and other Quake/Doom games' source code.
 
-[edit2] By "nearest point to the plane" I mean nearest to the "inside" side of the 
-plane, according to the normal. For an AA box we just check the signedness of each 
-axis of the normal and use the min or max on each axis to get the innermost or 
+[edit2] By "nearest point to the plane" I mean nearest to the "inside" side of the
+plane, according to the normal. For an AA box we just check the signedness of each
+axis of the normal and use the min or max on each axis to get the innermost or
 outermost point of the 8 points of the AA box.
 
-[edit3] And actually, the farthest point has to be the one from before the AA box 
-moved and the "nearest" point has to be from the moved position. 
+[edit3] And actually, the farthest point has to be the one from before the AA box
+moved and the "nearest" point has to be from the moved position.
 
  */
 
@@ -80,8 +80,8 @@ Brush& Brush::operator=(const Brush& original)
 	BrushSide* m_sides;
 	*/
 
-	//g_log<<"copy edbrush nsides="<<original.m_nsides<<endl;
-	//g_log.flush();
+	//g_applog<<"copy edbrush nsides="<<original.m_nsides<<std::endl;
+	//g_applog.flush();
 
 	if(m_sides)
 	{
@@ -105,7 +105,7 @@ Brush& Brush::operator=(const Brush& original)
 		m_sharedv[i] = original.m_sharedv[i];
 
 	m_texture = original.m_texture;
-	
+
 	if(m_door)
 	{
 		delete m_door;
@@ -147,7 +147,7 @@ Brush::Brush()
 Brush::~Brush()
 {
 #if 0
-	g_log<<"~Brush"<<endl;
+	g_applog<<"~Brush"<<std::endl;
 #endif
 
 	if(m_sides)
@@ -194,15 +194,15 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 		if(g_debugb == this)
 		{
-			g_log<<"side "<<i<<endl;
-			g_log<<"startD="<<startD<<", endD="<<endD<<endl;
-			g_log.flush();
+			g_applog<<"side "<<i<<std::endl;
+			g_applog<<"startD="<<startD<<", endD="<<endD<<std::endl;
+			g_applog.flush();
 		}
 
 		if(g_debugb == this)
 		{
-			g_log<<"traceray plane=("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<"d="<<s->m_plane.m_d<<") startD="<<startD<<" endD="<<endD<<endl;
-			g_log.flush();
+			g_applog<<"traceray plane=("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<"d="<<s->m_plane.m_d<<") startD="<<startD<<" endD="<<endD<<std::endl;
+			g_applog.flush();
 		}
 #endif
 
@@ -211,8 +211,8 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"startD > 0 && endD > 0"<<endl;
-				g_log.flush();
+				g_applog<<"startD > 0 && endD > 0"<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
@@ -224,8 +224,8 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"startD <= 0 && endD <= 0"<<endl;
-				g_log.flush();
+				g_applog<<"startD <= 0 && endD <= 0"<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
@@ -237,31 +237,31 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"startD > endD"<<endl;
-				g_log.flush();
+				g_applog<<"startD > endD"<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
 			// This gets a ratio from our starting point to the approximate collision spot
 			float ratio1 = (startD - EPSILON) / (startD - endD);
-			
+
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"ratio1 ="<<ratio1<<endl;
-				g_log.flush();
+				g_applog<<"ratio1 ="<<ratio1<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
 			if(ratio1 > startRatio)
 			{
 				startRatio = ratio1;
-				
+
 #ifdef SELECT_DEBUG
 				if(g_debugb == this)
 				{
-					g_log<<"ratio1 > startRatio == "<<startRatio<<endl;
-					g_log.flush();
+					g_applog<<"ratio1 > startRatio == "<<startRatio<<std::endl;
+					g_applog.flush();
 				}
 #endif
 			}
@@ -271,30 +271,30 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"else startD <= endD"<<endl;
-				g_log.flush();
+				g_applog<<"else startD <= endD"<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
 			float ratio = (startD + EPSILON) / (startD - endD);
-			
+
 #ifdef SELECT_DEBUG
 			if(g_debugb == this)
 			{
-				g_log<<"ratio ="<<ratio<<endl;
-				g_log.flush();
+				g_applog<<"ratio ="<<ratio<<std::endl;
+				g_applog.flush();
 			}
 #endif
 
 			if(ratio < endRatio)
 			{
 				endRatio = ratio;
-				
+
 #ifdef SELECT_DEBUG
 				if(g_debugb == this)
 				{
-					g_log<<"ratio < endRatio == "<<endRatio<<endl;
-					g_log.flush();
+					g_applog<<"ratio < endRatio == "<<endRatio<<std::endl;
+					g_applog.flush();
 				}
 #endif
 			}
@@ -306,8 +306,8 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 		if(g_debugb == this)
 		{
-			g_log<<"startRatio ("<<startRatio<<") < endRatio ("<<endRatio<<")"<<endl;
-			g_log.flush();
+			g_applog<<"startRatio ("<<startRatio<<") < endRatio ("<<endRatio<<")"<<std::endl;
+			g_applog.flush();
 		}
 #endif
 
@@ -316,14 +316,14 @@ Vec3f Brush::traceray(Vec3f line[])
 #ifdef SELECT_DEBUG
 				if(g_debugb == this)
 				{
-					g_log<<"startRatio > -1"<<endl;
-					g_log.flush();
+					g_applog<<"startRatio > -1"<<std::endl;
+					g_applog.flush();
 				}
 #endif
 
 			if(startRatio < 0)
 				startRatio = 0;
-			
+
 #ifdef SELECT_DEBUG
 			if(g_debugb == NULL)
 				g_debugb = this;
@@ -387,17 +387,17 @@ void Brush::moveto(Vec3f newp)
 void Brush::add(BrushSide b)
 {
 #if 0
-	g_log<<"addside before: "<<endl;
+	g_applog<<"addside before: "<<std::endl;
 	for(int vertindex = 0; vertindex < b.m_drawva.numverts; vertindex++)
 	{
 		Vec3f vert = b.m_drawva.vertices[vertindex];
-		g_log<<"\taddvert: "<<vert.x<<","<<vert.y<<","<<vert.z<<endl;
+		g_applog<<"\taddvert: "<<vert.x<<","<<vert.y<<","<<vert.z<<std::endl;
 	}
 #endif
 
 	BrushSide* newsides = new BrushSide[m_nsides + 1];
 	if(!newsides) OutOfMem(__FILE__, __LINE__);
-	
+
 	if(m_nsides > 0)
 	{
 		//memcpy(newsides, m_sides, sizeof(BrushSide)*m_nsides);
@@ -405,17 +405,17 @@ void Brush::add(BrushSide b)
 			newsides[i] = m_sides[i];
 		delete [] m_sides;
 	}
-	
+
 	newsides[m_nsides] = b;
 	m_sides = newsides;
 	m_nsides ++;
-	
+
 #if 0
-	g_log<<"addside after: "<<endl;
+	g_applog<<"addside after: "<<std::endl;
 	for(int vertindex = 0; vertindex < b.m_drawva.numverts; vertindex++)
 	{
 		Vec3f vert = b.m_drawva.vertices[vertindex];
-		g_log<<"\taddvert: "<<vert.x<<","<<vert.y<<","<<vert.z<<endl;
+		g_applog<<"\taddvert: "<<vert.x<<","<<vert.y<<","<<vert.z<<std::endl;
 	}
 #endif
 }
@@ -469,8 +469,8 @@ void Brush::removeside(int i)
 	m_sides = newsides;
 
 #ifdef REMOVESIDE_DEBUG
-	g_log<<"remove "<<i<<endl;
-	g_log.flush();
+	g_applog<<"remove "<<i<<std::endl;
+	g_applog.flush();
 #endif
 }
 
@@ -482,15 +482,15 @@ void Brush::collapse()
 	int oldnsharedv = m_nsharedv;
 
 #ifdef DEBUG_COLLAPSE
-	g_log<<"==================collapse this===================="<<endl;
-	g_log.flush();
-	
+	g_applog<<"==================collapse this===================="<<std::endl;
+	g_applog.flush();
+
 	for(int i=0; i<m_nsides; i++)
 	{
 		BrushSide* s = &m_sides[i];
 		Vec3f n = s->m_plane.m_normal;
 		float d = s->m_plane.m_d;
-		g_log<<"\t side["<<i<<"] plane=("<<n.x<<","<<n.y<<","<<n.z<<"),"<<d<<endl;
+		g_applog<<"\t side["<<i<<"] plane=("<<n.x<<","<<n.y<<","<<n.z<<"),"<<d<<std::endl;
 	}
 #endif
 
@@ -526,10 +526,10 @@ void Brush::collapse()
 			BrushSide* b = &m_sides[j];
 			if(Close(a->m_plane, b->m_plane))
 			{
-				
+
 #ifdef DEBUG_COLLAPSE
-				g_log<<"planes["<<i<<","<<j<<"] ("<<a->m_plane.m_normal.x<<","<<a->m_plane.m_normal.y<<","<<a->m_plane.m_normal.z<<"),"<<a->m_plane.m_d<<" and ("<<b->m_plane.m_normal.x<<","<<b->m_plane.m_normal.y<<","<<b->m_plane.m_normal.z<<"),"<<b->m_plane.m_d<<endl;
-				g_log.flush();
+				g_applog<<"planes["<<i<<","<<j<<"] ("<<a->m_plane.m_normal.x<<","<<a->m_plane.m_normal.y<<","<<a->m_plane.m_normal.z<<"),"<<a->m_plane.m_d<<" and ("<<b->m_plane.m_normal.x<<","<<b->m_plane.m_normal.y<<","<<b->m_plane.m_normal.z<<"),"<<b->m_plane.m_d<<std::endl;
+				g_applog.flush();
 #endif
 				removeside(j);
 				j--;
@@ -537,13 +537,13 @@ void Brush::collapse()
 		}
 	}
 
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag6. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag6. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
-	
-	list<Line>* sideedges = new list<Line>[m_nsides];	// a line along a plane intersecting two other planes. both vertices form the edge of a polygon.
+
+	std::list<Line>* sideedges = new std::list<Line>[m_nsides];	// a line along a plane intersecting two other planes. both vertices form the edge of a polygon.
 	if(!sideedges) OutOfMem(__FILE__, __LINE__);
 
 	for(int i=0; i<m_nsides; i++)
@@ -558,7 +558,7 @@ void Brush::collapse()
 			{
 				if(k == i || k == j)
 					continue;
-				
+
 				//for(int l=0; l<m_nsides; l++)
 				for(int l=k+1; l<m_nsides; l++)
 				{
@@ -573,21 +573,21 @@ void Brush::collapse()
 					//if(a->m_plane == b->m_plane)
 					//if(Close(a->m_plane, b->m_plane))
 					//{
-					//	g_log<<"close "<<i<<","<<j<<endl;
-					//	g_log.flush();
+					//	g_applog<<"close "<<i<<","<<j<<std::endl;
+					//	g_applog.flush();
 					//	continue;
 					//}
 
 					//if(Close(a->m_plane, c->m_plane))
 					//{
-					//	g_log<<"close "<<i<<","<<k<<endl;
-					//	g_log.flush();
+					//	g_applog<<"close "<<i<<","<<k<<std::endl;
+					//	g_applog.flush();
 					//	continue;
 					//}
-				
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"--------new side"<<i<<" edge--------"<<endl;
-					g_log.flush();
+					g_applog<<"--------new side"<<i<<" edge--------"<<std::endl;
+					g_applog.flush();
 #endif
 
 					// http://devmaster.net/forums/topic/8676-2-plane-intersection/page__view__findpost__p__47568
@@ -595,80 +595,80 @@ void Brush::collapse()
 					Vec3f pointonplanea = PointOnPlane(a->m_plane);	// arbitrary point on plane A
 					Vec3f v = Cross(linedir, a->m_plane.m_normal); // direction toward plane B, parallel to plane A
 					Vec3f l0;
-					
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"collapse ("<
-				
-					g_log<<"linedir="<<linedir.x<<","<<linedir.y<<","<<linedir.z<<endl;
-					g_log<<"pointonplanea="<<pointonplanea.x<<","<<pointonplanea.y<<","<<pointonplanea.z<<endl;
-					g_log.flush();
+					g_applog<<"collapse ("<
+
+					g_applog<<"linedir="<<linedir.x<<","<<linedir.y<<","<<linedir.z<<std::endl;
+					g_applog<<"pointonplanea="<<pointonplanea.x<<","<<pointonplanea.y<<","<<pointonplanea.z<<std::endl;
+					g_applog.flush();
 #endif
 
 					if(!Intersection(pointonplanea, v, b->m_plane, l0))
 						continue;
-					
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"l0="<<l0.x<<","<<l0.y<<","<<l0.z<<endl;
-					g_log.flush();
-					
-					g_log<<"\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 2"<<endl;
-					g_log.flush();
+					g_applog<<"l0="<<l0.x<<","<<l0.y<<","<<l0.z<<std::endl;
+					g_applog.flush();
+
+					g_applog<<"\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 2"<<std::endl;
+					g_applog.flush();
 #endif
 					Vec3f lineorigin;
 
 					if(!Intersection(l0, linedir, c->m_plane, lineorigin))
 						continue;
-					
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"\t\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 3"<<endl;
-					g_log.flush();
+					g_applog<<"\t\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 3"<<std::endl;
+					g_applog.flush();
 #endif
 					Vec3f lineend;
 
 					if(!Intersection(l0, linedir, d->m_plane, lineend))
 						continue;
-					
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"\t\t\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 4"<<endl;
-					g_log.flush();
+					g_applog<<"\t\t\tcollapse ("<<i<<","<<j<<","<<k<<","<<l<<") 4"<<std::endl;
+					g_applog.flush();
 #endif
 
 					if(Close(lineorigin, lineend))
 					//if(lineorigin == lineend)
 					{
 #ifdef DEBUG_COLLAPSE
-						g_log<<"close side["<<i<<"] newedge ("<<lineorigin.x<<","<<lineorigin.y<<","<<lineorigin.z<<")->("<<lineend.x<<","<<lineend.y<<","<<lineend.z<<")"<<endl;
+						g_applog<<"close side["<<i<<"] newedge ("<<lineorigin.x<<","<<lineorigin.y<<","<<lineorigin.z<<")->("<<lineend.x<<","<<lineend.y<<","<<lineend.z<<")"<<std::endl;
 #endif
 						continue;
 					}
 
 					Line edge(lineorigin, lineend);
 					sideedges[i].push_back(edge);
-					
+
 #ifdef DEBUG_COLLAPSE
-					g_log<<"\t\t\t\tfinal=("<<lineorigin.x<<","<<lineorigin.y<<","<<lineorigin.z<<") final=("<<lineend.x<<","<<lineend.y<<","<<lineend.z<<")"<<endl;
-					g_log.flush();
+					g_applog<<"\t\t\t\tfinal=("<<lineorigin.x<<","<<lineorigin.y<<","<<lineorigin.z<<") final=("<<lineend.x<<","<<lineend.y<<","<<lineend.z<<")"<<std::endl;
+					g_applog.flush();
 #endif
 				}
 			}
 		}
-		
+
 #ifdef DEBUG_COLLAPSE
-		g_log<<"side"<<i<<" remaining edges"<<endl;
+		g_applog<<"side"<<i<<" remaining edges"<<std::endl;
 		for(auto k=sideedges[i].begin(); k!=sideedges[i].end(); k++)
 		{
 			Line l = *k;
-			g_log<<"("<<l.m_vertex[0].x<<","<<l.m_vertex[0].y<<","<<l.m_vertex[0].z<<")->("<<l.m_vertex[1].x<<","<<l.m_vertex[1].y<<","<<l.m_vertex[1].z<<")"<<endl;
+			g_applog<<"("<<l.m_vertex[0].x<<","<<l.m_vertex[0].y<<","<<l.m_vertex[0].z<<")->("<<l.m_vertex[1].x<<","<<l.m_vertex[1].y<<","<<l.m_vertex[1].z<<")"<<std::endl;
 		}
 #endif
 	}
 
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag7. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag7. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
-			
+
 	//remove side edges that have any vertex outside (and not on) of at least one other plane
 	for(int i=0; i<m_nsides; i++)
 	{
@@ -685,8 +685,8 @@ void Brush::collapse()
 				if(!PointOnOrBehindPlane(k->m_vertex[0], s->m_plane, CLOSE_EPSILON*2) || !PointOnOrBehindPlane(k->m_vertex[1], s->m_plane, CLOSE_EPSILON*2))
 				{
 #ifdef DEBUG_COLLAPSE
-					g_log<<"-----------remove side["<<i<<"] edge ("<<k->m_vertex[0].x<<","<<k->m_vertex[0].y<<","<<k->m_vertex[0].z<<")->("<<k->m_vertex[1].x<<","<<k->m_vertex[1].y<<","<<k->m_vertex[1].z<<") out of plane["<<j<<"]=("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<"d="<<s->m_plane.m_d<<")--------------"<<endl;
-					g_log.flush();
+					g_applog<<"-----------remove side["<<i<<"] edge ("<<k->m_vertex[0].x<<","<<k->m_vertex[0].y<<","<<k->m_vertex[0].z<<")->("<<k->m_vertex[1].x<<","<<k->m_vertex[1].y<<","<<k->m_vertex[1].z<<") out of plane["<<j<<"]=("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<"d="<<s->m_plane.m_d<<")--------------"<<std::endl;
+					g_applog.flush();
 #endif
 					k = sideedges[i].erase(k);
 					continue;
@@ -697,20 +697,20 @@ void Brush::collapse()
 		}
 
 #ifdef DEBUG_COLLAPSE
-		g_log<<"side"<<i<<" 2remaining edges"<<endl;
+		g_applog<<"side"<<i<<" 2remaining edges"<<std::endl;
 		for(auto k=sideedges[i].begin(); k!=sideedges[i].end(); k++)
 		{
 			Line l = *k;
-			g_log<<"("<<l.m_vertex[0].x<<","<<l.m_vertex[0].y<<","<<l.m_vertex[0].z<<")->("<<l.m_vertex[1].x<<","<<l.m_vertex[1].y<<","<<l.m_vertex[1].z<<")"<<endl;
+			g_applog<<"("<<l.m_vertex[0].x<<","<<l.m_vertex[0].y<<","<<l.m_vertex[0].z<<")->("<<l.m_vertex[1].x<<","<<l.m_vertex[1].y<<","<<l.m_vertex[1].z<<")"<<std::endl;
 		}
 #endif
 	}
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag8. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag8. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
-	
+
 	//construct outlines of polygons from side edges
 	//Polyg* sidepolys = new Polyg[m_nsides];
 	for(int i=0; i<m_nsides; i++)
@@ -722,7 +722,7 @@ void Brush::collapse()
 			if(Close(edge->m_vertex[0], edge->m_vertex[1]))
 			{
 				//j = sideedges[i].erase(j);
-				g_log<<"close side["<<i<<"] edge ("<<edge->m_vertex[0].x<<","<<edge->m_vertex[0].y<<","<<edge->m_vertex[0].z<<")->("<<edge->m_vertex[1].x<<","<<edge->m_vertex[1].y<<","<<edge->m_vertex[1].z<<")"<<endl;
+				g_applog<<"close side["<<i<<"] edge ("<<edge->m_vertex[0].x<<","<<edge->m_vertex[0].y<<","<<edge->m_vertex[0].z<<")->("<<edge->m_vertex[1].x<<","<<edge->m_vertex[1].y<<","<<edge->m_vertex[1].z<<")"<<std::endl;
 			}
 		}
 #endif
@@ -730,17 +730,17 @@ void Brush::collapse()
 		if(sideedges[i].size() < 3)
 		{
 #ifdef DEBUG_COLLAPSE
-			g_log<<"sideedges["<<i<<"] < 3"<<endl;
-			g_log.flush();
+			g_applog<<"sideedges["<<i<<"] < 3"<<std::endl;
+			g_applog.flush();
 #endif
 			continue;
 		}
 
 		auto j=sideedges[i].begin();
 		//auto lastconnection = j;
-		set<Line*> connected;
+		std::set<Line*> connected;
 		//set<Vec3f> connectedv;
-		list<Vec3f> connectedv;
+		std::list<Vec3f> connectedv;
 		//set<Vec3f> connected;
 
 		Vec3f first = j->m_vertex[0];
@@ -755,8 +755,8 @@ void Brush::collapse()
 		for(j++; j!=sideedges[i].end(); j++)
 		{
 #ifdef DEBUG_COLLAPSE
-			g_log<<"sideedges["<<i<<"] first="<<first.x<<","<<first.y<<","<<first.z<<endl;
-			g_log.flush();
+			g_applog<<"sideedges["<<i<<"] first="<<first.x<<","<<first.y<<","<<first.z<<std::endl;
+			g_applog.flush();
 #endif
 
 			//if(j == lastconnection)
@@ -766,32 +766,32 @@ void Brush::collapse()
 				continue;
 
 			int whichclose = -1;
-			
+
 #ifdef DEBUG_COLLAPSE
-			g_log<<"\tclose? "<<j->m_vertex[0].x<<","<<j->m_vertex[0].y<<","<<j->m_vertex[0].z<<" == "<<curr.x<<","<<curr.y<<","<<curr.z<<endl;
-			g_log.flush();
+			g_applog<<"\tclose? "<<j->m_vertex[0].x<<","<<j->m_vertex[0].y<<","<<j->m_vertex[0].z<<" == "<<curr.x<<","<<curr.y<<","<<curr.z<<std::endl;
+			g_applog.flush();
 #endif
 
 			if(Close(j->m_vertex[0], curr))
 			{
 #ifdef DEBUG_COLLAPSE
-				g_log<<"\t\tyes"<<endl;
-				g_log.flush();
+				g_applog<<"\t\tyes"<<std::endl;
+				g_applog.flush();
 #endif
 				whichclose = 0;
 				goto foundnext;
 			}
-			
+
 #ifdef DEBUG_COLLAPSE
-			g_log<<"\tclose? "<<j->m_vertex[1].x<<","<<j->m_vertex[1].y<<","<<j->m_vertex[1].z<<" == "<<curr.x<<","<<curr.y<<","<<curr.z<<endl;
-			g_log.flush();
+			g_applog<<"\tclose? "<<j->m_vertex[1].x<<","<<j->m_vertex[1].y<<","<<j->m_vertex[1].z<<" == "<<curr.x<<","<<curr.y<<","<<curr.z<<std::endl;
+			g_applog.flush();
 #endif
 
 			if(Close(j->m_vertex[1], curr))
 			{
 #ifdef DEBUG_COLLAPSE
-				g_log<<"\t\tyes"<<endl;
-				g_log.flush();
+				g_applog<<"\t\tyes"<<std::endl;
+				g_applog.flush();
 #endif
 				whichclose = 1;
 				goto foundnext;
@@ -820,17 +820,17 @@ void Brush::collapse()
 				if(found)
 				{
 #ifdef DEBUG_COLLAPSE
-					g_log<<"\t\t found"<<endl;
+					g_applog<<"\t\t found"<<std::endl;
 #endif
 					if(Close(next, first))
 					{
 #ifdef DEBUG_COLLAPSE
-						g_log<<"\t\t\t next close to first"<<endl;
+						g_applog<<"\t\t\t next close to first"<<std::endl;
 #endif
 						if(s->m_outline.m_edv.size() < 2)
 						{
 #ifdef DEBUG_COLLAPSE
-							g_log<<"found close(next,first) outline verts < 3"<<endl;
+							g_applog<<"found close(next,first) outline verts < 3"<<std::endl;
 #endif
 							continue;
 						}
@@ -840,7 +840,7 @@ void Brush::collapse()
 				}
 #ifdef DEBUG_COLLAPSE
 				else
-					g_log<<"\t\t unique"<<endl;
+					g_applog<<"\t\t unique"<<std::endl;
 #endif
 
 				//connectedv.insert(next);
@@ -853,26 +853,26 @@ void Brush::collapse()
 					break;	//avoid infinite loop in degenerate sides
 
 				curr = next;
-				
+
 #ifdef DEBUG_COLLAPSE
-				g_log<<"\t\tcurr = "<<curr.x<<","<<curr.y<<","<<curr.z<<endl;
-				g_log.flush();
+				g_applog<<"\t\tcurr = "<<curr.x<<","<<curr.y<<","<<curr.z<<std::endl;
+				g_applog.flush();
 #endif
-				
+
 				//if(Close(j->m_vertex[0], first) || Close(j->m_vertex[1], first))
 				if(Close(curr, first))
 				{
 #ifdef DEBUG_COLLAPSE
-					g_log<<"\t\t\tpolygon loop complete"<<endl;
+					g_applog<<"\t\t\tpolygon loop complete"<<std::endl;
 
 					for(auto k=s->m_outline.m_edv.begin(); k!=s->m_outline.m_edv.end(); k++)
 					{
-						g_log<<"("<<(*k).x<<","<<(*k).y<<","<<(*k).z<<")->";
+						g_applog<<"("<<(*k).x<<","<<(*k).y<<","<<(*k).z<<")->";
 					}
 
-					g_log<<endl;
+					g_applog<<std::endl;
 
-					g_log.flush();
+					g_applog.flush();
 #endif
 					//sidepolys[i].m_vertex.push_back(curr);
 					break;	//loop completed
@@ -883,12 +883,12 @@ void Brush::collapse()
 		}
 	}
 
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag9. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag9. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
-	
+
 	//make sure all polys are clockwise
 	for(int i=0; i<m_nsides; i++)
 	{
@@ -907,16 +907,16 @@ void Brush::collapse()
 		if(Magnitude(s->m_plane.m_normal - revnorm) < Magnitude(s->m_plane.m_normal - norm))
 		{
 #ifdef DEBUG_COLLAPSE
-			g_log<<"reverse polygon loop order (revnorm("<<revnorm.x<<","<<revnorm.y<<","<<revnorm.z<<") is closer to planenorm("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<")d="<<s->m_plane.m_d<<")"<<endl;
+			g_applog<<"reverse polygon loop order (revnorm("<<revnorm.x<<","<<revnorm.y<<","<<revnorm.z<<") is closer to planenorm("<<s->m_plane.m_normal.x<<","<<s->m_plane.m_normal.y<<","<<s->m_plane.m_normal.z<<")d="<<s->m_plane.m_d<<")"<<std::endl;
 #endif
 			//sidepolys[i].m_vertex.reverse();
 			s->m_outline.m_edv.reverse();
 		}
 	}
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag10. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag10. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
 
 	//construct triangles from polygons
@@ -925,25 +925,25 @@ void Brush::collapse()
 		BrushSide* s = &m_sides[i];
 		//s->m_ntris = (int)sidepolys[i].m_vertex.size() - 2;
 		s->m_ntris = (int)s->m_outline.m_edv.size() - 2;
-		
-		//g_log<<"sidepolys["<<i<<"].m_vertex.size() = "<<(int)sidepolys[i].m_vertex.size()<<endl;
-		//g_log<<"sidepolys["<<i<<"].m_vertex.size() = "<<(int)s->m_outline.m_edv.size()<<endl;
+
+		//g_applog<<"sidepolys["<<i<<"].m_vertex.size() = "<<(int)sidepolys[i].m_vertex.size()<<std::endl;
+		//g_applog<<"sidepolys["<<i<<"].m_vertex.size() = "<<(int)s->m_outline.m_edv.size()<<std::endl;
 
 		if(s->m_ntris <= 0)
 		{
 #ifdef DEBUG_COLLAPSE
-			g_log<<"tris["<<i<<"] = "<<0<<endl;
+			g_applog<<"tris["<<i<<"] = "<<0<<std::endl;
 #endif
 			continue;
 		}
-		
+
 #ifdef DEBUG_COLLAPSE
-			g_log<<"tris["<<i<<"] = "<<s->m_ntris<<endl;
+			g_applog<<"tris["<<i<<"] = "<<s->m_ntris<<std::endl;
 #endif
-			g_log.flush();
+			g_applog.flush();
 
 		s->m_tris = new Triangle2[s->m_ntris];
-		
+
 		//auto j = sidepolys[i].m_vertex.begin();
 		auto j = s->m_outline.m_edv.begin();
 		Vec3f first = *j;
@@ -963,12 +963,12 @@ void Brush::collapse()
 		s->makeva();
 	}
 
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"tag11. m_nsides="<<m_nsides<<endl;
-	g_log.flush();
+	g_applog<<"tag11. m_nsides="<<m_nsides<<std::endl;
+	g_applog.flush();
 #endif
-	
+
 	//delete [] sidepolys;
 	bool* removes = new bool[m_nsides];	//degenerate sides to remove
 	if(!removes) OutOfMem(__FILE__, __LINE__);
@@ -980,13 +980,13 @@ void Brush::collapse()
 		BrushSide* s = &m_sides[i];
 
 		//if(sideedges[i].size() <= 0)
-		if(sideedges[i].size() < 3 || 
+		if(sideedges[i].size() < 3 ||
 			s->m_outline.m_edv.size() < 3 ||	//3 is the minimum number of edges to form a polygon
 			s->m_ntris <= 0)
 		{
 #ifdef DEBUG_COLLAPSE
-			g_log<<"remove side. "<<i<<" sideedges[i].size()="<<sideedges[i].size()<<" s->m_outline.m_edv.size()="<<s->m_outline.m_edv.size()<<" s->m_ntris="<<s->m_ntris<<endl;
-			g_log.flush();
+			g_applog<<"remove side. "<<i<<" sideedges[i].size()="<<sideedges[i].size()<<" s->m_outline.m_edv.size()="<<s->m_outline.m_edv.size()<<" s->m_ntris="<<s->m_ntris<<std::endl;
+			g_applog.flush();
 #endif
 			//removeside(i);
 			//i--;
@@ -1003,27 +1003,27 @@ void Brush::collapse()
 	delete [] removes;
 
 	delete [] sideedges;
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"1a"<<endl;
-	g_log.flush();
+	g_applog<<"1a"<<std::endl;
+	g_applog.flush();
 #endif
 
 	//get shared vertices and centroids
-	vector<Vec3f> sharedv;
+	std::vector<Vec3f> sharedv;
 	for(int i=0; i<m_nsides; i++)
 	{
 		BrushSide* s = &m_sides[i];
 
 		if(s->m_ntris <= 0)
 			continue;
-		
+
 		//s->m_vindices = new int[s->m_outline.m_edv.size()];
 		s->m_vindices = new int[s->m_ntris+2];
-		
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"1b side"<<i<<" vindices="<<s->m_outline.m_edv.size()<<endl;
-	g_log.flush();
+	g_applog<<"1b side"<<i<<" vindices="<<s->m_outline.m_edv.size()<<std::endl;
+	g_applog.flush();
 #endif
 
 		Vec3f centroid(0,0,0);
@@ -1034,8 +1034,8 @@ void Brush::collapse()
 		{
 			centroid = centroid * (count/(count+1)) + (*j) * (1.0f/(count+1));
 #ifdef DEBUG_COLLAPSE
-			g_log<<"centroid "<<count<<" "<<centroid.x<<","<<centroid.y<<","<<centroid.z<<" *j "<<(*j).x<<","<<(*j).y<<","<<(*j).z<<endl;
-			g_log.flush();
+			g_applog<<"centroid "<<count<<" "<<centroid.x<<","<<centroid.y<<","<<centroid.z<<" *j "<<(*j).x<<","<<(*j).y<<","<<(*j).z<<std::endl;
+			g_applog.flush();
 #endif
 
 			count += 1;
@@ -1058,26 +1058,26 @@ void Brush::collapse()
 		}
 
 		s->m_centroid = centroid;
-		
+
 #ifdef DEBUG_COLLAPSE
-		g_log<<"1c side"<<i<<endl;
-		g_log.flush();
+		g_applog<<"1c side"<<i<<std::endl;
+		g_applog.flush();
 #endif
 	}
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"1d"<<endl;
-	g_log.flush();
+	g_applog<<"1d"<<std::endl;
+	g_applog.flush();
 #endif
 
 	m_nsharedv = sharedv.size();
 	m_sharedv = new Vec3f[m_nsharedv];
 	for(int i=0; i<m_nsharedv; i++)
 		m_sharedv[i] = sharedv[i];
-	
+
 #ifdef DEBUG_COLLAPSE
-	g_log<<"shared vertices num = "<<m_nsharedv<<endl;
-	g_log.flush();
+	g_applog<<"shared vertices num = "<<m_nsharedv<<std::endl;
+	g_applog.flush();
 #endif
 
 	if(g_sel1b == this && oldnsharedv != m_nsharedv)
@@ -1164,7 +1164,7 @@ bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const
         if(LineInterPlane(line, norms[i], -ds[i], &inter))
         {
 #if 0
-			g_log<<"inter"<<i<<" at "<<inter.x<<","<<inter.y<<","<<inter.z<<endl;
+			g_applog<<"inter"<<i<<" at "<<inter.x<<","<<inter.y<<","<<inter.z<<std::endl;
 #endif
 
 			bool allin = true;
@@ -1175,7 +1175,7 @@ bool LineInterHull(const Vec3f* line, const Vec3f* norms, const float* ds, const
 
 #if 0
 				float result = inter.x*norms[j].x + inter.y*norms[j].y + inter.z*norms[j].z + ds[j];
-				g_log<<"pldot"<<j<<" = "<<result<<endl;
+				g_applog<<"pldot"<<j<<" = "<<result<<std::endl;
 #endif
 
 				if(!PointOnOrBehindPlane(inter, norms[j], ds[j]))

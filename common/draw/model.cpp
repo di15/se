@@ -120,9 +120,9 @@ void DrawVA(VertexArray* va, Vec3f pos)
     glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
     glNormalPointer(GL_FLOAT, 0, va->normals);
 
-	//if(s->m_slot[SSLOT_TEXCOORD0] == -1) g_log<<"s->m_slot[SSLOT_TEXCOORD0] = -1"<<endl;
-	//if(s->m_slot[SSLOT_NORMAL] == -1) g_log<<"s->m_slot[SSLOT_NORMAL] = -1"<<endl;
-	//g_log.flush();
+	//if(s->m_slot[SSLOT_TEXCOORD0] == -1) g_applog<<"s->m_slot[SSLOT_TEXCOORD0] = -1"<<std::endl;
+	//if(s->m_slot[SSLOT_NORMAL] == -1) g_applog<<"s->m_slot[SSLOT_NORMAL] = -1"<<std::endl;
+	//g_applog.flush();
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);

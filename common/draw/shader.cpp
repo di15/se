@@ -33,13 +33,13 @@ GLint Shader::GetAttrib(const char* strVariable)
 void Shader::MapUniform(int slot, const char* variable)
 {
 	m_slot[slot] = GetUniform(variable);
-	//g_log<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<endl;
+	//g_applog<<"\tmap uniform "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
 }
 
 void Shader::MapAttrib(int slot, const char* variable)
 {
 	m_slot[slot] = GetAttrib(variable);
-	//g_log<<"\tmap attrib "<<variable<<" = "<<(int)m_slot[slot]<<endl;
+	//g_applog<<"\tmap attrib "<<variable<<" = "<<(int)m_slot[slot]<<std::endl;
 }
 
 void GetGLVersion(int* major, int* minor)
@@ -90,8 +90,8 @@ void InitGLSL()
 		return;
 	}
 
-	g_log<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<endl;
-	g_log<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<endl;
+	g_applog<<"Renderer: "<<(char*)glGetString(GL_RENDERER)<<std::endl;
+	g_applog<<"GL_VERSION = "<<(char*)glGetString(GL_VERSION)<<std::endl;
 
 #if 0
 	//Make sure OpenGL 2.1 is supported
@@ -118,20 +118,20 @@ void InitGLSL()
 #if 1
 	char* szGLExtensions = (char*)glGetString(GL_EXTENSIONS);
 
-	g_log<<szGLExtensions<<endl;
-	g_log.flush();
+	g_applog<<szGLExtensions<<std::endl;
+	g_applog.flush();
 
 	if(!strstr(szGLExtensions, "GL_ARB_debug_output"))
 	{
 		//ErrorMessage("Error", "GL_ARB_debug_output extension not supported!");
 		//g_quit = true;
 		//return;
-		g_log<<"GL_ARB_debug_output extension not supported"<<endl;
+		g_applog<<"GL_ARB_debug_output extension not supported"<<std::endl;
 	}
 	else
 	{
-		g_log<<"Reging debug handler"<<endl;
-		g_log.flush();
+		g_applog<<"Reging debug handler"<<std::endl;
+		g_applog.flush();
 		glDebugMessageCallbackARB(&GLMessageHandler, 0);
 		CheckGLError(__FILE__, __LINE__);
 	}
@@ -185,15 +185,15 @@ void InitGLSL()
 	CheckGLError(__FILE__, __LINE__);
 }
 
-string LoadTextFile(char* strFile)
+std::string LoadTextFile(char* strFile)
 {
-	ifstream fin(strFile);
+	std::ifstream fin(strFile);
 
 	if(!fin)
 		return "";
 
-	string strLine = "";
-	string strText = "";
+	std::string strLine = "";
+	std::string strText = "";
 
 	while(getline(fin, strLine))
 		strText = strText + "\n" + strLine;
@@ -206,7 +206,7 @@ string LoadTextFile(char* strFile)
 void LoadShader(int shader, char* strVertex, char* strFragment)
 {
 	Shader* s = &g_shader[shader];
-	string strVShader, strFShader;
+	std::string strVShader, strFShader;
 
 	if(s->m_hVertexShader || s->m_hFragmentShader || s->m_hProgramObject)
 		s->release();
@@ -236,7 +236,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
         GLchar *log = (GLchar *)malloc(logLength);
 		if(!log) OutOfMem(__FILE__, __LINE__);
         glGetShaderInfoLog(s->m_hVertexShader, logLength, &logLength, log);
-        g_log<<"Shader "<<strVertex<<" compile log: "<<endl<<log<<endl;
+        g_applog<<"Shader "<<strVertex<<" compile log: "<<std::endl<<log<<std::endl;
         free(log);
     }
 
@@ -250,7 +250,7 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
         GLchar *log = (GLchar *)malloc(logLength);
 		if(!log) OutOfMem(__FILE__, __LINE__);
         glGetShaderInfoLog(s->m_hFragmentShader, logLength, &logLength, log);
-        g_log<<"Shader "<<strFragment<<" compile log: "<<endl<<log<<endl;
+        g_applog<<"Shader "<<strFragment<<" compile log: "<<std::endl<<log<<std::endl;
         free(log);
     }
 
@@ -267,17 +267,17 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 
 	//glUseProgramObjectARB(s->m_hProgramObject);
 
-	//g_log<<"shader "<<strVertex<<","<<strFragment<<endl;
+	//g_applog<<"shader "<<strVertex<<","<<strFragment<<std::endl;
 
 	CheckGLError(__FILE__, __LINE__);
 
-	g_log<<"Program "<<strVertex<<" / "<<strFragment<<" :";
+	g_applog<<"Program "<<strVertex<<" / "<<strFragment<<" :";
 
 	glGetProgramiv(s->m_hProgramObject, GL_INFO_LOG_LENGTH, &logLength);
 	if (logLength > 0) {
 		GLchar *log = (GLchar *)malloc(logLength);
 		glGetProgramInfoLog(s->m_hProgramObject, logLength, &logLength, log);
-		g_log<<"Program link log:"<<endl<<log<<endl;
+		g_applog<<"Program link log:"<<std::endl<<log<<std::endl;
 		free(log);
 	}
 
@@ -285,14 +285,14 @@ void LoadShader(int shader, char* strVertex, char* strFragment)
 	glGetProgramiv(s->m_hProgramObject, GL_LINK_STATUS, &status);
 	if (status == 0)
 	{
-		g_log<<"link status 0"<<endl;
+		g_applog<<"link status 0"<<std::endl;
 	}
 	else
 	{
-		g_log<<"link status ok"<<endl;
+		g_applog<<"link status ok"<<std::endl;
 	}
 
-	g_log<<endl<<endl;
+	g_applog<<std::endl<<std::endl;
 
 	CheckGLError(__FILE__, __LINE__);
 

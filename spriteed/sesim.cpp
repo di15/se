@@ -845,7 +845,7 @@ void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 {
 	Shader* shader = &g_shader[g_curS];
 
-	if(ViewOpen("door edit"))
+	if(g_GUI.get("door edit")->m_opened)
 	{
 		if(g_selB.size() <= 0)
 			return;
@@ -873,7 +873,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	CloseSideView();
 	//CloseView("brush edit");
 
-	//g_log<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<endl;
+	//g_applog<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<std::endl;
 	list<Brush*> selB;
 	list<ModelHolder*> selM;
 
@@ -929,7 +929,8 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			{
 				g_selB.clear();
 				g_selB.push_back(*i);
-				OpenAnotherView("brush edit");
+				g_GUI.closeall();
+				g_GUI.open("brush edit");
 				return;
 			}
 
@@ -980,7 +981,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	else if(selB.size() > 0)
 	{
 		g_selB.push_back( *selB.begin() );
-		OpenAnotherView("brush edit");
+		g_GUI.open("brush edit");
 	}
 }
 
@@ -1046,8 +1047,8 @@ void SelectDrag_VertFaceBrush(EdMap* map, Matrix* mvp, int w, int h, int x, int 
 		for(int j=0; j<b->m_nsides; j++)
 		{
 			BrushSide* side = &b->m_sides[j];
-			//g_log<<"centroid "<<side->m_centroid.x<<","<<side->m_centroid.y<<","<<side->m_centroid.z<<endl;
-			//g_log.flush();
+			//g_applog<<"centroid "<<side->m_centroid.x<<","<<side->m_centroid.y<<","<<side->m_centroid.z<<std::endl;
+			//g_applog.flush();
 			Vec4f screenpos = ScreenPos(mvp, side->m_centroid, w, h, persp);
 
 			if(x >= screenpos.x - FACE_DRAG_HSIZE && x <= screenpos.x + FACE_DRAG_HSIZE && y >= screenpos.y - FACE_DRAG_HSIZE && y <= screenpos.y + FACE_DRAG_HSIZE)
@@ -1299,7 +1300,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	g_dragW = false;
 	g_dragD = -1;
 
-	if(ViewOpen("door edit"))
+	if(g_GUI.get("door edit")->m_opened)
 	{
 		if(g_selB.size() <= 0)
 			goto nodoor;
@@ -1325,8 +1326,9 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	{
 		if(g_dragS >= 0)
 		{
-			OpenAnotherView("brush edit");
-			OpenAnotherView("brush side edit");
+			g_GUI.closeall();
+			g_GUI.open("brush edit");
+			g_GUI.open("brush side edit");
 			RedoBSideGUI();
 		}
 
@@ -1362,15 +1364,15 @@ bool PruneB2(Brush* b, Plane* p, float epsilon)
 bool PruneB(EdMap* map, Brush* b)
 {
 #ifdef PRUNEB_DEBUG
-	g_log<<"-------------"<<endl;
-	g_log.flush();
+	g_applog<<"-------------"<<std::endl;
+	g_applog.flush();
 #endif
 
 	//remove sides that share the exact same set of vertices
 	for(int i=0; i<b->m_nsides; i++)
 	{
 #ifdef PRUNEB_DEBUG
-		g_log<<"\t side"<<i<<endl;
+		g_applog<<"\t side"<<i<<std::endl;
 #endif
 		BrushSide* s1 = &b->m_sides[i];
 
@@ -1385,7 +1387,7 @@ bool PruneB(EdMap* map, Brush* b)
 		Vec3f matchv = b->m_sharedv[ s1->m_vindices[0] ];
 
 #ifdef PRUNEB_DEBUG
-		g_log<<"s1->m_ntris = "<<s1->m_ntris<<endl;
+		g_applog<<"s1->m_ntris = "<<s1->m_ntris<<std::endl;
 #endif
 
 		for(int v=0; v<s1->m_outline.m_edv.size(); v++)
@@ -1393,8 +1395,8 @@ bool PruneB(EdMap* map, Brush* b)
 			Vec3f thisv = b->m_sharedv[ s1->m_vindices[v] ];
 
 #ifdef PRUNEB_DEBUG
-			g_log<<"vertex "<<v<<" = "<<thisv.x<<","<<thisv.y<<","<<thisv.z<<endl;
-			g_log.flush();
+			g_applog<<"vertex "<<v<<" = "<<thisv.x<<","<<thisv.y<<","<<thisv.z<<std::endl;
+			g_applog.flush();
 #endif
 
 			float mag = Magnitude(matchv - thisv);
@@ -1512,8 +1514,8 @@ bool PruneB(EdMap* map, Brush* b)
 				}
 			}
 
-			//g_log<<"pruned brush"<<endl;
-			//g_log.flush();
+			//g_applog<<"pruned brush"<<std::endl;
+			//g_applog.flush();
 			//continue;
 
 			return true;

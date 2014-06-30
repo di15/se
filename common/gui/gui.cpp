@@ -1,8 +1,5 @@
-
-
-
-#include "../draw/shader.h"
 #include "gui.h"
+#include "../draw/shader.h"
 #include "../texture.h"
 #include "font.h"
 #include "../math/3dmath.h"
@@ -10,192 +7,160 @@
 #include "../window.h"
 #include "draw2d.h"
 #include "../draw/shadow.h"
+#include "../../spriteed/main.h"
 #include "../debug.h"
 
-GUI g_GUI;
 int g_currw;
 int g_currh;
+GUI g_GUI;
+bool g_mouseoveraction = false;
+int g_kbfocus = 0;
 
 void GUI::draw()
 {
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
 	glClear(GL_DEPTH_BUFFER_BIT);
-#ifdef DEBUG
+	glDisable(GL_DEPTH_TEST);
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	Ortho(g_width, g_height, 1, 1, 1, 1);
-
-#ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
-	LastNum(__FILE__, __LINE__);
+
+#if 0
+	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
 
-	for(auto i=view.begin(); i!=view.end(); i++)
-	{
-		if(i->opened)
-		{
-			//LastNum(view[i].name.c_str());
-			//g_log<<(i->name)<<endl;
-			//g_log.flush();
-#ifdef DEBUG
-			CheckGLError(__FILE__, __LINE__);
-#endif
-			i->draw();
-		}
-	}
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		(*i)->draw();
 
-#ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
-	LastNum(__FILE__, __LINE__);
+
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		(*i)->drawover();
+
+#if 0
+	DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
 
-	for(auto i=view.begin(); i!=view.end(); i++)
-		if(i->opened)
-		{
-			//g_log<<(i->name)<<endl;
-			//g_log.flush();
-#ifdef DEBUG
-			CheckGLError(__FILE__, __LINE__);
+#if 0
+	if(g_depth != -1)
+		DrawImage(g_depth, 0, 0, 150, 150, 0, 1, 1, 0);
 #endif
-			i->draw2();
-		}
 
-	//DrawImage(g_depth, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
+#if 0
+	if(g_mode == APPMODE_PLAY)
+		DrawImage(g_tiletexs[TILE_PRERENDER], 0, 0, 150, 150, 0, 1, 1, 0);
+#endif
 
-#ifdef DEBUG
+	//Sprite* sp = &g_cursor[g_curst];
+	//DrawImage(g_texture[sp->texindex].texname, g_mouse.x-sp->offset[0], g_mouse.y-sp->offset[1], g_mouse.x-sp->offset[0]+32, g_mouse.y-sp->offset[1]+32);
+
 	CheckGLError(__FILE__, __LINE__);
-	LastNum(__FILE__, __LINE__);
-#endif
+
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
 
 	UseS(SHADER_COLOR2D);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
-    glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
+	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_HEIGHT], (float)g_height);
+	glUniform4f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_COLOR], 0, 1, 0, 0.75f);
+	//glEnable(GL_DEPTH_TEST);
+	//DrawSelector();
 	//DrawMarquee();
+
+	CheckGLError(__FILE__, __LINE__);
 	EndS();
+	CheckGLError(__FILE__, __LINE__);
+
+	glEnable(GL_DEPTH_TEST);
 }
 
-void AssignKey(int i, void (*down)(), void (*up)())
+void GUI::inev(InEv* ev)
 {
-	g_GUI.assignKey(i, down, up);
-}
+	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
+		(*w)->inev(ev);
 
-void AssignAnyKey(void (*down)(int k), void (*up)(int k))
-{
-	g_GUI.assignAnyKey(down, up);
-}
-
-void AssignMouseWheel(void (*wheel)(int delta))
-{
-	g_GUI.assignMouseWheel(wheel);
-}
-
-void AssignMouseMove(void (*mouse)())
-{
-	g_GUI.assignMouseMove(mouse);
-}
-
-void AssignLButton(void (*down)(), void (*up)())
-{
-	g_GUI.assignLButton(down, up);
-}
-
-void AssignRButton(void (*down)(), void (*up)())
-{
-	g_GUI.assignRButton(down, up);
-}
-
-void AssignMButton(void (*down)(), void (*up)())
-{
-	g_GUI.assignMButton(down, up);
-}
-
-View* AddView(const char* name, int page)
-{
-	View view(name, page);
-	g_GUI.view.push_back(view);
-	return &*g_GUI.view.rbegin();
-}
-
-bool ViewOpen(const char* name, int page)
-{
-	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
-		if(_stricmp(i->name.c_str(), name) == 0 && i->page == page)
-			return i->opened;
-
-	return false;
-}
-
-void CloseView(const char* name)
-{
-	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
-		if(_stricmp(i->name.c_str(), name) == 0)
-			i->opened = false;
-}
-
-void OpenSoleView(const char* name, int page)
-{
-	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
+	if(!ev->intercepted)
 	{
-		if(_stricmp(i->name.c_str(), name) == 0 && i->page == page)
-			i->opened = true;
-		else
-			i->opened = false;
+		if(ev->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
+		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
+		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
+		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_MIDDLE && mbuttondownfunc) mbuttondownfunc();
+		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_MIDDLE && mbuttonupfunc) mbuttonupfunc();
+		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_RIGHT && rbuttondownfunc) rbuttondownfunc();
+		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_RIGHT && rbuttonupfunc) rbuttonupfunc();
+		else if(ev->type == INEV_MOUSEWHEEL && mousewheelfunc) mousewheelfunc(ev->amount);
+		else if(ev->type == INEV_KEYDOWN && keydownfunc[ev->scancode]) keydownfunc[ev->scancode]();
+		else if(ev->type == INEV_KEYUP && keyupfunc[ev->scancode]) keyupfunc[ev->scancode]();
 	}
 }
 
-bool OpenAnotherView(const char* name, int page)
+void GUI::closeall()
 {
-	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
-	{
-		if(_stricmp(i->name.c_str(), name) == 0 && i->page == page)
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		(*i)->m_opened = false;
+}
+
+void GUI::close(const char* name)
+{
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		if(stricmp((*i)->m_name.c_str(), name) == 0)
 		{
-			i->opened = true;
-			return true;
+			(*i)->close();
 		}
-	}
-
-	return false;
 }
 
-void NextPage(const char* name)
+void GUI::open(const char* name)
 {
-	int page = 0;
+	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+		if(stricmp((*i)->m_name.c_str(), name) == 0)
+			(*i)->m_opened = true;
+}
 
-	for(auto i=g_GUI.view.begin(); i!=g_GUI.view.end(); i++)
-	{
-		if(_stricmp(i->name.c_str(), name) == 0 && i->opened)
-		{
-			page = i->page;
-			i->opened = false;
-			break;
-		}
-	}
+void GUI::reframe()
+{
+	m_pos[0] = 0;
+	m_pos[1] = 0;
+	m_pos[2] = g_width-1;
+	m_pos[3] = g_height-1;
 
-	if(!OpenAnotherView(name, page+1))
-		OpenAnotherView(name, 0);
+	for(auto w=m_subwidg.begin(); w!=m_subwidg.end(); w++)
+		(*w)->reframe();
 }
 
 void Status(const char* status, bool logthis)
 {
 	if(logthis)
 	{
-		g_log<<status<<endl;
-		g_log.flush();
+		g_applog<<status<<std::endl;
+		g_applog.flush();
 	}
+
+#if 1
+	g_applog<<status<<std::endl;
+	g_applog.flush();
+#endif
 	/*
 	char upper[1024];
 	int i;
 	for(i=0; i<strlen(status); i++)
 	{
-		upper[i] = toupper(status[i]);
+	upper[i] = toupper(status[i]);
 	}
 	upper[i] = '\0';*/
 
-	//g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = upper;
-	g_GUI.getview("loading")->getwidget("status", WIDGET_TEXT)->m_text = status;
+	GUI* gui = &g_GUI;
+
+	//gui->get("loading")->get("status", WIDGET_TEXT)->m_text = upper;
+	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
+
+	if(!loadingview)
+		return;
+
+	Widget* statustext = loadingview->get("status");
+
+	if(!statustext)
+		return;
+
+	statustext->m_text = status;
 }
 
 bool MousePosition()
@@ -218,18 +183,16 @@ void CenterMouse()
 
 void Ortho(int width, int height, float r, float g, float b, float a)
 {
-#ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
-#endif
 	UseS(SHADER_ORTHO);
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
+	Shader* s = &g_shader[g_curS];
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_WIDTH], (float)width);
 	glUniform1f(g_shader[SHADER_ORTHO].m_slot[SSLOT_HEIGHT], (float)height);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], r, g, b, a);
-	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_POSITION]);
+	//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_TEXCOORD0]);
+	//glEnableVertexAttribArray(g_shader[SHADER_ORTHO].m_slot[SSLOT_NORMAL]);
 	g_currw = width;
 	g_currh = height;
+	CheckGLError(__FILE__, __LINE__);
 }
