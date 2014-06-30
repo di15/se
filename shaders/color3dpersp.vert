@@ -13,7 +13,7 @@ uniform mat4 view;
 
 void main(void)
 {
-	gl_Position = projection * (view * (model * gl_Vertex));
+	gl_Position = projection * view * model * gl_Vertex;
 	//gl_Position = projection * view * model * position;
 	//gl_Position = mvpmat * position;
 	//gl_Position = position * mvpmat;

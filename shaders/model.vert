@@ -43,7 +43,7 @@ void main(void)
 	//vpos.w = 1;	//ortho=1/persp?
 	lpos = lightMatrix * vpos;
 	//lpos.w = 1;
-	gl_Position = projection * (view * (model * gl_Vertex));
+	gl_Position = projection * view * model * gl_Vertex;
 	//gl_Position.w = 1;	//ortho=1/persp?
 
 	elevy = position.y;
@@ -85,7 +85,7 @@ void main(void)
 	vec3 b = normalize(cross(n, t));
 	//vec3 b = normalOut;
 
-	vec3 vVertex = vec3(view * (model * position));
+	vec3 vVertex = vec3(view * model * gl_Vertex);
 
 	//light_vec = vpos.xyz - lightPos;
 	//vec3 tmpVec = lightPos - vVertex;
@@ -105,5 +105,5 @@ void main(void)
 	eyevec.y = dot(tmpVec, b);
 	eyevec.z = dot(tmpVec, n);
 
-	texCoordOut0 = texCoordIn0;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
 }

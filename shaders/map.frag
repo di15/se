@@ -47,8 +47,8 @@ void main (void)
 	float cosTheta = dot( normalOut, light_vec );
 	float shadow_bias = 0.005 * tan(acos(cosTheta)); 
 	// cosTheta is dot( n,l ), clamped between 0 and 1
-	//shadow_bias = clamp(shadow_bias, 0, 0.01);
-	shadow_bias = 0;
+	shadow_bias = clamp(shadow_bias, 0, 0.01);
+	//shadow_bias = 0;
 
 	vec3 smcoord = lpos.xyz / lpos.w;
 	//vec3 smcoord = lpos.xyz;
@@ -108,14 +108,16 @@ void main (void)
 	//float alph = color.w * texel0.w;
 	float alph = 1;
 	float minlight = min(shadow, diffuse);
+	//float minlight = shadow;
 
 	// with specular highlights:
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse + vspecular, alph);
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
 
 	// without specular highlights:
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * shadow * diffuse, alph);
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight, alph);
 
 	gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	//gl_FragColor = vec4(color.xyz * minlight, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(normalOut, alph);
 	//gl_FragColor = vec4(normalize(light_vec), alph);
