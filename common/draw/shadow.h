@@ -13,6 +13,7 @@ extern Vec3f g_lightOff;
 extern Vec3f g_lightPos;
 extern Vec3f g_lightEye;
 extern Vec3f g_lightUp;
+extern bool g_shadowpass;
 
 class Matrix;
 

@@ -38,6 +38,7 @@ int g_rendside;
 bool g_warned = false;
 
 unsigned int g_rendertex;
+unsigned int g_renderdepthtex;
 unsigned int g_renderrb;
 unsigned int g_renderfb;
 bool g_renderbs = false;
@@ -60,6 +61,7 @@ bool CallResize(int w, int h)
 	if(!g_renderbs && (g_mode == RENDERING || g_mode == PREREND_ADJFRAME))
 	{
 		g_renderbs = true;
+#if 0   //OpenGL 3.0 way
 #if 1
 		glGenTextures(1, &g_rendertex);
 		glBindTexture(GL_TEXTURE_2D, g_rendertex);
@@ -114,6 +116,50 @@ bool CallResize(int w, int h)
 		//Attach depth buffer to FBO
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, g_renderrb);
 		//-------------------------
+#endif
+#else   //OpenGL 1.4 way
+
+        glGenTextures(1, &g_rendertex);
+        glBindTexture(GL_TEXTURE_2D, g_rendertex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        //g_applog<<"gge1 "<<glGetError()<<std::endl;
+
+        glGenTextures(1, &g_renderdepthtex);
+        glBindTexture(GL_TEXTURE_2D, g_renderdepthtex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        //g_applog<<"gge2 "<<glGetError()<<std::endl;
+        //glDrawBuffer(GL_NONE); // No color buffer is drawn
+        //glReadBuffer(GL_NONE);
+
+        glGenFramebuffers(1, &g_renderfb);
+        glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_rendertex, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, g_renderdepthtex, 0);
+
+        //g_applog<<"gge3 "<<glGetError()<<std::endl;
+
+        GLenum DrawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT_EXT};
+        glDrawBuffers(1, DrawBuffers);
+
+        //g_applog<<"gge4 "<<glGetError()<<std::endl;
+
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            ErrorMessage("Error", "Couldn't create framebuffer for render.");
+            return false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
 
 #ifdef DEBUG
@@ -767,7 +813,7 @@ void UpdateRender()
 	DrawViewport(3, 0, 0, g_width, g_height);
 	EndS();
 #else
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, g_renderfb);
+	glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
 #ifdef DEBUG
 	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
 	CheckGLError(__FILE__, __LINE__);

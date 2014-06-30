@@ -97,12 +97,13 @@ void main (void)
 	//float alph = color.w * texel0.w;
 	float alph = 1;
 	float minlight = min(shadow, diffuse);
+	//float minlight = diffuse;
 
 	// with specular highlights:
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
 
 	// without specular highlights:
-	gl_FragColor = vec4(color.xyz * stexel.xyz * minlight, alph);
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight, alph);
 
 	//gl_FragColor = vec4(1,0,0,1);
 	//gl_FragColor = texel0;

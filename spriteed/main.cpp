@@ -357,6 +357,7 @@ void LoadConfig()
         else if(stricmp(keystr, "sun_x") == 0)					g_lightOff.x = valuef;
         else if(stricmp(keystr, "sun_y") == 0)					g_lightOff.y = valuef;
         else if(stricmp(keystr, "sun_z") == 0)					g_lightOff.z = valuef;
+        else if(stricmp(keystr, "shadow_pass") == 0)			g_shadowpass = valueb;
     }
 }
 
@@ -586,13 +587,13 @@ void EventLoop()
                 ev.type = INEV_TEXTIN;
                 ev.text = e.text.text;
 
-                g_applog<<"SDL_TEXTINPUT:";
-                for(int i=0; i<strlen(e.text.text); i++)
-                {
-                    g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
-                }
-                g_applog<<std::endl;
-                g_applog.flush();
+                //g_applog<<"SDL_TEXTINPUT:";
+                //for(int i=0; i<strlen(e.text.text); i++)
+                //{
+                 //   g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
+                //}
+                //g_applog<<std::endl;
+                //g_applog.flush();
 
                 gui->inev(&ev);
                 break;
@@ -603,16 +604,16 @@ void EventLoop()
                 ev.cursor = e.edit.start;
                 ev.sellen = e.edit.length;
 
-                g_applog<<"SDL_TEXTEDITING:";
-                for(int i=0; i<strlen(e.text.text); i++)
-                {
-                    g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
-                }
-                g_applog<<std::endl;
-                g_applog.flush();
+                //g_applog<<"SDL_TEXTEDITING:";
+                //for(int i=0; i<strlen(e.text.text); i++)
+                //{
+                //    g_applog<<"[#"<<(unsigned int)(unsigned char)e.text.text[i]<<"]";
+                //}
+                //g_applog<<std::endl;
+                //g_applog.flush();
 
-                g_applog<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<std::endl;
-                g_applog.flush();
+                //g_applog<<"texted: cursor:"<<ev.cursor<<" sellen:"<<ev.sellen<<std::endl;
+                //g_applog.flush();
 
                 gui->inev(&ev);
 #if 0

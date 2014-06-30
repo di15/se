@@ -87,8 +87,9 @@ void main (void)
 
 	float distSqr = dot(light_vec, light_vec);
 	vec3 lvec = light_vec * inversesqrt(distSqr);
-	//float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
-	float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.50;
+	float diffuse = max( dot(lvec, bump), 0.0 ) * 0.75 + 0.50;
+	//float diffuse = max( dot(lvec, bump), 0.0 );
+	//float diffuse = max( dot(lvec, vec3(0,0,1)), 0.0 ) * 0.75 + 0.50;
 
 	vec3 vvec = normalize(eyevec);
 	float specular = pow(clamp(dot(reflect(-lvec, bump), vvec), 0.0, 1.0), 0.7 );
@@ -108,15 +109,16 @@ void main (void)
 	//float alph = color.w * texel0.w;
 	float alph = 1;
 	float minlight = min(shadow, diffuse);
+	//float minlight = diffuse;
 	//float minlight = shadow;
 
 	// with specular highlights:
-	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
 
 	// without specular highlights:
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight, alph);
 
-	gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
+	//gl_FragColor = vec4(color.xyz * stexel.xyz * minlight + vspecular, alph);
 	//gl_FragColor = vec4(color.xyz * minlight, alph);
 	//gl_FragColor = vec4(color.xyz * stexel.xyz * diffuse + vspecular, alph);
 	//gl_FragColor = vec4(normalOut, alph);

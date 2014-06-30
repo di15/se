@@ -88,7 +88,7 @@ void Resize(int width, int height)
 
 	glViewport(0, 0, width, height);
 
-	if(g_width != width || g_height != height)
+	//if(g_width != width || g_height != height)
 	{
 		g_width = width;
 		g_height = height;

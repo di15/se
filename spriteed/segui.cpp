@@ -2105,16 +2105,16 @@ void FillGUI()
 	snapgs->m_selected = 6;
 
 	//toppanel->add(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
-	toppanel->add(new Text(toppanel, "snapgrid", "snap grid",													MAINFONT8, Resize_SnapGridText));
+	toppanel->add(new Text(toppanel, "snapgrid text", "snap grid",													MAINFONT8, Resize_SnapGridText));
 	toppanel->add(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
-	toppanel->add(new Text(toppanel, "maxelev", "max elev.",													MAINFONT8, Resize_MaxElevText));
+	toppanel->add(new Text(toppanel, "maxelev text", "max elev.",													MAINFONT8, Resize_MaxElevText));
 	toppanel->add(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
 
 	toppanel->add(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL, NULL, NULL, -1));
 	toppanel->add(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL, NULL, NULL, -1));
 	toppanel->add(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, BUTTON_BGIMAGE, Resize_ResetViewButton, Click_ResetView, NULL, NULL, NULL, NULL, -1));
 
-	toppanel->add(new Text(toppanel, "frames", "frames",														MAINFONT8, Resize_FramesText));
+	toppanel->add(new Text(toppanel, "frames text", "frames",														MAINFONT8, Resize_FramesText));
 	toppanel->add(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
 
 #if 0
@@ -2183,9 +2183,9 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	selcompwidg->m_options.push_back("u component");
 	selcompwidg->m_options.push_back("v component");
 	leftpanel->add(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, 0));
-	leftpanel->add(new Button(leftpanel, "texture scale", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new Button(leftpanel, "texture scale button", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL, NULL, NULL, -1));
 	leftpanel->add(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
-	leftpanel->add(new Button(leftpanel, "texture shift", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new Button(leftpanel, "texture shift button", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL, NULL, NULL, -1));
 
 	g_GUI.add(new ViewLayer(&g_GUI, "choose file"));
 	ViewLayer* choosefileview = (ViewLayer*)g_GUI.get("choose file");
@@ -2239,9 +2239,15 @@ void SetNumFrames(int nframes)
 {
 	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
 
+	if(!edview)  ErrorMessage("Error", "edview not found");
+
 	Widget* toppanel = edview->get("top panel");
 
+	if(!toppanel)  ErrorMessage("Error", "toppanel not found");
+
 	EditBox* frameseditbox = (EditBox*)toppanel->get("frames");
+
+	if(!frameseditbox)  ErrorMessage("Error", "frameseditbox not found");
 
 	char nframesstr[128];
 	sprintf(nframesstr, "%d", nframes);

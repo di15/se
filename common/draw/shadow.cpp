@@ -22,6 +22,7 @@
 unsigned int g_depth;
 unsigned int g_rbdepth;
 unsigned int g_fbdepth;
+bool g_shadowpass = true;
 
 //1000000.0f/300 = 3333.3333333333333333333333333333 cm =
 
@@ -547,8 +548,11 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 #endif
 
 #if 1
-	if(DrawSceneDepthFunc != NULL)
-		DrawSceneDepthFunc();
+    if(g_shadowpass)
+    {
+        if(DrawSceneDepthFunc != NULL)
+            DrawSceneDepthFunc();
+    }
 
 	//TurnOffShader();
 	EndS();

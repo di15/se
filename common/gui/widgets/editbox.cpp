@@ -452,7 +452,8 @@ void EditBox::inev(InEv* ev)
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
 
-		//ev->intercepted = true;
+        if(ev->scancode != SDL_SCANCODE_LCTRL && ev->scancode != SDL_SCANCODE_RCTRL)
+            ev->intercepted = true;
 	}
 	else if(ev->type == INEV_KEYUP && !ev->intercepted)
 	{
@@ -580,11 +581,6 @@ void EditBox::placestr(const std::string* str)
 
 void EditBox::changevalue(const char* str)
 {
-	int len = m_value.length();
-
-	if(len >= m_maxlen)
-		return;
-
 	int setlen = strlen(str);
 	if(setlen >= m_maxlen)
 		setlen = m_maxlen;
@@ -597,7 +593,6 @@ void EditBox::changevalue(const char* str)
 	for(int i=0; i<setlen; i++)
 		setstr[i] = str[i];
 	setstr[setlen] = '\0';
-
 	m_value = setstr;
 	m_highl[0] = m_highl[1] = 0;
 	m_caret = 0;
