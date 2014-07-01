@@ -40,9 +40,6 @@ Matrix g_camproj;
 Matrix g_cammvp;
 Matrix g_camview;
 
-void (*DrawSceneDepthFunc)() = NULL;
-void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
-
 Vec3f g_viewInter;
 
 void InitShadows()
@@ -467,7 +464,11 @@ void Transpose(Matrix mat, Matrix& transpMat)
 	transpMat.set(transp);
 }
 
-void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus)
+
+void (*DrawSceneDepthFunc)() = NULL;
+void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]) = NULL;
+
+void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus, void (*drawscenedepthfunc)())
 {
     g_camproj = projection;
     g_camview = viewmat;
@@ -550,8 +551,8 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 #if 1
     if(g_shadowpass)
     {
-        if(DrawSceneDepthFunc != NULL)
-            DrawSceneDepthFunc();
+        if(drawscenedepthfunc != NULL)
+            drawscenedepthfunc();
     }
 
 	//TurnOffShader();
@@ -593,7 +594,7 @@ void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, M
 	glUniform1fARB(s->m_slot[SSLOT_MAXELEV], g_maxelev);
 }
 
-void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview)
+void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]))
 {
 
 #if 0
@@ -656,8 +657,8 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	lightDir[1] = g_lightPos.y - g_lightEye.y;
 	lightDir[2] = g_lightPos.z - g_lightEye.z;
 
-	if(DrawSceneFunc != NULL)
-		DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	if(drawscenefunc != NULL)
+		drawscenefunc(projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
 		//DrawSceneFunc(projection, viewmat, modelmat, modelviewinv, (float*)&g_lightPos, lightDir);
 #if 0
 	//TurnOffShader();

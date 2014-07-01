@@ -647,7 +647,7 @@ void AdjustFrame()
 	g_mode = RENDERING;
 }
 
-void SaveRender()
+void SaveRender(int rendstage)
 {
 #if 0
 	SaveScreenshot();
@@ -750,7 +750,13 @@ void SaveRender()
 #endif
 
 	char fullpath[MAX_PATH+1];
-	sprintf(fullpath, "%s_si%d_fr%03d.png", g_renderbasename, g_rendside, g_renderframe);
+
+	string stage = "";
+
+	if(rendstage == RENDSTAGE_TEAM)
+		stage = "_team";
+
+	sprintf(fullpath, "%s_si%d_fr%03d%s.png", g_renderbasename, g_rendside, g_renderframe, stage.c_str());
 	SavePNG(fullpath, &sprite);
 	//sprite.channels = 3;
 	//sprintf(fullpath, "%s_si%d_fr%03d-rgb.png", g_renderbasename, g_rendside, g_renderframe);
@@ -778,7 +784,8 @@ void SaveRender()
 #else
 	//Delete resources
 	glDeleteTextures(1, &g_rendertex);
-	glDeleteRenderbuffers(1, &g_renderrb);
+	glDeleteTextures(1, &g_renderdepthtex);
+	//glDeleteRenderbuffers(1, &g_renderrb);
 	//Bind 0, which means render to back buffer, as a result, fb is unbound
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glDeleteFramebuffers(1, &g_renderfb);
@@ -789,50 +796,14 @@ void SaveRender()
 	g_renderbs = false;
 }
 
-void UpdateRender()
+void SpriteRender(int rendstage)
 {
-	ResetView();
-	g_lightPos = Rotate(g_lightPos, g_rendside*DEGTORAD(45.0), 0, 1, 0);
-	g_camera.rotateabout(Vec3f(0,0,0), g_rendside*DEGTORAD(45.0), 0, 1, 0);
-	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
-
-	//AllScreenMinMax needs to be called again because the pixels center of rendering depends on the window width and height, influencing the clip min/max
-	AllScreenMinMax(&g_clipmin, &g_clipmax, g_width, g_height);
-	g_spritecenter.x = g_width/2 - g_clipmin.x;
-	g_spritecenter.y = g_height/2 - g_clipmin.y;
-
-	APPMODE oldmode = g_mode;
-	g_mode = EDITOR;
-	Draw();
-	Draw();
-	g_mode = oldmode;
-#if 0
-	Draw();
-#elif 0
-	Ortho(g_width, g_height, 1, 1, 1, 1);
-	DrawViewport(3, 0, 0, g_width, g_height);
-	EndS();
-#else
-	glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
-#ifdef DEBUG
-	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
-	CheckGLError(__FILE__, __LINE__);
-#endif
-	glViewport(0, 0, g_width, g_height);
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
-	glClearColor(1.0, 1.0, 1.0, 0.0);
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
 	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<std::endl;
 #endif
-	glEnable(GL_DEPTH_TEST);
 
 	{
 		float aspect = fabsf((float)g_width / (float)g_height);
@@ -902,7 +873,10 @@ void UpdateRender()
 #ifdef DEBUG
 			LastNum(__FILE__, __LINE__);
 #endif
-			RenderShadowedScene(projection, viewmat, modelmat, modelview);
+			if(rendstage == RENDSTAGE_COLOR)
+				RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawScene);
+			else if(rendstage == RENDSTAGE_TEAM)
+				RenderShadowedScene(projection, viewmat, modelmat, modelview, DrawSceneTeam);
 		}
 #endif
 	}
@@ -918,7 +892,54 @@ void UpdateRender()
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	SaveRender();
+}
+
+void UpdateRender()
+{
+	ResetView();
+	g_lightPos = Rotate(g_lightPos, g_rendside*DEGTORAD(45.0), 0, 1, 0);
+	g_camera.rotateabout(Vec3f(0,0,0), g_rendside*DEGTORAD(45.0), 0, 1, 0);
+	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+
+	//AllScreenMinMax needs to be called again because the pixels center of rendering depends on the window width and height, influencing the clip min/max
+	AllScreenMinMax(&g_clipmin, &g_clipmax, g_width, g_height);
+	g_spritecenter.x = g_width/2 - g_clipmin.x;
+	g_spritecenter.y = g_height/2 - g_clipmin.y;
+
+	APPMODE oldmode = g_mode;
+	g_mode = EDITOR;
+	Draw();
+	Draw();
+	g_mode = oldmode;
+#if 0
+	Draw();
+#elif 0
+	Ortho(g_width, g_height, 1, 1, 1, 1);
+	DrawViewport(3, 0, 0, g_width, g_height);
+	EndS();
+#else
+	glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
+#ifdef DEBUG
+	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	glViewport(0, 0, g_width, g_height);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	glClearColor(1.0, 1.0, 1.0, 0.0);
+	glEnable(GL_DEPTH_TEST);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+
+	SpriteRender(RENDSTAGE_COLOR);
+	SaveRender(RENDSTAGE_COLOR);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+	SpriteRender(RENDSTAGE_TEAM);
+	SaveRender(RENDSTAGE_TEAM);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif

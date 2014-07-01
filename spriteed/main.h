@@ -20,6 +20,7 @@ class Matrix;
 
 void WriteConfig();
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
+void DrawSceneTeam(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
 void DrawSceneDepth();
 void Draw();
 

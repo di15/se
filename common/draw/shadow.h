@@ -30,11 +30,8 @@ void Transpose(Matrix mat, Matrix& transpMat);
 bool Inverse2(Matrix mat, Matrix& invMat);
 
 void InitShadows();
-void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus);
-void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview);
+void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f focus, void (*drawscenedepthfunc)());
+void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelview, void (*drawscenefunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]));
 void UseShadow(int shader, Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
-
-extern void (*DrawSceneDepthFunc)();
-extern void (*DrawSceneFunc)(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3]);
 
 #endif

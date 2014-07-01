@@ -1979,9 +1979,6 @@ void Callback_ChooseFile(const char* fullpath)
 
 void FillGUI()
 {
-	DrawSceneDepthFunc = &DrawSceneDepth;
-	DrawSceneFunc = &DrawScene;
-
 	g_applog<<"assign keys"<<std::endl;
 	g_applog.flush();
 

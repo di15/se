@@ -335,7 +335,7 @@ BrushSide::BrushSide(Vec3f normal, Vec3f point)
 	CreateTexture(m_diffusem, "textures/notex.jpg", false, true);
 	m_specularm = m_diffusem;
 	m_normalm = m_diffusem;
-	m_ownerm = m_diffusem;
+	CreateTexture(m_ownerm, "textures/notex.team.png", false, true);
 	m_vindices = NULL;
 	//m_centroid = Vec3f(0,0,0);
 }

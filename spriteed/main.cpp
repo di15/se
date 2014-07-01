@@ -160,6 +160,38 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 }
 
+void DrawSceneTeam(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
+{
+
+#if 1
+    UseShadow(SHADER_TEAM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+    glActiveTextureARB(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, g_depth);
+    glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+    /*
+    glActiveTextureARB(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, g_transparency);
+    glUniform1iARB(g_shader[SHADER_OWNED].m_slot[SSLOT_TEXTURE1], 1);
+    glActiveTextureARB(GL_TEXTURE0);*/
+    DrawModelHolders();
+#ifdef DEBUG
+    CheckGLError(__FILE__, __LINE__);
+#endif
+    EndS();
+#endif
+
+    UseShadow(SHADER_TEAM, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+    CheckGLError(__FILE__, __LINE__);
+    glActiveTextureARB(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, g_depth);
+    //glBindTexture(GL_TEXTURE_2D, g_texture[0].texname);
+    glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+    CheckGLError(__FILE__, __LINE__);
+    DrawEdMap(&g_edmap, g_showsky);
+    CheckGLError(__FILE__, __LINE__);
+    EndS();
+}
+
 void DrawSceneDepth()
 {
     //g_model[themodel].draw(0, Vec3f(0,0,0), 0);

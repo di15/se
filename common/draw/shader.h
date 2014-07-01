@@ -82,19 +82,20 @@ public:
 	GLhandleARB m_hProgramObject;
 };
 
-#define SHADER_DEPTH		0
-#define SHADER_SHADOW		1
-#define SHADER_OWNED		2
-#define SHADER_ORTHO		3
-#define SHADER_COLOR2D		4
-#define SHADER_MODEL		5
-#define SHADER_MAP		6
-#define SHADER_COLOR3D		7
-#define SHADER_BILLBOARD	8
-#define SHADER_WATER		9
-#define SHADER_COLOR3DPERSP	10
+#define SHADER_DEPTH			0
+#define SHADER_SHADOW			1
+#define SHADER_OWNED			2
+#define SHADER_ORTHO			3
+#define SHADER_COLOR2D			4
+#define SHADER_MODEL			5
+#define SHADER_MAP				6
+#define SHADER_COLOR3D			7
+#define SHADER_BILLBOARD		8
+#define SHADER_WATER			9
+#define SHADER_COLOR3DPERSP		10
 #define SHADER_BILLBOARDPERSP	11
-#define SHADERS				12
+#define SHADER_TEAM				12
+#define SHADERS					13
 
 extern Shader g_shader[SHADERS];
 extern int g_curS;

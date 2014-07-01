@@ -181,6 +181,7 @@ void InitGLSL()
 	LoadShader(SHADER_MAP, "shaders/map.vert", "shaders/map.frag");
 	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag");
 	LoadShader(SHADER_BILLBOARDPERSP, "shaders/billboardpersp.vert", "shaders/billboard.frag");
+	LoadShader(SHADER_TEAM, "shaders/team.vert", "shaders/team.frag");
 
 	CheckGLError(__FILE__, __LINE__);
 }

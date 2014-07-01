@@ -21,11 +21,14 @@ extern unsigned int g_renderfb;
 #define RENDER_BUILDING		0
 #define RENDER_UNIT			1
 
+#define RENDSTAGE_COLOR		0
+#define RENDSTAGE_TEAM		1
+
 void AdjustFrame();
 void PrepareRender(const char* fullpath, int rendtype);
 void UpdateRender();
 void EndRender();
 void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height);
-void SaveRender();
+void SaveRender(int rendstage);
 
 #endif
