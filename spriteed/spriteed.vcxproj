@@ -85,9 +85,11 @@
     <ClCompile Include="..\common\sim\entitytype.cpp" />
     <ClCompile Include="..\common\sim\explocrater.cpp" />
     <ClCompile Include="..\common\sim\map.cpp" />
+    <ClCompile Include="..\common\sim\road.cpp" />
     <ClCompile Include="..\common\sim\selection.cpp" />
     <ClCompile Include="..\common\sim\sim.cpp" />
     <ClCompile Include="..\common\sim\statesoldier.cpp" />
+    <ClCompile Include="..\common\sim\terrtile.cpp" />
     <ClCompile Include="..\common\sim\tile.cpp" />
     <ClCompile Include="..\common\sound.cpp" />
     <ClCompile Include="..\common\sys\dirent.c" />
@@ -176,9 +178,11 @@
     <ClInclude Include="..\common\sim\entitytype.h" />
     <ClInclude Include="..\common\sim\explocrater.h" />
     <ClInclude Include="..\common\sim\map.h" />
+    <ClInclude Include="..\common\sim\road.h" />
     <ClInclude Include="..\common\sim\selection.h" />
     <ClInclude Include="..\common\sim\sim.h" />
     <ClInclude Include="..\common\sim\statesoldier.h" />
+    <ClInclude Include="..\common\sim\terrtile.h" />
     <ClInclude Include="..\common\sim\tile.h" />
     <ClInclude Include="..\common\sound.h" />
     <ClInclude Include="..\common\sys\dirent.h" />

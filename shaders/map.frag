@@ -2,6 +2,7 @@
 #version 120
 
 uniform vec4 color;
+const vec4 owncolor = vec4(1,1,1,1);
 
 uniform sampler2D texture0;
 //uniform sampler2D texture1;
@@ -10,6 +11,7 @@ uniform sampler2D texture0;
 uniform sampler2D specularmap;
 uniform sampler2D normalmap;
 uniform sampler2D shadowmap;
+uniform sampler2D ownermap;
 
 varying vec4 lpos;
 varying vec3 light_vec;
@@ -24,15 +26,15 @@ varying vec3 eyevec;
 uniform float maxelev;
 varying float elevy;
 
-const vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
-);
+vec2 poissonDisk[4];
 
 void main (void)
 {
+  poissonDisk[0] = vec2( -0.94201624, -0.39906216 );
+  poissonDisk[1] = vec2( 0.94558609, -0.76890725 );
+  poissonDisk[2] = vec2( -0.094184101, -0.92938870 );
+  poissonDisk[3] = vec2( 0.34495938, 0.29387760 );
+
 	if(elevy > maxelev)
 		discard;
 
@@ -100,14 +102,19 @@ void main (void)
 	//float alph2 = texel2.w;
 	//float alph3 = texel3.w;
 
+	vec4 texel1 = texture2D(ownermap, gl_TexCoord[0].xy);
+	float alph1 = texel1.w;
 	vec4 stexel = texel0;
+	stexel = vec4(stexel.xyz * (1.0 - alph1) + owncolor.xyz * alph1, texel0.w);
+
+	//vec4 stexel = texel0;
 	//stexel = vec4(stexel.xyz * (1.0 - alph1) + texel1.xyz * alph1, 1.0);
 	//stexel = vec4(stexel.xyz * (1.0 - alph2) + texel2.xyz * alph2, 1.0);
 	//stexel = vec4(stexel.xyz * (1.0 - alph3) + texel3.xyz * alph3, 1.0);
 
 	//float alph = color.w * texel0.w * elevtransp;
 	//float alph = color.w * texel0.w;
-	float alph = 1;
+	float alph = texel0.w;
 	float minlight = min(shadow, diffuse);
 	//float minlight = diffuse;
 	//float minlight = shadow;
