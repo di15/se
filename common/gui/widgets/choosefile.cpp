@@ -58,6 +58,7 @@ void ChooseFile::reframe()	//resized or moved
 
 void ChooseFile::chdir(const char* fullpath)
 {
+#if 0
 	while(m_listbox.m_options.size() > 0)
 		m_listbox.erase(0);
 
@@ -81,6 +82,7 @@ void ChooseFile::chdir(const char* fullpath)
     }
 
     closedir(dp);
+#endif
 }
 
 void ChooseFile::draw()

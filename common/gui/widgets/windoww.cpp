@@ -124,7 +124,7 @@ void WindowW::reframe()
 	inner_top_mid_image.m_pos[2] = innerright - 12 - innerfree/6.0f - 32;
 	inner_top_mid_image.m_pos[3] = innertop + 3;
 
-	float minsz = std::min((innerright-innerleft),(innerbottom-innertop));
+	float minsz = fmin((innerright-innerleft),(innerbottom-innertop));
 
 	bg_logo_image.m_pos[0] = (innerleft+innerright)/2.0f - minsz/2.0f;
 	bg_logo_image.m_pos[1] = (innertop+innerbottom)/2.0f - minsz/2.0f;

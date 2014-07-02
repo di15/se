@@ -43,22 +43,12 @@ unsigned int g_renderrb;
 unsigned int g_renderfb;
 bool g_renderbs = false;
 
-bool CallResize(int w, int h)
+void MakeFBO()
 {
-	int maxsz[] = {0,0};
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, maxsz);
+	if(g_renderbs)
+		return;
 
-	if((w >= maxsz[0]*0.7f || h >= maxsz[0]*0.7f) && !g_warned)
-	{
-		g_warned = true;
-		char msg[1024];
-		sprintf(msg, "The required texture size of %dx%d exceeds or approaches your system's supported maximum of %d. You might not be able to finish the render. Reduce 1_tile_pixel_width in config.ini.", w, h, maxsz[0]);
-		WarningMessage("Warning", msg);
-	}
-
-#if 1
-
-	if(!g_renderbs && (g_mode == RENDERING || g_mode == PREREND_ADJFRAME))
+	if(g_mode == RENDERING || g_mode == PREREND_ADJFRAME)
 	{
 		g_renderbs = true;
 #if 0   //OpenGL 3.0 way
@@ -121,7 +111,7 @@ bool CallResize(int w, int h)
 
         glGenTextures(1, &g_rendertex);
         glBindTexture(GL_TEXTURE_2D, g_rendertex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, g_deswidth, g_desheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -131,7 +121,7 @@ bool CallResize(int w, int h)
 
         glGenTextures(1, &g_renderdepthtex);
         glBindTexture(GL_TEXTURE_2D, g_renderdepthtex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, g_deswidth, g_desheight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -157,7 +147,7 @@ bool CallResize(int w, int h)
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
             ErrorMessage("Error", "Couldn't create framebuffer for render.");
-            return false;
+            return;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
@@ -167,6 +157,55 @@ bool CallResize(int w, int h)
 		g_applog<<__FILE__<<":"<<__LINE__<<"create check frame buf stat ext: "<<glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)<<" ok="<<(int)(GL_FRAMEBUFFER_COMPLETE)<<std::endl;
 #endif
 	}
+}
+
+void DelFBO()
+{
+#if 0
+	CheckGLError(__FILE__, __LINE__);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	CheckGLError(__FILE__, __LINE__);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+	CheckGLError(__FILE__, __LINE__);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	CheckGLError(__FILE__, __LINE__);
+	glDeleteFramebuffers(1, &g_renderfb);
+	CheckGLError(__FILE__, __LINE__);
+	glDeleteRenderbuffers(1, &g_renderrb);
+	CheckGLError(__FILE__, __LINE__);
+	glDeleteTextures(1, &g_rendertex);
+	CheckGLError(__FILE__, __LINE__);
+#else
+	//Delete resources
+	glDeleteTextures(1, &g_rendertex);
+	glDeleteTextures(1, &g_renderdepthtex);
+	//glDeleteRenderbuffers(1, &g_renderrb);
+	//Bind 0, which means render to back buffer, as a result, fb is unbound
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glDeleteFramebuffers(1, &g_renderfb);
+#ifdef DEBUG
+	CheckGLError(__FILE__, __LINE__);
+#endif
+#endif
+	
+	g_renderbs = false;
+}
+
+bool CallResize(int w, int h)
+{
+	int maxsz[] = {0,0};
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, maxsz);
+
+	if((w >= maxsz[0]*0.7f || h >= maxsz[0]*0.7f) && !g_warned)
+	{
+		g_warned = true;
+		char msg[1024];
+		sprintf(msg, "The required texture size of %dx%d exceeds or approaches your system's supported maximum of %d. You might not be able to finish the render. Reduce 1_tile_pixel_width in config.ini.", w, h, maxsz[0]);
+		WarningMessage("Warning", msg);
+	}
+
+#if 1
 	//w=2048;
 	//h=2048;
 #if 0
@@ -179,6 +218,7 @@ bool CallResize(int w, int h)
 	WindowRect.bottom=(long)h;
 #else
     SDL_SetWindowSize(g_window, w, h);
+	Resize(w, h);
 #endif
 
 	int startx = 0;
@@ -733,7 +773,7 @@ void SaveRender(int rendstage)
 			int index = 4 * ( y * imagew + x );
 			int index2 = 4 * ( (y+yoff) * g_width + (x+xoff) );
 
-#if 0
+#if 1
 			if(screen.data[index2+0] == transpkey[0]
 			&& screen.data[index2+1] == transpkey[1]
 			&& screen.data[index2+2] == transpkey[2])
@@ -765,40 +805,15 @@ void SaveRender(int rendstage)
 	sprintf(fullpath, "%s_si%d_fr%03d.txt", g_renderbasename, g_rendside, g_renderframe);
 	ofstream ofs(fullpath, ios_base::out);
 	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<std::endl<<imagew<<" "<<imageh<<std::endl<<clipsz.x<<" "<<clipsz.y;
-
-#if 0
-	CheckGLError(__FILE__, __LINE__);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	CheckGLError(__FILE__, __LINE__);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-	CheckGLError(__FILE__, __LINE__);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
-	CheckGLError(__FILE__, __LINE__);
-	glDeleteFramebuffers(1, &g_renderfb);
-	CheckGLError(__FILE__, __LINE__);
-	glDeleteRenderbuffers(1, &g_renderrb);
-	CheckGLError(__FILE__, __LINE__);
-	glDeleteTextures(1, &g_rendertex);
-	CheckGLError(__FILE__, __LINE__);
-#else
-	//Delete resources
-	glDeleteTextures(1, &g_rendertex);
-	glDeleteTextures(1, &g_renderdepthtex);
-	//glDeleteRenderbuffers(1, &g_renderrb);
-	//Bind 0, which means render to back buffer, as a result, fb is unbound
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	glDeleteFramebuffers(1, &g_renderfb);
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
-#endif
-	g_renderbs = false;
 }
 
 void SpriteRender(int rendstage)
 {
+	glClearColor(g_transpkey[0],g_transpkey[1],g_transpkey[2],0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
@@ -933,13 +948,17 @@ void UpdateRender()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
+	MakeFBO();
 	SpriteRender(RENDSTAGE_COLOR);
 	SaveRender(RENDSTAGE_COLOR);
+	DelFBO();
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
+	MakeFBO();
 	SpriteRender(RENDSTAGE_TEAM);
 	SaveRender(RENDSTAGE_TEAM);
+	DelFBO();
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -977,4 +996,5 @@ void EndRender()
 	CallResize(g_origwidth, g_origheight);
 	ResetView();
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
+	g_GUI.reframe();
 }

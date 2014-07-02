@@ -169,19 +169,19 @@ void InitGLSL()
 
 	CheckGLError(__FILE__, __LINE__);
 
-	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag");
-	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag");
-	LoadShader(SHADER_MODEL, "shaders/model.vert", "shaders/model.frag");
-	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag");
-	LoadShader(SHADER_COLOR3DPERSP, "shaders/color3dpersp.vert", "shaders/color3d.frag");
-	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag");
-	LoadShader(SHADER_DEPTH, "shaders/depth.vert", "shaders/depth.frag");
+	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag", true, true, false);
+	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag", true, false, false);
+	LoadShader(SHADER_MODEL, "shaders/model.vert", "shaders/model.frag", true, true, true);
+	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag", true, false, false);
+	LoadShader(SHADER_COLOR3DPERSP, "shaders/color3dpersp.vert", "shaders/color3d.frag", true, false, false);
+	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag", true, true, false);
+	LoadShader(SHADER_DEPTH, "shaders/depth.vert", "shaders/depth.frag", true, true, false);
 	//LoadShader(SHADER_SHADOW, "shaders/shadow.vert", "shaders/shadow.frag");
-	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag");
-	LoadShader(SHADER_MAP, "shaders/map.vert", "shaders/map.frag");
-	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag");
-	LoadShader(SHADER_BILLBOARDPERSP, "shaders/billboardpersp.vert", "shaders/billboard.frag");
-	LoadShader(SHADER_TEAM, "shaders/team.vert", "shaders/team.frag");
+	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag", true, true, true);
+	LoadShader(SHADER_MAP, "shaders/map.vert", "shaders/map.frag", true, true, true);
+	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag", true, true, true);
+	LoadShader(SHADER_BILLBOARDPERSP, "shaders/billboardpersp.vert", "shaders/billboard.frag", true, true, false);
+	LoadShader(SHADER_TEAM, "shaders/team.vert", "shaders/team.frag", true, true, true);
 
 	CheckGLError(__FILE__, __LINE__);
 }
@@ -204,9 +204,14 @@ std::string LoadTextFile(char* strFile)
 	return strText;
 }
 
-void LoadShader(int shader, char* strVertex, char* strFragment)
+void LoadShader(int shader, char* strVertex, char* strFragment, bool hasverts, bool hastexcoords, bool hasnormals)
 {
 	Shader* s = &g_shader[shader];
+	
+	g_shader[shader].m_hasverts = hasverts;
+	g_shader[shader].m_hastexcoords = hastexcoords;
+	g_shader[shader].m_hasnormals = hasnormals;
+
 	std::string strVShader, strFShader;
 
 	if(s->m_hVertexShader || s->m_hFragmentShader || s->m_hProgramObject)
@@ -425,9 +430,9 @@ void UseS(int shader)
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
+	if(s->m_hasverts)	glEnableClientState(GL_VERTEX_ARRAY);
+	if(s->m_hastexcoords)	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	if(s->m_hasnormals)	glEnableClientState(GL_NORMAL_ARRAY);
 }
 
 void EndS()

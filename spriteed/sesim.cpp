@@ -852,7 +852,7 @@ void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 
 		//return;
 
-		DrawDrag_Door(map, mvp, w, h, persp);
+		//DrawDrag_Door(map, mvp, w, h, persp);
 	}
 	else if(g_selB.size() > 0)
 	{
@@ -929,7 +929,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 			{
 				g_selB.clear();
 				g_selB.push_back(*i);
-				//g_GUI.closeall();
+				CloseSideView();
 				g_GUI.open("brush edit");
 				return;
 			}
@@ -1300,6 +1300,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	g_dragW = false;
 	g_dragD = -1;
 
+#if 0
 	if(g_GUI.get("door edit")->m_opened)
 	{
 		if(g_selB.size() <= 0)
@@ -1316,6 +1317,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	}
 
 	nodoor:
+#endif
 
 	CloseSideView();
 	//CloseView("brush side edit");
@@ -1326,7 +1328,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	{
 		if(g_dragS >= 0)
 		{
-			g_GUI.closeall();
+			CloseSideView();
 			g_GUI.open("brush edit");
 			g_GUI.open("brush side edit");
 			RedoBSideGUI();

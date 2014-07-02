@@ -465,7 +465,7 @@ void TextArea::copyval()
 	g_applog.flush();
 #endif
 
-#ifdef PLATFORM_WIN
+#if 0
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		std::string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
@@ -498,7 +498,7 @@ void TextArea::copyval()
 
 void TextArea::pasteval()
 {
-#ifdef PLATFORM_WIN
+#if 0
 #ifdef PASTE_DEBUG
 	g_applog<<"paste"<<std::endl;
 #endif

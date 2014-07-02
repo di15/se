@@ -75,6 +75,9 @@ public:
 
 	void release();
 
+	bool m_hasverts;
+	bool m_hastexcoords;
+	bool m_hasnormals;
 	GLint m_slot[SSLOTS];
 
 	GLhandleARB m_hVertexShader;
@@ -106,7 +109,7 @@ void InitGLSL();
 void TurnOffShader();
 void ReleaseShaders();
 std::string LoadTextFile(char* strFile);
-void LoadShader(int shader, char* strVertex, char* strFragment);
+void LoadShader(int shader, char* strVertex, char* strFragment, bool hasverts, bool hastexcoords, bool hasnormals);
 void GetGLVersion(int* major, int* minor);
 
 #endif

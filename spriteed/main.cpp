@@ -35,6 +35,10 @@ bool g_moved = false;
 
 void Draw()
 {
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
     CheckGLError(__FILE__, __LINE__);
 
     if(g_mode == LOADING)
@@ -49,12 +53,22 @@ void Draw()
     LastNum(__FILE__, __LINE__);
     CheckGLError(__FILE__, __LINE__);
 #endif
+	
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
     g_GUI.frameupd();
 
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
     CheckGLError(__FILE__, __LINE__);
+#endif
+	
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
 #endif
 
     g_GUI.draw();
@@ -80,12 +94,21 @@ void Draw()
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
 #endif
+	
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
     SDL_GL_SwapWindow(g_window);
 }
 
 void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelviewinv, float mvLightPos[3], float lightDir[3])
 {
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
 #endif
@@ -130,6 +153,11 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     EndS();
 #endif
 
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
+
     UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
     CheckGLError(__FILE__, __LINE__);
     glActiveTextureARB(GL_TEXTURE4);
@@ -141,10 +169,10 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     CheckGLError(__FILE__, __LINE__);
     EndS();
 
-    if(g_mode == EDITOR)
-    {
-
-    }
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 #if 0
     if(g_mode == RENDERING)
@@ -195,6 +223,10 @@ void DrawSceneTeam(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mo
 void DrawSceneDepth()
 {
     //g_model[themodel].draw(0, Vec3f(0,0,0), 0);
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
@@ -205,6 +237,10 @@ void DrawSceneDepth()
 #ifdef DEBUG
     CheckGLError(__FILE__, __LINE__);
 #endif
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
     //if(g_model[0].m_on)
     //	g_model[0].draw(0, Vec3f(0,0,0), 0);
 
@@ -213,6 +249,10 @@ void DrawSceneDepth()
 		for(int j=0; j<5; j++)
 			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
 
+#ifdef DEBUG
+	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 #ifdef DEBUG
     CheckGLError(__FILE__, __LINE__);
 #endif
@@ -557,6 +597,10 @@ void EventLoop()
         SDL_Event e;
         while (SDL_PollEvent(&e))
         {
+#ifdef DEBUG
+			g_applog<<"ev "<<e.type<<std::endl;
+#endif
+
             InEv ev;
             ev.intercepted = false;
 
@@ -566,6 +610,9 @@ void EventLoop()
                 switch (e.window.event)
                 {
                 case SDL_WINDOWEVENT_RESIZED:
+
+					//InfoMessage("info", "resz");
+
                     if(g_mode == PREREND_ADJFRAME)
                     {
 #ifdef DEBUG
@@ -577,8 +624,8 @@ void EventLoop()
                     }
                     else
                     {
-#if 0
-                        g_applog<<"rf"<<g_renderframe<<" rsz "<<(LOWORD(lParam))<<","<<(HIWORD(lParam))<<std::endl;
+#if DEBUG
+                        g_applog<<"rf"<<g_renderframe<<" rsz "<<e.window.data1<<","<<e.window.data2<<std::endl;
 #endif
                         Resize(e.window.data1, e.window.data2);
                     }
@@ -792,19 +839,27 @@ void EventLoop()
         if(g_mode == LOADING || g_mode == RENDERING || DrawNextFrame(FRAME_RATE))
         {
 #ifdef DEBUG
+			g_applog<<"calc draw rate"<<std::endl;
+			g_applog.flush();
             CheckGLError(__FILE__, __LINE__);
 #endif
             CalcDrawRate();
 #ifdef DEBUG
+			g_applog<<"score fps"<<std::endl;
+			g_applog.flush();
             CheckGLError(__FILE__, __LINE__);
 #endif
             ScoreFPS();
 #ifdef DEBUG
+			g_applog<<"update"<<std::endl;
+			g_applog.flush();
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif
             Update();
 #ifdef DEBUG
+			g_applog<<"draw"<<std::endl;
+			g_applog.flush();
             LastNum(__FILE__, __LINE__);
             CheckGLError(__FILE__, __LINE__);
 #endif

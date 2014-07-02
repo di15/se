@@ -205,7 +205,7 @@ void Button::draw()
 
 		float w = m_pos[2]-m_pos[0]-2;
 		float h = m_pos[3]-m_pos[1]-2;
-		float minsz = std::min(w, h);
+		float minsz = fmin(w, h);
 
 		DrawImage(g_texture[m_tex].texname, m_pos[0]+1, m_pos[1]+1, m_pos[0]+minsz, m_pos[1]+minsz);
 

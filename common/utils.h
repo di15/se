@@ -39,6 +39,8 @@ void Sleep(int ms);
 
 float fmax(float a, float b);
 float fmin(float a, float b);
+int imax(float a, float b);
+int imin(float a, float b);
 
 #endif
 

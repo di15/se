@@ -90,6 +90,12 @@ void NextLineBreak()
 
 void DrawGlyph()
 {
+	
+#ifdef DEBUG
+		g_applog<<"drawglyph() "<<str[i]<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog.flush();
+#endif
+
     Font* f = &g_font[font];
     Glyph* g = &f->glyph[str[i]];
 
@@ -315,6 +321,11 @@ void LoadFont(int id, const char* fontname)
 
 void DrawGlyph(float left, float top, float right, float bottom, float texleft, float textop, float texright, float texbottom)
 {
+#ifdef DEBUG
+		g_applog<<"drawglyph "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog.flush();
+#endif
+
     float vertices[] =
     {
         //posx, posy    texx, texy
@@ -334,6 +345,11 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 
 	//glVertexPointer(3, GL_FLOAT, sizeof(float)*5, &vertices[0]);
 	//glTexCoordPointer(2, GL_FLOAT, sizeof(float)*5, &vertices[3]);
+	
+#ifdef DEBUG
+		g_applog<<"drawglyph vp "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog.flush();
+#endif
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
@@ -351,6 +367,11 @@ void DrawGlyph(float left, float top, float right, float bottom, float texleft, 
 #endif
     glVertexPointer(3, GL_FLOAT, sizeof(float) * 5, &vertices[0]);
     glTexCoordPointer(2, GL_FLOAT, sizeof(float) * 5, &vertices[3]);
+	
+#ifdef DEBUG
+		g_applog<<"drawglyph dra "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog.flush();
+#endif
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 #ifdef DEBUG

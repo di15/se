@@ -18,6 +18,11 @@ int g_kbfocus = 0;
 
 void GUI::draw()
 {
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	CheckGLError(__FILE__, __LINE__);
@@ -27,11 +32,28 @@ void GUI::draw()
 #if 0
 	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
+	
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
+	{
+#ifdef DEBUG
+		g_applog<<"gui "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog.flush();
+#endif
+
 		(*i)->draw();
+	}
 
 	CheckGLError(__FILE__, __LINE__);
+	
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->drawover();
@@ -55,8 +77,18 @@ void GUI::draw()
 
 	CheckGLError(__FILE__, __LINE__);
 
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
+
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
+	
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 	UseS(SHADER_COLOR2D);
 	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
@@ -65,6 +97,11 @@ void GUI::draw()
 	//glEnable(GL_DEPTH_TEST);
 	//DrawSelector();
 	//DrawMarquee();
+	
+#ifdef DEBUG
+	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
+	g_applog.flush();
+#endif
 
 	CheckGLError(__FILE__, __LINE__);
 	EndS();

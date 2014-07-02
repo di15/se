@@ -649,7 +649,7 @@ bool OpenFileDialog(char* initdir, char* filepath)
 	ofn.lpstrInitialDir = initdir;
 	ofn.lpstrFile = filepath;
 	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
+	ofn.nMaxFile = MAX_PATH;
 	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
 	ofn.lpstrFilter = "All\0*.*\0";
 	ofn.nFilterIndex =1;
@@ -724,7 +724,7 @@ bool SaveFileDialog(char* initdir, char* filepath)
 	ofn.lpstrInitialDir = initdir;
 	ofn.lpstrFile = filepath;
 	//ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = sizeof( filepath );
+	ofn.nMaxFile = MAX_PATH;
 	//ofn.lpstrFilter = "Save\0*.map\0All\0*.*\0";
 	ofn.lpstrFilter = "All\0*.*\0";
 	ofn.nFilterIndex =1;
@@ -734,8 +734,8 @@ bool SaveFileDialog(char* initdir, char* filepath)
 	ofn.Flags = OFN_OVERWRITEPROMPT;
 
 	if(!GetSaveFileName(&ofn))
-		return;
-
+		return false;
+	
 	return true;
 #elif defined( PLATFORM_LINUX )
     GtkWidget *dialog;
@@ -1031,6 +1031,11 @@ void RedoBSideGUI()
 
 	if(g_dragS < 0)
 		return;
+	
+	if(!g_GUI.get("brush side edit"))	InfoMessage("e", "no bse");
+	if(!g_GUI.get("brush side edit")->get("left panel"))	InfoMessage("e", "no lp");
+	if(!g_GUI.get("brush side edit")->get("left panel")->get("u equation"))	InfoMessage("e", "no ue");
+	if(!g_GUI.get("brush side edit")->get("left panel")->get("v equation"))	InfoMessage("e", "no ve");
 
 	EditBox* uwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("u equation");
 	EditBox* vwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("v equation");
@@ -2168,8 +2173,8 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	//leftpanel->add(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
 
 	g_GUI.add(new ViewLayer(&g_GUI, "brush side edit"));
-	ViewLayer* brushsideeditview = (ViewLayer*)g_GUI.get("brush edit");
-	brushsideeditview->add(new Frame(NULL, "left panel", Resize_BrushSideEditFrame));
+	ViewLayer* brushsideeditview = (ViewLayer*)g_GUI.get("brush side edit");
+	brushsideeditview->add(new Frame(brushsideeditview, "left panel", Resize_BrushSideEditFrame));
 
 	leftpanel = brushsideeditview->get("left panel");
 	leftpanel->add(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, BUTTON_BGIMAGE, Resize_RotateTexButton, Click_RotateTex, NULL, NULL, NULL, NULL, -1));

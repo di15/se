@@ -63,10 +63,10 @@ Vec2i TileTimes(Vec2f* tc)
 	Vec2f tc1 = tc[1];
 	Vec2f tc2 = tc[2];
 
-	float minu = std::min(tc0.x, std::min(tc1.x, tc2.x));
-	float minv = std::min(tc0.y, std::min(tc1.y, tc2.y));
-	float maxu = std::max(tc0.x, std::max(tc1.x, tc2.x));
-	float maxv = std::max(tc0.y, std::max(tc1.y, tc2.y));
+	float minu = fmin(tc0.x, fmin(tc1.x, tc2.x));
+	float minv = fmin(tc0.y, fmin(tc1.y, tc2.y));
+	float maxu = fmax(tc0.x, fmax(tc1.x, tc2.x));
+	float maxv = fmax(tc0.y, fmax(tc1.y, tc2.y));
 
 	float rangeu = maxu - minu;
 	float rangev = maxv - minv;
@@ -832,10 +832,10 @@ void CalcTexCoords(EdMap* map, std::list<ModelHolder> &modelholders)
 				tc[1] = va->texcoords[j + 1];
 				tc[2] = va->texcoords[j + 2];
 
-				float minu = std::min(tc[0].x, std::min(tc[1].x, tc[2].x));
-				float minv = std::min(tc[0].y, std::min(tc[1].y, tc[2].y));
-				float maxu = std::max(tc[0].x, std::max(tc[1].x, tc[2].x));
-				float maxv = std::max(tc[0].y, std::max(tc[1].y, tc[2].y));
+				float minu = fmin(tc[0].x, fmin(tc[1].x, tc[2].x));
+				float minv = fmin(tc[0].y, fmin(tc[1].y, tc[2].y));
+				float maxu = fmax(tc[0].x, fmax(tc[1].x, tc[2].x));
+				float maxv = fmax(tc[0].y, fmax(tc[1].y, tc[2].y));
 
 				float rangeu = maxu - minu;
 				float rangev = maxv - minv;
@@ -878,10 +878,10 @@ void CalcTexCoords(EdMap* map, std::list<ModelHolder> &modelholders)
 			tc[1] = va->texcoords[j + 1];
 			tc[2] = va->texcoords[j + 2];
 
-			float minu = std::min(tc[0].x, std::min(tc[1].x, tc[2].x));
-			float minv = std::min(tc[0].y, std::min(tc[1].y, tc[2].y));
-			float maxu = std::max(tc[0].x, std::max(tc[1].x, tc[2].x));
-			float maxv = std::max(tc[0].y, std::max(tc[1].y, tc[2].y));
+			float minu = fmin(tc[0].x, fmin(tc[1].x, tc[2].x));
+			float minv = fmin(tc[0].y, fmin(tc[1].y, tc[2].y));
+			float maxu = fmax(tc[0].x, fmax(tc[1].x, tc[2].x));
+			float maxv = fmax(tc[0].y, fmax(tc[1].y, tc[2].y));
 
 			float rangeu = maxu - minu;
 			float rangev = maxv - minv;

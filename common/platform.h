@@ -29,10 +29,8 @@
 #include <winsock2.h>	// winsock2 needs to be included before windows.h
 #include <windows.h>
 #include <mmsystem.h>
-#endif
-
-#ifdef PLATFORM_WIN
 #include <commdlg.h>
+#include "sys/dirent.h"
 #endif
 
 #ifdef PLATFORM_LINUX
@@ -92,7 +90,7 @@
 #include <GL/wglew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <SDL_net.h>
+//#include <SDL_net.h>
 #endif
 #endif
 

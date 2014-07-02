@@ -218,8 +218,13 @@ void CorrectSlashes(char* corrected)
 {
 	int strl = strlen(corrected);
 	for(int i=0; i<strl; i++)
+#ifdef PLATFORM_WIN
+		if(corrected[i] == '/')
+			corrected[i] = '\\';
+#else
 		if(corrected[i] == '\\')
 			corrected[i] = '/';
+#endif
 }
 
 void BackSlashes(char* corrected)
@@ -287,8 +292,18 @@ float fmax(float a, float b)
 	return (((a)>(b))?(a):(b));
 }
 
-
 float fmin(float a, float b)
+{
+	return (((a)<(b))?(a):(b));
+}
+
+int imax(int a, int b)
+{
+	return (((a)>(b))?(a):(b));
+}
+
+
+int imin(int a, int b)
 {
 	return (((a)<(b))?(a):(b));
 }

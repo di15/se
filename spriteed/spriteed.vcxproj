@@ -30,29 +30,31 @@
     <ClCompile Include="..\common\draw\sortb.cpp" />
     <ClCompile Include="..\common\draw\vertexarray.cpp" />
     <ClCompile Include="..\common\draw\water.cpp" />
-    <ClCompile Include="..\common\gui\barbutton.cpp" />
-    <ClCompile Include="..\common\gui\button.cpp" />
-    <ClCompile Include="..\common\gui\checkbox.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
-    <ClCompile Include="..\common\gui\dropdownl.cpp" />
-    <ClCompile Include="..\common\gui\dropdownm.cpp" />
-    <ClCompile Include="..\common\gui\dropdowns.cpp" />
-    <ClCompile Include="..\common\gui\editbox.cpp" />
     <ClCompile Include="..\common\gui\font.cpp" />
-    <ClCompile Include="..\common\gui\frame.cpp" />
     <ClCompile Include="..\common\gui\gui.cpp" />
-    <ClCompile Include="..\common\gui\hscroller.cpp" />
-    <ClCompile Include="..\common\gui\image.cpp" />
-    <ClCompile Include="..\common\gui\insdraw.cpp" />
-    <ClCompile Include="..\common\gui\link.cpp" />
-    <ClCompile Include="..\common\gui\listbox.cpp" />
-    <ClCompile Include="..\common\gui\text.cpp" />
-    <ClCompile Include="..\common\gui\textarea.cpp" />
-    <ClCompile Include="..\common\gui\textblock.cpp" />
-    <ClCompile Include="..\common\gui\touchlistener.cpp" />
-    <ClCompile Include="..\common\gui\view.cpp" />
-    <ClCompile Include="..\common\gui\viewportw.cpp" />
+    <ClCompile Include="..\common\gui\inevent.cpp" />
+    <ClCompile Include="..\common\gui\viewlayer.cpp" />
     <ClCompile Include="..\common\gui\widget.cpp" />
+    <ClCompile Include="..\common\gui\widgets\barbutton.cpp" />
+    <ClCompile Include="..\common\gui\widgets\button.cpp" />
+    <ClCompile Include="..\common\gui\widgets\checkbox.cpp" />
+    <ClCompile Include="..\common\gui\widgets\choosefile.cpp" />
+    <ClCompile Include="..\common\gui\widgets\dropdowns.cpp" />
+    <ClCompile Include="..\common\gui\widgets\editbox.cpp" />
+    <ClCompile Include="..\common\gui\widgets\frame.cpp" />
+    <ClCompile Include="..\common\gui\widgets\hscrollbar.cpp" />
+    <ClCompile Include="..\common\gui\widgets\image.cpp" />
+    <ClCompile Include="..\common\gui\widgets\insdraw.cpp" />
+    <ClCompile Include="..\common\gui\widgets\link.cpp" />
+    <ClCompile Include="..\common\gui\widgets\listbox.cpp" />
+    <ClCompile Include="..\common\gui\widgets\text.cpp" />
+    <ClCompile Include="..\common\gui\widgets\textarea.cpp" />
+    <ClCompile Include="..\common\gui\widgets\textblock.cpp" />
+    <ClCompile Include="..\common\gui\widgets\touchlistener.cpp" />
+    <ClCompile Include="..\common\gui\widgets\viewportw.cpp" />
+    <ClCompile Include="..\common\gui\widgets\vscrollbar.cpp" />
+    <ClCompile Include="..\common\gui\widgets\windoww.cpp" />
     <ClCompile Include="..\common\math\3dmath.cpp" />
     <ClCompile Include="..\common\math\brush.cpp" />
     <ClCompile Include="..\common\math\brushside.cpp" />
@@ -88,9 +90,12 @@
     <ClCompile Include="..\common\sim\statesoldier.cpp" />
     <ClCompile Include="..\common\sim\tile.cpp" />
     <ClCompile Include="..\common\sound.cpp" />
+    <ClCompile Include="..\common\sys\dirent.c" />
+    <ClCompile Include="..\common\sys\unicode.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\tool\compilebl.cpp" />
     <ClCompile Include="..\common\tool\rendersprite.cpp" />
+    <ClCompile Include="..\common\ustring.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
     <ClCompile Include="..\common\window.cpp" />
     <ClCompile Include="main.cpp" />
@@ -113,29 +118,31 @@
     <ClInclude Include="..\common\draw\sortb.h" />
     <ClInclude Include="..\common\draw\vertexarray.h" />
     <ClInclude Include="..\common\draw\water.h" />
-    <ClInclude Include="..\common\gui\barbutton.h" />
-    <ClInclude Include="..\common\gui\button.h" />
-    <ClInclude Include="..\common\gui\checkbox.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />
-    <ClInclude Include="..\common\gui\dropdownl.h" />
-    <ClInclude Include="..\common\gui\dropdownm.h" />
-    <ClInclude Include="..\common\gui\dropdowns.h" />
-    <ClInclude Include="..\common\gui\editbox.h" />
     <ClInclude Include="..\common\gui\font.h" />
-    <ClInclude Include="..\common\gui\frame.h" />
     <ClInclude Include="..\common\gui\gui.h" />
-    <ClInclude Include="..\common\gui\hscroller.h" />
-    <ClInclude Include="..\common\gui\image.h" />
-    <ClInclude Include="..\common\gui\insdraw.h" />
-    <ClInclude Include="..\common\gui\link.h" />
-    <ClInclude Include="..\common\gui\listbox.h" />
-    <ClInclude Include="..\common\gui\text.h" />
-    <ClInclude Include="..\common\gui\textarea.h" />
-    <ClInclude Include="..\common\gui\textblock.h" />
-    <ClInclude Include="..\common\gui\touchlistener.h" />
-    <ClInclude Include="..\common\gui\view.h" />
-    <ClInclude Include="..\common\gui\viewportw.h" />
+    <ClInclude Include="..\common\gui\inevent.h" />
+    <ClInclude Include="..\common\gui\viewlayer.h" />
     <ClInclude Include="..\common\gui\widget.h" />
+    <ClInclude Include="..\common\gui\widgets\barbutton.h" />
+    <ClInclude Include="..\common\gui\widgets\button.h" />
+    <ClInclude Include="..\common\gui\widgets\checkbox.h" />
+    <ClInclude Include="..\common\gui\widgets\choosefile.h" />
+    <ClInclude Include="..\common\gui\widgets\dropdowns.h" />
+    <ClInclude Include="..\common\gui\widgets\editbox.h" />
+    <ClInclude Include="..\common\gui\widgets\frame.h" />
+    <ClInclude Include="..\common\gui\widgets\hscrollbar.h" />
+    <ClInclude Include="..\common\gui\widgets\image.h" />
+    <ClInclude Include="..\common\gui\widgets\insdraw.h" />
+    <ClInclude Include="..\common\gui\widgets\link.h" />
+    <ClInclude Include="..\common\gui\widgets\listbox.h" />
+    <ClInclude Include="..\common\gui\widgets\text.h" />
+    <ClInclude Include="..\common\gui\widgets\textarea.h" />
+    <ClInclude Include="..\common\gui\widgets\textblock.h" />
+    <ClInclude Include="..\common\gui\widgets\touchlistener.h" />
+    <ClInclude Include="..\common\gui\widgets\viewportw.h" />
+    <ClInclude Include="..\common\gui\widgets\vscrollbar.h" />
+    <ClInclude Include="..\common\gui\widgets\windoww.h" />
     <ClInclude Include="..\common\math\3dmath.h" />
     <ClInclude Include="..\common\math\brush.h" />
     <ClInclude Include="..\common\math\brushside.h" />
@@ -174,9 +181,12 @@
     <ClInclude Include="..\common\sim\statesoldier.h" />
     <ClInclude Include="..\common\sim\tile.h" />
     <ClInclude Include="..\common\sound.h" />
+    <ClInclude Include="..\common\sys\dirent.h" />
+    <ClInclude Include="..\common\sys\unicode.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\tool\compilebl.h" />
     <ClInclude Include="..\common\tool\rendersprite.h" />
+    <ClInclude Include="..\common\ustring.h" />
     <ClInclude Include="..\common\utils.h" />
     <ClInclude Include="..\common\window.h" />
     <ClInclude Include="main.h" />
@@ -224,15 +234,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\GL;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\GL;$(LibraryPath)</LibraryPath>
     <TargetName>SpriteEdDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>SpriteEd</TargetName>
-    <IncludePath>$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\GL;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
