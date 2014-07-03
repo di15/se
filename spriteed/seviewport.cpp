@@ -276,7 +276,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 
 	if(g_projtype == PROJ_PERSP && v->m_type == VIEWPORT_ANGLE45O)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else if(g_projtype == PROJ_ORTHO || v->m_type != VIEWPORT_ANGLE45O)
@@ -305,7 +305,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	//	upvec = t->m_up;
 
-	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
 	g_camview = viewmat;
 
@@ -314,6 +314,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	float translation[] = {0, 0, 0};
 	modelview.setTranslation(translation);
 	modelmat.setTranslation(translation);
+	//modelview.postmult(viewmat);
 	modelview.postmult(viewmat);
 
 	g_cammodelview = modelview;
@@ -412,6 +413,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
 		glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 		glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+		glUniformMatrix4fvARB(s->m_slot[SSLOT_MVP], 1, GL_FALSE, mvpmat.m_matrix);
 		//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		DrawGrid(vmin, vmax);
 #ifdef DEBUG
@@ -432,23 +434,27 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	{
 		Shader* s = &g_shader[g_curS];
 
-		//if(persp)
-		if(v->m_type == VIEWPORT_ANGLE45O)
+#if 1
+		if(persp)
+		//if(v->m_type == VIEWPORT_ANGLE45O)
 		{
 			UseS(SHADER_COLOR3DPERSP);
 			s = &g_shader[g_curS];
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_MVP], 1, GL_FALSE, mvpmat.m_matrix);
 			//glEnableVertexAttribArray(s->m_slot[SSLOT_POSITION]);
 		}
 		else
+#endif
 		{
 			UseS(SHADER_COLOR3D);
 			s = &g_shader[g_curS];
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_PROJECTION], 1, GL_FALSE, projection.m_matrix);
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_VIEWMAT], 1, GL_FALSE, viewmat.m_matrix);
 			glUniformMatrix4fvARB(s->m_slot[SSLOT_MODELMAT], 1, GL_FALSE, modelmat.m_matrix);
+			glUniformMatrix4fvARB(s->m_slot[SSLOT_MVP], 1, GL_FALSE, mvpmat.m_matrix);
 		}
 
 #ifdef DEBUG
@@ -615,7 +621,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 
 	if(v->m_type == VIEWPORT_ANGLE45O && g_projtype == PROJ_PERSP)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else
@@ -645,9 +651,10 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	//if(v->m_type != VIEWPORT_ANGLE45O)
 	//	upvec = t->m_up;
 
-	Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+	Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
+	//mvpmat.postmult(viewmat);
 	mvpmat.postmult(viewmat);
 
 	SelectDrag(&g_edmap, &mvpmat, width, height, relx, rely, posvec, persp);

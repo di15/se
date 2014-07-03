@@ -14,10 +14,12 @@
 #include "../common/save/modelholder.h"
 #include "../common/save/compilemap.h"
 #include "../common/tool/rendersprite.h"
+#include "../common/draw/shadow.h"
 
 Brush g_copyB;
 ModelHolder g_copyM;
 int g_edtool = EDTOOL_NONE;
+bool g_leads[LEADS_DIRS];
 
 // draw selected brushes filled bg
 void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
@@ -68,6 +70,11 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	Matrix modelmat;
 	modelmat.reset();
     glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvpmat;
+	mvpmat.set(g_camproj.m_matrix);
+	mvpmat.postmult(g_camview);
+    glUniformMatrix4fvARB(shader->m_slot[SSLOT_MVP], 1, 0, mvpmat.m_matrix);
 
 	//glUniform4f(shader->m_slot[SSLOT_COLOR], 0.2f, 0.9f, 0.3f, 0.75f);
 
@@ -195,6 +202,11 @@ void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
 	Matrix modelmat;
 	modelmat.reset();
     glUniformMatrix4fvARB(shader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
+
+	Matrix mvpmat;
+	mvpmat.set(g_camproj.m_matrix);
+	mvpmat.postmult(g_camview);
+    glUniformMatrix4fvARB(shader->m_slot[SSLOT_MVP], 1, 0, mvpmat.m_matrix);
 
 	for(auto bi=g_selB.begin(); bi!=g_selB.end(); bi++)
 	{

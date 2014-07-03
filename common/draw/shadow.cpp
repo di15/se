@@ -508,13 +508,13 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(2.0, 500.0);
 
-	g_lightPos = focus + g_lightOff;
+	g_lightPos = focus + g_lightOff/300;
 	g_lightEye = focus;
 
 	//g_lightEye = Vec3f(0,0,0);
 	//g_lightPos = g_lightEye + g_lightOff;
 
-	//g_lightproj = BuildPerspProjMat(90.0, 1.0, 30.0, 10000.0);
+	//g_lightproj = PerspProj(90.0, 1.0, 30.0, 10000.0);
 	g_lightproj = OrthoProj(-PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, PROJ_RIGHT*2/g_zoom, -PROJ_RIGHT*2/g_zoom, MIN_DISTANCE, MAX_DISTANCE/300);
 	g_lightview = LookAt(g_lightPos.x, g_lightPos.y, g_lightPos.z,
 		g_lightEye.x, g_lightEye.y, g_lightEye.z,
@@ -542,7 +542,9 @@ void RenderToShadowMap(Matrix projection, Matrix viewmat, Matrix modelmat, Vec3f
 
 	Matrix mvp;
 	mvp.set(g_lightproj.m_matrix);
-	mvp.postmult2(g_lightview);
+	mvp.postmult2(g_lightview);	//prev
+	//mvp.postmult(g_lightview);
+	glUniformMatrix4fvARB(g_shader[SHADER_DEPTH].m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
@@ -613,7 +615,7 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	//glMatrixMode(GL_PROJECTION);
 	//glLoadIdentity();
 	//gluPerspective(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
-	//g_camproj = BuildPerspProjMat(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
+	//g_camproj = PerspProj(FIELD_OF_VIEW, double(g_width) / double(g_height), MIN_DISTANCE, MAX_DISTANCE);
 	//glMatrixMode(GL_MODELVIEW);
 	//glLoadIdentity();
 	//g_camera.Look();
@@ -634,9 +636,15 @@ void RenderShadowedScene(Matrix projection, Matrix viewmat, Matrix modelmat, Mat
 	float scalef[] = { 0.5f, 0.5f, 0.5f };
 	Matrix scalem;
 	scalem.setScale(scalef);
+#if 0	//correct results when glsl constructs mvp in depth shader, though looks like perspective projection.
 	g_lightmat.postmult(scalem);
 	g_lightmat.postmult(g_lightproj);
 	g_lightmat.postmult(g_lightview);
+#else	//correct when setting gl_Position.w=1 or constructing mvp on CPU side using postmult2. looks like orthographic projection, as it should.
+	g_lightmat.postmult2(scalem);
+	g_lightmat.postmult2(g_lightproj);
+	g_lightmat.postmult2(g_lightview);
+#endif
 	//g_lightmat.postmult(g_caminvmv);
 
 	Matrix modelviewinv;

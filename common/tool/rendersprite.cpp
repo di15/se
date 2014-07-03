@@ -360,7 +360,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else
@@ -393,7 +393,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 	Vec3f focusvec = viewvec;
 
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+    Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postmult(viewmat);
@@ -437,7 +437,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else
@@ -486,7 +486,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 
 	Vec3f focusvec = viewvec;
 
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+    Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postmult(viewmat);
@@ -546,24 +546,24 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 					vmax->y = ceilf(v4.y);
 #endif
 
-				if((v4.x) < vmin->x || !setmm[0])
+				if(floor(v4.x+0.5f) < vmin->x || !setmm[0])
 				{
-					vmin->x = (v4.x);
+					vmin->x = floor(v4.x+0.5f);
 					setmm[0] = true;
 				}
-				if((v4.y) < vmin->y || !setmm[1])
+				if(floor(v4.y+0.5f) < vmin->y || !setmm[1])
 				{
-					vmin->y = (v4.y);
+					vmin->y = floor(v4.y+0.5f);
 					setmm[1] = true;
 				}
-				if((v4.x) > vmax->x || !setmm[2])
+				if(floor(v4.x+0.5f) > vmax->x || !setmm[2])
 				{
-					vmax->x = (v4.x);
+					vmax->x = floor(v4.x+0.5f);
 					setmm[2] = true;
 				}
-				if((v4.y) > vmax->y || !setmm[3])
+				if(floor(v4.y+0.5f) > vmax->y || !setmm[3])
 				{
-					vmax->y = (v4.y);
+					vmax->y = floor(v4.y+0.5f);
 					setmm[3] = true;
 				}
 			}
@@ -615,30 +615,59 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 				vmax->y = ceilf(v4.y);
 #endif
 
-			if((v4.x) < vmin->x || !setmm[0])
+			if(floor(v4.x+0.5f) < vmin->x || !setmm[0])
 			{
-				vmin->x = (v4.x);
+				vmin->x = floor(v4.x+0.5f);
 				setmm[0] = true;
 			}
-			if((v4.y) < vmin->y || !setmm[1])
+			if(floor(v4.y+0.5f) < vmin->y || !setmm[1])
 			{
-				vmin->y = (v4.y);
+				vmin->y = floor(v4.y+0.5f);
 				setmm[1] = true;
 			}
-			if((v4.x) > vmax->x || !setmm[2])
+			if(floor(v4.x+0.5f) > vmax->x || !setmm[2])
 			{
-				vmax->x = (v4.x);
+				vmax->x = floor(v4.x+0.5f);
 				setmm[2] = true;
 			}
-			if((v4.y) > vmax->y || !setmm[3])
+			if(floor(v4.y+0.5f) > vmax->y || !setmm[3])
 			{
-				vmax->y = (v4.y);
+				vmax->y = floor(v4.y+0.5f);
 				setmm[3] = true;
 			}
 		}
 	}
 
+	{
+		VertexArray* va = &g_tileva[g_currinc];
 
+		for(int i=0; i<va->numverts; i++)
+		{
+			Vec3f v = va->vertices[i];
+			Vec4f v4 = ScreenPos(&mvpmat, v, width, height, persp);
+
+			if(floor(v4.x+0.5f) < vmin->x || !setmm[0])
+			{
+				vmin->x = floor(v4.x+0.5f);
+				setmm[0] = true;
+			}
+			if(floor(v4.y+0.5f) < vmin->y || !setmm[1])
+			{
+				vmin->y = floor(v4.y+0.5f);
+				setmm[1] = true;
+			}
+			if(floor(v4.x+0.5f) > vmax->x || !setmm[2])
+			{
+				vmax->x = floor(v4.x+0.5f);
+				setmm[2] = true;
+			}
+			if(floor(v4.y+0.5f) > vmax->y || !setmm[3])
+			{
+				vmax->y = floor(v4.y+0.5f);
+				setmm[3] = true;
+			}
+		}
+	}
 #ifdef DEBUG
 	g_applog<<"rf"<<g_renderframe<<" setmm:"<<setmm[0]<<","<<setmm[1]<<","<<setmm[2]<<","<<setmm[3]<<std::endl;
 #endif
@@ -791,18 +820,50 @@ void SaveRender(int rendstage)
 
 	char fullpath[MAX_PATH+1];
 
+	char frame[32];
+	char side[32];
+	strcpy(frame, "");
+	strcpy(side, "");
+
+	if(g_rendertype == RENDER_UNIT || g_rendertype == RENDER_BUILDING)
+		sprintf(frame, "_fr%03d", g_renderframe);
+	
+	if(g_rendertype == RENDER_UNIT)
+		sprintf(side, "_si%d", g_rendside);
+	
+	string incline = "";
+
+	if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
+	{
+		if(g_currinc == INC_0000)	incline = "_inc0000";
+		else if(g_currinc == INC_0001)	incline = "_inc0001";
+		else if(g_currinc == INC_0010)	incline = "_inc0010";
+		else if(g_currinc == INC_0011)	incline = "_inc0011";
+		else if(g_currinc == INC_0100)	incline = "_inc0100";
+		else if(g_currinc == INC_0101)	incline = "_inc0101";
+		else if(g_currinc == INC_0110)	incline = "_inc0110";
+		else if(g_currinc == INC_0111)	incline = "_inc0111";
+		else if(g_currinc == INC_1000)	incline = "_inc1000";
+		else if(g_currinc == INC_1001)	incline = "_inc1001";
+		else if(g_currinc == INC_1010)	incline = "_inc1010";
+		else if(g_currinc == INC_1011)	incline = "_inc1011";
+		else if(g_currinc == INC_1100)	incline = "_inc1100";
+		else if(g_currinc == INC_1101)	incline = "_inc1101";
+		else if(g_currinc == INC_1110)	incline = "_inc1110";
+	}
+
 	string stage = "";
 
 	if(rendstage == RENDSTAGE_TEAM)
 		stage = "_team";
 
-	sprintf(fullpath, "%s_si%d_fr%03d%s.png", g_renderbasename, g_rendside, g_renderframe, stage.c_str());
+	sprintf(fullpath, "%s%s%s%s%s.png", g_renderbasename, side, frame, incline.c_str(), stage.c_str());
 	SavePNG(fullpath, &sprite);
 	//sprite.channels = 3;
 	//sprintf(fullpath, "%s_si%d_fr%03d-rgb.png", g_renderbasename, g_rendside, g_renderframe);
 	//SavePNG(fullpath, &sprite);
 
-	sprintf(fullpath, "%s_si%d_fr%03d.txt", g_renderbasename, g_rendside, g_renderframe);
+	sprintf(fullpath, "%s%s%s%s.txt", g_renderbasename, side, frame, incline.c_str());
 	ofstream ofs(fullpath, ios_base::out);
 	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<std::endl<<imagew<<" "<<imageh<<std::endl<<clipsz.x<<" "<<clipsz.y;
 }
@@ -832,7 +893,7 @@ void SpriteRender(int rendstage)
 #if 0
 		if(g_projtype == PROJ_PERSP && v->m_type == VIEWPORT_ANGLE45O)
 		{
-			projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+			projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 			persp = true;
 		}
 		else if(g_projtype == PROJ_ORTHO || v->m_type != VIEWPORT_ANGLE45O)
@@ -860,7 +921,7 @@ void SpriteRender(int rendstage)
 		//if(v->m_type != VIEWPORT_ANGLE45O)
 		//	upvec = t->m_up;
 
-		Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+		Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 
 		Matrix modelview;
 		Matrix modelmat;
@@ -875,7 +936,7 @@ void SpriteRender(int rendstage)
 
 		Matrix mvpmat;
 		mvpmat.set(projection.m_matrix);
-		mvpmat.postmult(viewmat);
+		mvpmat.postmult2(viewmat);
 
 #if 1
 		if(v->m_type == VIEWPORT_ANGLE45O)
@@ -955,24 +1016,36 @@ void UpdateRender()
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	MakeFBO();
-	SpriteRender(RENDSTAGE_TEAM);
-	SaveRender(RENDSTAGE_TEAM);
-	DelFBO();
+	if(g_rendertype != RENDER_TERRTILE)
+	{
+		MakeFBO();
+		SpriteRender(RENDSTAGE_TEAM);
+		SaveRender(RENDSTAGE_TEAM);
+		DelFBO();
+	}
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
 #endif
 
-	g_renderframe++;
+	if(g_rendertype == RENDER_UNIT || g_rendertype == RENDER_BUILDING)
+		g_renderframe++;
+	else if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
+		g_currinc++;
 
-	if(g_renderframe >= g_renderframes)
+	if(((g_rendertype == RENDER_UNIT || g_rendertype == RENDER_BUILDING) && g_renderframe >= g_renderframes) ||
+		((g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD) && g_currinc >= INCLINES))
 	{
 		if(g_rendside < 7 && g_rendertype == RENDER_UNIT)
 		{
 			g_renderframe = 0;
 			g_rendside++;
 			AdjustFrame();
+		}
+		else if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
+		{
+			g_currinc = 0;
+			EndRender();
 		}
 		else
 		{

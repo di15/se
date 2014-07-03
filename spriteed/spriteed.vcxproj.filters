@@ -313,9 +313,6 @@
     <ClCompile Include="..\common\sim\road.cpp">
       <Filter>source\common\sim</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sim\terrtile.cpp">
-      <Filter>source\common\sim</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -589,9 +586,6 @@
       <Filter>source\common</Filter>
     </ClInclude>
     <ClInclude Include="..\common\sim\road.h">
-      <Filter>source\common\sim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\terrtile.h">
       <Filter>source\common\sim</Filter>
     </ClInclude>
   </ItemGroup>

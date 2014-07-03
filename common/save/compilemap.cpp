@@ -335,7 +335,7 @@ void ResetView()
 
 	if(g_mode == EDITOR && g_projtype == PROJ_PERSP)
 	{
-		projection = BuildPerspProjMat(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
+		projection = PerspProj(FIELD_OF_VIEW, aspect, MIN_DISTANCE, MAX_DISTANCE);
 		persp = true;
 	}
 	else
@@ -377,7 +377,7 @@ void ResetView()
 
 	Vec3f focusvec = viewvec;
 
-    Matrix viewmat = gluLookAt3(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
+    Matrix viewmat = LookAt(posvec.x, posvec.y, posvec.z, focusvec.x, focusvec.y, focusvec.z, upvec.x, upvec.y, upvec.z);
 	Matrix mvpmat;
 	mvpmat.set(projection.m_matrix);
 	mvpmat.postmult(viewmat);

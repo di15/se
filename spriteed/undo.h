@@ -4,12 +4,14 @@
 #include "../common/sim/map.h"
 #include "../common/platform.h"
 #include "../common/save/modelholder.h"
+#include "sesim.h"
 
 class UndoH	//undo history
 {
 public:
 	std::list<Brush> brushes;
 	std::list<ModelHolder> modelholders;
+	unsigned int tiletexs[TEX_TYPES];
 
 	UndoH(){}
 	~UndoH();

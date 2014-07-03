@@ -5,6 +5,7 @@
 #include "../common/math/camera.h"
 #include "../common/utils.h"
 #include "../common/save/edmap.h"
+#include "sesim.h"
 
 std::list<UndoH> g_undoh;
 int g_currundo = -1;	//the index which we will revert to when pressing undo next time
@@ -31,6 +32,9 @@ void WriteH(UndoH* towrite)
 	towrite->brushes = g_edmap.m_brush;
 	towrite->modelholders.clear();
 	towrite->modelholders = g_modelholder;
+
+	for(int k=0; k<4; k++)
+		towrite->tiletexs[k] = g_tiletexs[k];
 
 #ifdef UNDO_DEBUG
 	g_applog<<"save h "<<towrite->brushes.size()<<" brushes"<<std::endl;
@@ -187,6 +191,9 @@ void Undo()
 			UndoH* h = &*i;
 			g_edmap.m_brush = h->brushes;
 			g_modelholder = h->modelholders;
+
+			for(int k=0; k<4; k++)
+				g_tiletexs[k] = h->tiletexs[k];
 
 #ifdef UNDO_DEBUG
 			g_applog<<"undid now "<<g_edmap.m_brush.size()<<" brushes"<<std::endl;

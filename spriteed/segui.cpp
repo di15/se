@@ -332,6 +332,50 @@ void Click_ExportUnitSprites()
 #endif
 }
 
+void Click_ExportTileSprites()
+{
+#ifdef DEMO
+	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
+#else
+	char filepath[MAX_PATH+1];
+	char initdir[MAX_PATH+1];
+	FullPath("renders\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("renders\\tile base name", filepath);
+	CorrectSlashes(filepath);
+
+	if(!SaveFileDialog(initdir, filepath))
+		return;
+
+	//CorrectSlashes(filepath);
+	//CompileMap(filepath, &g_edmap);
+	PrepareRender(filepath, RENDER_TERRTILE);
+#endif
+}
+
+void Click_ExportRoadSprites()
+{
+#ifdef DEMO
+	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
+#else
+	char filepath[MAX_PATH+1];
+	char initdir[MAX_PATH+1];
+	FullPath("renders\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("renders\\road base name", filepath);
+	CorrectSlashes(filepath);
+
+	if(!SaveFileDialog(initdir, filepath))
+		return;
+
+	//CorrectSlashes(filepath);
+	//CompileMap(filepath, &g_edmap);
+	PrepareRender(filepath, RENDER_ROAD);
+#endif
+}
+
 void RunMap(const char* full)
 {
 	// TO DO: launch game
@@ -1756,6 +1800,142 @@ void Resize_ExplodeButton(Widget* thisw)
 	CenterLabel(thisw);
 }
 
+void Resize_AddTileButton(Widget* thisw)
+{
+	int i = 15;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 32;
+	CenterLabel(thisw);
+}
+
+void Resize_LeadsNECheckBox(Widget* thisw)
+{
+	int i = 16;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 16;
+	CenterLabel(thisw);
+}
+
+void Resize_LeadsSECheckBox(Widget* thisw)
+{
+	int i = 16;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32 + 16;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 32;
+	CenterLabel(thisw);
+}
+
+void Resize_LeadsSWCheckBox(Widget* thisw)
+{
+	int i = 18;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 16;
+	CenterLabel(thisw);
+}
+
+void Resize_LeadsNWCheckBox(Widget* thisw)
+{
+	int i = 18;
+	thisw->m_pos[0] = 0+32*i;
+	thisw->m_pos[1] = 32 + 16;
+	thisw->m_pos[2] = 32+32*i;
+	thisw->m_pos[3] = 32 + 32;
+	CenterLabel(thisw);
+}
+
+void Change_Leads()
+{
+}
+
+void Click_AddTile()
+{
+	char filepath[MAX_PATH+1];
+	char initdir[MAX_PATH+1];
+	FullPath("textures\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("textures\\texture", filepath);
+	CorrectSlashes(filepath);
+
+	if(!OpenFileDialog(initdir, filepath))
+		return;
+
+	LinkPrevUndo();
+
+	unsigned int diffuseindex;
+	string relativepath = MakeRelative(filepath);
+	CreateTexture(diffuseindex, relativepath.c_str(), false, true);
+	unsigned int texname = g_texture[diffuseindex].texname;
+
+	if(diffuseindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load diffuse texture %s", relativepath.c_str());
+
+		ErrorMessage("Error", msg);
+	}
+
+	char specpath[MAX_PATH+1];
+	strcpy(specpath, relativepath.c_str());
+	StripExtension(specpath);
+	strcat(specpath, ".spec.jpg");
+
+	unsigned int specindex;
+	CreateTexture(specindex, specpath, false, true);
+
+	if(specindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load specular texture %s", specpath);
+
+		ErrorMessage("Error", msg);
+	}
+
+	char normpath[MAX_PATH+1];
+	strcpy(normpath, relativepath.c_str());
+	StripExtension(normpath);
+	strcat(normpath, ".norm.jpg");
+
+	unsigned int normindex;
+	CreateTexture(normindex, normpath, false, true);
+
+	if(normindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load normal texture %s", normpath);
+
+		ErrorMessage("Error", msg);
+	}
+
+	char ownpath[MAX_PATH+1];
+	strcpy(ownpath, relativepath.c_str());
+	StripExtension(ownpath);
+	strcat(ownpath, ".team.png");
+
+	unsigned int ownindex;
+	CreateTexture(ownindex, ownpath, false, true);
+
+	if(ownindex == 0)
+	{
+		char msg[MAX_PATH+1];
+		sprintf(msg, "Couldn't load team color texture %s", normpath);
+
+		ErrorMessage("Error", msg);
+	}
+	
+	g_tiletexs[TEX_DIFF] = diffuseindex;
+	g_tiletexs[TEX_SPEC] = specindex;
+	g_tiletexs[TEX_NORM] = normindex;
+	g_tiletexs[TEX_TEAM] = ownindex;
+}
+
 void Change_Frames(int dummy)
 {
 }
@@ -2054,13 +2234,15 @@ void FillGUI()
 #endif
 	toppanel->add(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL, NULL, NULL, -1));
 	toppanel->add(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL, NULL, NULL, -1));
+#if 1
+	toppanel->add(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExportTileButton, Click_ExportTileSprites, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tiles with applicable inclines and rotations",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRoadButton, Click_ExportRoadSprites, NULL, NULL, NULL, NULL, -1));
 #if 0
-	toppanel->add(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExportTileButton, Click_CompileMap, NULL, NULL));
-	toppanel->add(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tile with inclines from 4 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRoadButton, Click_CompileMap, NULL, NULL));
 	toppanel->add(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
 	toppanel->add(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, BUTTON_BGIMAGE, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
 	//toppanel->add(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, BUTTON_BGIMAGE, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
 #endif
+	#endif
 	toppanel->add(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, BUTTON_BGIMAGE, Resize_UndoButton, Undo, NULL, NULL, NULL, NULL, -1));
 	toppanel->add(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, BUTTON_BGIMAGE, Resize_RedoButton, Redo, NULL, NULL, NULL, NULL, -1));
 	toppanel->add(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, BUTTON_BGIMAGE, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL, NULL, NULL, -1));
@@ -2120,8 +2302,18 @@ void FillGUI()
 	toppanel->add(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
 
 #if 0
-	toppanel->add(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExplodeButton, Click_Explode, NULL, NULL));
+	toppanel->add(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExplodeButton, Click_Explode, NULL, NULL, NULL, NULL, -1));
 #endif
+
+	
+	toppanel->add(new Button(toppanel, "addtile", "gui/addtile.png", "", "Add tile texture",					MAINFONT8, BUTTON_BGIMAGE, Resize_AddTileButton, Click_AddTile, NULL, NULL, NULL, NULL, -1));
+	
+	toppanel->add(new CheckBox(toppanel, "NE", "Leads NE",													MAINFONT8, Resize_LeadsNECheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
+	toppanel->add(new CheckBox(toppanel, "SE", "Leads SE",													MAINFONT8, Resize_LeadsSECheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
+	toppanel->add(new CheckBox(toppanel, "SW", "Leads SW",													MAINFONT8, Resize_LeadsSWCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
+	toppanel->add(new CheckBox(toppanel, "NW", "Leads NW",													MAINFONT8, Resize_LeadsNWCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
+
+
 
 	//toppanel->add(new Text(toppanel, "fps", "fps: 0", MAINFONT8, Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 10), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 70), true));
 
@@ -2145,9 +2337,9 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 	viewportsframe->add(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
 	viewportsframe->add(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
 
-	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/2), Vec3f(0, 1, 0), "Front");
-	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/2, 0), Vec3f(0, 0, -1), "Top");
-	g_viewportT[VIEWPORT_LEFT] = ViewportT(Vec3f(MAX_DISTANCE/2, 0, 0), Vec3f(0, 1, 0), "Left");
+	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Front");
+	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/3, 0), Vec3f(0, 0, -1), "Top");
+	g_viewportT[VIEWPORT_LEFT] = ViewportT(Vec3f(MAX_DISTANCE/3, 0, 0), Vec3f(0, 1, 0), "Left");
 	//g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(MAX_DISTANCE/3, MAX_DISTANCE/3, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Angle");
 	g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3), Vec3f(0, 1, 0), "Angle");
 	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);

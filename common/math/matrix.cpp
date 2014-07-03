@@ -60,7 +60,7 @@ void Matrix::inverseTranslateVect( float *pVect )
 	pVect[2] = pVect[2]-m_matrix[14];
 }
 
-void Matrix::postmult( const Matrix& matrix )
+void Matrix::postmult( const Matrix& matrix )	//no longer used for light matrix concatenation (and skeletal animation?)
 {
 	float newMatrix[16];
 
@@ -117,7 +117,7 @@ void Matrix::postmult( const Matrix& matrix )
 	set( newMatrix );
 }
 
-void Matrix::postmult2( const Matrix& matrix )
+void Matrix::postmult2( const Matrix& matrix )	//used only for light matrix (and skeletal animation?), doesn't work with perspective projection because that is not an affine transformation
 {
 	float newMatrix[16];
 
@@ -229,7 +229,7 @@ void Matrix::setInverseTranslation( const float *translation )
 
 void Matrix::setScale( const float *scale )
 {
-	reset();
+	//reset();
 
 	m_matrix[0] = scale[0];
 	m_matrix[5] = scale[1];

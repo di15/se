@@ -6,7 +6,7 @@ attribute vec4 position;
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
-//uniform mat4 mvpmat;
+uniform mat4 mvp;
 
 uniform vec4 color;
 //attribute vec3 normalIn;
@@ -17,9 +17,9 @@ void main(void)
 	//gl_Position = projection * (view * (model * gl_Vertex));
 	//gl_Position = projection * gl_Vertex;
 	//gl_Position = projection * view * gl_Vertex;
-	gl_Position = projection * view * model * gl_Vertex;
+	//gl_Position = projection * view * model * gl_Vertex;
 	//gl_Position = projection * view * model * position;
-	//gl_Position = mvpmat * position;
+	gl_Position = mvp * position;
 	//gl_Position = position * mvpmat;
 	//gl_Position = position * model * view * projection;
 	//normalOut = normalIn;

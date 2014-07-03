@@ -615,7 +615,7 @@ void MS3DModel::setupjoints()
 		if ( joint.m_parent != -1 )
 		{
 			joint.m_absolute.set( m_pJoints[joint.m_parent].m_absolute.m_matrix);
-			joint.m_absolute.postmult( joint.m_relative );
+			joint.m_absolute.postmult2( joint.m_relative );
 		}
 		else
 			joint.m_absolute.set( joint.m_relative.m_matrix);
@@ -689,7 +689,7 @@ void MS3DModel::advanceanim()
 			else
 			{
 				pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
-				pJoint->m_final.postmult( relativeFinal );
+				pJoint->m_final.postmult2( relativeFinal );
 			}
 #endif
 			continue;
@@ -758,14 +758,14 @@ void MS3DModel::advanceanim()
 
 		transform.setTranslation( transVec );
 		Matrix relativeFinal( pJoint->m_relative );
-		relativeFinal.postmult( transform );
+		relativeFinal.postmult2( transform );
 
 		if ( pJoint->m_parent == -1 )
 			pJoint->m_final.set( relativeFinal.m_matrix );
 		else
 		{
 			pJoint->m_final.set( m_pJoints[pJoint->m_parent].m_final.m_matrix );
-			pJoint->m_final.postmult( relativeFinal );
+			pJoint->m_final.postmult2( relativeFinal );
 		}
 	}
 

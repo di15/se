@@ -20,6 +20,8 @@ extern unsigned int g_renderfb;
 
 #define RENDER_BUILDING		0
 #define RENDER_UNIT			1
+#define RENDER_TERRTILE		2
+#define RENDER_ROAD			3
 
 #define RENDSTAGE_COLOR		0
 #define RENDSTAGE_TEAM		1

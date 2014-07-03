@@ -168,10 +168,12 @@ void InitGLSL()
 	}
 
 	CheckGLError(__FILE__, __LINE__);
-
+	
 	LoadShader(SHADER_ORTHO, "shaders/ortho.vert", "shaders/ortho.frag", true, true, false);
+	LoadShader(SHADER_LIGHTTEST, "shaders/lighttest.vert", "shaders/lighttest.frag", true, true, false);
 	LoadShader(SHADER_COLOR2D, "shaders/color2d.vert", "shaders/color2d.frag", true, false, false);
 	LoadShader(SHADER_MODEL, "shaders/model.vert", "shaders/model.frag", true, true, true);
+	LoadShader(SHADER_MODELPERSP, "shaders/modelpersp.vert", "shaders/model.frag", true, true, true);
 	LoadShader(SHADER_COLOR3D, "shaders/color3d.vert", "shaders/color3d.frag", true, false, false);
 	LoadShader(SHADER_COLOR3DPERSP, "shaders/color3dpersp.vert", "shaders/color3d.frag", true, false, false);
 	LoadShader(SHADER_BILLBOARD, "shaders/billboard.vert", "shaders/billboard.frag", true, true, false);
@@ -179,6 +181,7 @@ void InitGLSL()
 	//LoadShader(SHADER_SHADOW, "shaders/shadow.vert", "shaders/shadow.frag");
 	LoadShader(SHADER_OWNED, "shaders/owned.vert", "shaders/owned.frag", true, true, true);
 	LoadShader(SHADER_MAP, "shaders/map.vert", "shaders/map.frag", true, true, true);
+	LoadShader(SHADER_MAPPERSP, "shaders/mappersp.vert", "shaders/map.frag", true, true, true);
 	LoadShader(SHADER_WATER, "shaders/water.vert", "shaders/water.frag", true, true, true);
 	LoadShader(SHADER_BILLBOARDPERSP, "shaders/billboardpersp.vert", "shaders/billboard.frag", true, true, false);
 	LoadShader(SHADER_TEAM, "shaders/team.vert", "shaders/team.frag", true, true, true);

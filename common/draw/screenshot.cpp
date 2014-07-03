@@ -44,6 +44,11 @@ void SaveScreenshot()
 
 void SaveScreenshot()
 {
+#ifdef DEMO
+	InfoMessage("Demo", "Feature disabled ;)");
+	return;
+#endif
+
 	LoadedTex screenshot;
 	screenshot.channels = 3;
 	screenshot.sizeX = g_width;
@@ -64,14 +69,16 @@ void SaveScreenshot()
 
 	char relative[256];
 	std::string datetime = FileDateTime();
-	sprintf(relative, "screenshots/%s.jpg", datetime.c_str());
+	//sprintf(relative, "screenshots/%s.jpg", datetime.c_str());
+	sprintf(relative, "screenshots/%s.png", datetime.c_str());
 	char fullpath[MAX_PATH+1];
 	FullPath(relative, fullpath);
 
 	g_applog<<"Writing screenshot "<<fullpath<<std::endl;
 	g_applog.flush();
-
-	SaveJPEG(fullpath, &screenshot, 0.9f);
+	
+	//SaveJPEG(fullpath, &screenshot, 0.9f);
+	SavePNG(fullpath, &screenshot);
 
 	//free(screenshot.data);
 }

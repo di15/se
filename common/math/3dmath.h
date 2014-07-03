@@ -50,10 +50,12 @@ float GetYaw(float dx, float dz);
 Matrix LookAt(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
-Matrix gluLookAt3(float eyex, float eyey, float eyez,
+#if 0
+Matrix LookAtOrtho(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz);
-Matrix BuildPerspProjMat(float fov, float aspect, float znear, float zfar);
+#endif
+Matrix PerspProj(float fov, float aspect, float znear, float zfar);
 Matrix OrthoProj(float l, float r, float t, float b, float n, float f);
 Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp);
 float Snap(float base, float value);

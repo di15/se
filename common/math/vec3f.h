@@ -68,6 +68,11 @@ public:
 		return Vec3f(x / num, y / num, z / num);
 	}
 
+	float& operator[](int i)
+	{
+		return (float)*((float*)(this)+i);
+	}
+
 	inline void set(const float* values)
 	{
 		x = values[0];

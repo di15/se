@@ -101,17 +101,9 @@ void DrawMap(Map* map)
 	glUniformMatrix4fv(s->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Matrix mvp;
-#if 0
-	mvp.set(modelview.m_matrix);
-	mvp.postmult(g_camproj);
-#elif 0
-	mvp.set(g_camproj.m_matrix);
-	mvp.postmult(modelview);
-#else
 	mvp.set(g_camproj.m_matrix);
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
-#endif
 	glUniformMatrix4fv(s->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelview;
@@ -208,17 +200,9 @@ void DrawMap2(Map* map)
     glUniformMatrix4fvARB(pshader->m_slot[SSLOT_MODELMAT], 1, 0, modelmat.m_matrix);
 
 	Matrix mvp;
-#if 0
-	mvp.set(modelview.m_matrix);
-	mvp.postmult(g_camproj);
-#elif 0
-	mvp.set(g_camproj.m_matrix);
-	mvp.postmult(modelview);
-#else
 	mvp.set(g_camproj.m_matrix);
 	mvp.postmult(g_camview);
 	mvp.postmult(modelmat);
-#endif
 	glUniformMatrix4fv(pshader->m_slot[SSLOT_MVP], 1, 0, mvp.m_matrix);
 
 	Matrix modelview;

@@ -27,6 +27,9 @@
 #include "../common/save/modelholder.h"
 #include "../common/tool/rendersprite.h"
 #include "../common/debug.h"
+#include "sesim.h"
+#include "../common/sim/tile.h"
+#include "../common/sim/road.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
@@ -137,7 +140,10 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 #endif
 
 #if 1
-    UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	if(g_projtype == PROJ_ORTHO)
+		UseShadow(SHADER_MODEL, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	else
+		UseShadow(SHADER_MODELPERSP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
@@ -158,16 +164,56 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	g_applog.flush();
 #endif
 
-    UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+#if 1
+	if(g_projtype == PROJ_ORTHO)
+		UseShadow(SHADER_MAP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	else
+		UseShadow(SHADER_MAPPERSP, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+#else
+	UseShadow(SHADER_LIGHTTEST, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	glUniformMatrix4fv(g_shader[SHADER_LIGHTTEST].m_slot[SSLOT_MVP], 1, GL_FALSE, g_lightmat.m_matrix);
+#endif
     CheckGLError(__FILE__, __LINE__);
     glActiveTextureARB(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, g_depth);
     //glBindTexture(GL_TEXTURE_2D, g_texture[0].texname);
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	DrawTile();
+	Matrix offmat;
+	Vec3f offvec(-TILE_SIZE, 0, -TILE_SIZE);
+	offmat.setTranslation((float*)&offvec);
+	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MODELMAT], 1, GL_FALSE, offmat.m_matrix);
+	//DrawTile();
+	offvec = Vec3f(-TILE_SIZE, 0, 0);
+	offmat.setTranslation((float*)&offvec);
+	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MODELMAT], 1, GL_FALSE, offmat.m_matrix);
+	//DrawTile();
     CheckGLError(__FILE__, __LINE__);
     DrawEdMap(&g_edmap, g_showsky);
     CheckGLError(__FILE__, __LINE__);
     EndS();
+	
+#if 0
+	glDisable(GL_DEPTH_TEST);
+    UseShadow(SHADER_COLOR3D, projection, viewmat, modelmat, modelviewinv, mvLightPos, lightDir);
+	Matrix mvp;
+	mvp.set(projection.m_matrix);
+	mvp.postmult(viewmat);
+	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MVP], 1, GL_FALSE, mvp.m_matrix);
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 0, 0, 1, 0.2f);
+	VertexArray* va = &g_tileva[g_currinc];
+	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+	glNormalPointer(GL_FLOAT, 0, va->normals);
+	//glDrawArrays(GL_LINE_LOOP, 0, va->numverts);
+	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 1, 0, 0, 0.2f);
+	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
+	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
+	glNormalPointer(GL_FLOAT, 0, va->normals);
+	glDrawArrays(GL_POINTS, 0, va->numverts);
+    EndS();
+	glEnable(GL_DEPTH_TEST);
+#endif
 
 #ifdef DEBUG
 	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
@@ -214,6 +260,7 @@ void DrawSceneTeam(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix mo
     glBindTexture(GL_TEXTURE_2D, g_depth);
     //glBindTexture(GL_TEXTURE_2D, g_texture[0].texname);
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
+	DrawTile();
     CheckGLError(__FILE__, __LINE__);
     DrawEdMap(&g_edmap, g_showsky);
     CheckGLError(__FILE__, __LINE__);
@@ -231,8 +278,9 @@ void DrawSceneDepth()
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
 #endif
-
-    DrawModelHoldersDepth();
+	
+    //DrawModelHoldersDepth();
+    DrawModelHolders();
 
 #ifdef DEBUG
     CheckGLError(__FILE__, __LINE__);
@@ -243,12 +291,14 @@ void DrawSceneDepth()
 #endif
     //if(g_model[0].m_on)
     //	g_model[0].draw(0, Vec3f(0,0,0), 0);
-
-    DrawEdMapDepth(&g_edmap, false);/*
+	
+    //DrawEdMapDepth(&g_edmap, false);
+    DrawEdMap(&g_edmap, false);/*
 	for(int i=0; i<10; i++)
 		for(int j=0; j<5; j++)
 			g_model[themodel].draw(0, Vec3f(-5*180 + 180*i,0,-2.5f*90 + j*90), 0);*/
-
+	
+	DrawTile();
 #ifdef DEBUG
 	g_applog<<"draw "<<__FILE__<<" "<<__LINE__<<std::endl;
 	g_applog.flush();

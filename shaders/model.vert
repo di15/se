@@ -7,6 +7,7 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 normalMatrix;
+uniform mat4 mvp;
 
 uniform mat4 lightMatrix;
 uniform vec3 lightPos;
@@ -43,10 +44,11 @@ void main(void)
 	//vpos.w = 1;	//ortho=1/persp?
 	lpos = lightMatrix * vpos;
 	//lpos.w = 1;
-	gl_Position = projection * view * model * gl_Vertex;
-	//gl_Position.w = 1;	//ortho=1/persp?
+	//gl_Position = projection * view * model * gl_Vertex;
+	gl_Position = mvp * gl_Vertex;
+	gl_Position.w = 1;	//ortho=1/persp?
 
-	elevy = position.y;
+	elevy = gl_Vertex.y;
 	//elevtransp = 1;
 
 	//if(position.y > maxelev)

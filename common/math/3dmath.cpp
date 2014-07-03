@@ -371,7 +371,7 @@ Matrix LookAt(float eyex, float eyey, float eyez,
     /* cross product gives area of parallelogram, which is < 1.0 for
      * non-perpendicular unit-length vectors; so normalize x, y here
      */
-
+#if 1
     mag = sqrtf(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
     if (mag) {
         x[0] /= mag;
@@ -385,6 +385,7 @@ Matrix LookAt(float eyex, float eyey, float eyez,
         y[1] /= mag;
         y[2] /= mag;
     }
+#endif
 
 #define M(row,col)  m[col*4+row]
     M(0, 0) = x[0];
@@ -413,24 +414,32 @@ Matrix LookAt(float eyex, float eyey, float eyez,
     Matrix mat2;
     float trans[] = {-eyex, -eyey, -eyez};
     mat2.setTranslation(trans);
-
+	
+    //mat.postmult(mat2);
     mat.postmult(mat2);
 
     return mat;
 }
 
-Matrix gluLookAt3(float eyex, float eyey, float eyez,
+#if 0
+Matrix LookAtOrtho(float eyex, float eyey, float eyez,
                float centerx, float centery, float centerz,
                float upx, float upy, float upz)
 {
     float m[16];
     Vec3f x, y, z;
+    float mag;
 
     /* Make rotation matrix */
 
     /* Z vector */
     z = Vec3f(eyex, eyey, eyez) - Vec3f(centerx, centery, centerz);
-    z = Normalize(z);
+    mag = sqrtf(z[0] * z[0] + z[1] * z[1] + z[2] * z[2]);
+    if (mag) {          /* mpichler, 19950515 */
+        z[0] /= mag;
+        z[1] /= mag;
+        z[2] /= mag;
+    }
 
     /* Y vector */
     y = Vec3f(upx, upy, upz);
@@ -447,6 +456,21 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
     /* cross product gives area of parallelogram, which is < 1.0 for
      * non-perpendicular unit-length vectors; so normalize x, y here
      */
+#if 1
+    mag = sqrtf(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
+    if (mag) {
+        x[0] /= mag;
+        x[1] /= mag;
+        x[2] /= mag;
+    }
+
+    mag = sqrtf(y[0] * y[0] + y[1] * y[1] + y[2] * y[2]);
+    if (mag) {
+        y[0] /= mag;
+        y[1] /= mag;
+        y[2] /= mag;
+    }
+#endif
 
 #define M(row,col)  m[col*4+row]
 //#define M(row,col)  m[row*4+col]
@@ -493,14 +517,15 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 	//mat2.set(m);
 /*
 	g_applog<<"------------------------"<<std::endl;
-	g_applog<<"gluLookAt3 "<<std::endl;
+	g_applog<<"LookAt "<<std::endl;
 	g_applog<<"eye="<<eyex<<","<<eyey<<","<<eyez<<" center="<<centerx<<","<<centery<<","<<centerz<<" up="<<upx<<","<<upy<<","<<upz<<std::endl;
 	for(int i=0; i<16; i++)
 		g_applog<<"before translation["<<i<<"] = "<<m[i]<<std::endl;
 	for(int i=0; i<16; i++)
 		g_applog<<"the translation["<<i<<"] = "<<mat2.m_matrix[i]<<std::endl;*/
-
-    mat.postmult(mat2);
+	
+    //mat.postmult(mat2);
+    mat.postmult2(mat2);
     /*
 	for(int i=0; i<16; i++)
 		g_applog<<"final view matrix, after translation["<<i<<"] = "<<mat.m_matrix[i]<<std::endl;
@@ -511,6 +536,7 @@ Matrix gluLookAt3(float eyex, float eyey, float eyez,
 
     return mat;
 }
+#endif
 
 // http://www.songho.ca/opengl/gl_projectionmatrix.html
 // http://www.scratchapixel.com/lessons/3d-advanced-lessons/perspective-and-orthographic-projection-matrix/orthographic-projection/
@@ -532,14 +558,14 @@ Matrix OrthoProj(float l, float r, float t, float b, float n, float f)
 
     M(2, 0) = 0;
     M(2, 1) = 0;
-    M(2, 2) = -1 / (f - n);
-    //M(2, 2) = -2 / (f - n);
+    //M(2, 2) = -1 / (f - n);
+    M(2, 2) = -2 / (f - n);
     M(2, 3) = 0;
 
     M(3, 0) = -(r + l) / (r - l);
     M(3, 1) = -(t + b) / (t - b);
-    M(3, 2) = -n / (f - n);
-    //M(3, 2) = -(f + n) / (f - n);
+    //M(3, 2) = -n / (f - n);
+    M(3, 2) = -(f + n) / (f - n);
     M(3, 3) = 1;
 #undef M
 
@@ -610,7 +636,7 @@ Matrix setperspectivepmat(float Near, float Far, float fov)
 }*/
 
 #define PI_OVER_360		(M_PI/360.0f)
-Matrix BuildPerspProjMat(float fov, float aspect, float znear, float zfar)
+Matrix PerspProj(float fov, float aspect, float znear, float zfar)
 {
 	float m[16];
 
@@ -664,11 +690,18 @@ Vec4f ScreenPos(Matrix* mvp, Vec3f vec, float width, float height, bool persp)
 
 	screenpos.transform(*mvp);
 
-	if(persp)
+	if(persp)	//.w is not always exactly 1 and doesn't give pixel-perfect tiles
 	{
-		//does this need to be commented out for correct orthographic pixel-to-pixel match?
+		//only needed for perspective projection
 		screenpos = screenpos / screenpos.w;
 	}
+
+#if 0
+	if(!persp)
+	{
+		g_applog<<".w="<<screenpos.w<<std::endl;
+	}
+#endif
 
 	screenpos.x = (screenpos.x * 0.5f + 0.5f) * width;
 	screenpos.y = (-screenpos.y * 0.5f + 0.5f) * height;

@@ -98,7 +98,10 @@ public:
 #define SHADER_COLOR3DPERSP		10
 #define SHADER_BILLBOARDPERSP	11
 #define SHADER_TEAM				12
-#define SHADERS					13
+#define SHADER_MODELPERSP		13
+#define SHADER_MAPPERSP			14
+#define SHADER_LIGHTTEST		15
+#define SHADERS					16
 
 extern Shader g_shader[SHADERS];
 extern int g_curS;
