@@ -460,7 +460,7 @@ void MS3DModel::genva(VertexArray** vertexArrays, Vec3f scale, Vec3f translate, 
 
 					if(m_pVertices[index].m_boneID == -1)
 					{
-						g_applog<<"\tno tran"<<std::endl;
+						//g_applog<<"\tno tran"<<std::endl;
 
 						texcoords[vert].x = pTri->m_s[k];
 						texcoords[vert].y = 1.0f - pTri->m_t[k];
