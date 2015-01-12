@@ -1,7 +1,7 @@
 
 
 #include "modelholder.h"
-#include "../draw/vertexarray.h"
+#include "../render/vertexarray.h"
 #include "../math/brush.h"
 #include "../math/quaternion.h"
 #include "../math/vec4f.h"
@@ -110,7 +110,10 @@ void ModelHolder::retransform()
 
 	Model* m = &g_model[model];
 
+	//TODO: update to use ModelPart
+#if 1
 	CopyVAs(&frames, &nframes, &m->m_va, m->m_ms3d.m_totalFrames);
+#endif
 
 	//Quaternion rotquat;
 	Vec3f rotrads;
@@ -142,6 +145,8 @@ void ModelHolder::retransform()
 
 void ModelHolder::regennormals()
 {
+	//TODO
+#if 1
 	Model* m = &g_model[model];
 	MS3DModel* ms3d = &m->m_ms3d;
 
@@ -235,6 +240,7 @@ void ModelHolder::regennormals()
 	}
 
 	delete [] normalweights;
+#endif
 }
 
 void ModelHolder::destroy()
@@ -281,6 +287,7 @@ void DrawModelHolders()
 		ModelHolder* h = &*iter;
 		Model* m = &g_model[h->model];
 
+#if 1 //TODO
 #ifdef DEBUG
 		CheckGLError(__FILE__, __LINE__);
 #endif
@@ -305,6 +312,8 @@ void DrawModelHolders()
 #ifdef DEBUG
 		CheckGLError(__FILE__, __LINE__);
 #endif
+#endif
+
 	}
 }
 
@@ -315,8 +324,10 @@ void DrawModelHoldersDepth()
 		ModelHolder* h = &*iter;
 		Model* m = &g_model[h->model];
 
+#if 1	//TODO
 		m->usedifftex();
 		//DrawVA(&m->m_va[rand()%10], h->translation);
 		DrawVADepth(&h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ], h->translation);
+#endif
 	}
 }

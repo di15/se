@@ -1,3 +1,6 @@
+#ifndef UTILS_H
+#define UTILS_H
+
 #include "platform.h"
 
 #define CORRECT_SLASH '/'
@@ -7,9 +10,10 @@
 extern std::ofstream g_applog;
 
 const std::string DateTime();
+const std::string Time();
 const std::string FileDateTime();
 void FullPath(const char* filename, char* full);
-std::string MakeRelative(const char* full);
+std::string MakePathRelative(const char* full);
 void ExePath(char* exepath);
 std::string StripFile(std::string filepath);
 void StripPathExtension(const char* n, char* o);
@@ -21,26 +25,59 @@ int HexToInt(const char* s);
 int StrToInt(const char *s);
 void CorrectSlashes(char* corrected);
 void BackSlashes(char* corrected);
-void ErrorMessage(const char* title, const char* message);
-void InfoMessage(const char* title, const char* message);
-void WarningMessage(const char* title, const char* message);
+void ErrMess(const char* title, const char* message);
+void InfoMess(const char* title, const char* message);
+void WarnMess(const char* title, const char* message);
 void OutOfMem(const char* file, int line);
+std::string MakeRelative(const char* full);
 
 #ifndef PLATFORM_WIN
 
-long timeGetTime();
-long GetTickCount();
-long long GetTickCount64();
+unsigned long long timeGetTime();
+unsigned long long GetTickCount();
+unsigned long long GetTickCount64();
 void Sleep(int ms);
 
 #endif
 
-#ifdef PLATFORM_WIN
+inline float fmax(const float a, const float b)
+{
+	return (((a)>(b))?(a):(b));
+}
 
-float fmax(float a, float b);
-float fmin(float a, float b);
-int imax(float a, float b);
-int imin(float a, float b);
+inline float fmin(const float a, const float b)
+{
+	return (((a)<(b))?(a):(b));
+}
 
-#endif
+inline int imax(const int a, const int b)
+{
+	return (((a)>(b))?(a):(b));
+}
 
+inline int imin(const int a, const int b)
+{
+	return (((a)<(b))?(a):(b));
+}
+
+//deterministic ceil
+inline int iceil(const int num, const int denom)
+{
+	if(denom  == 0)
+		return 0;
+
+	int div = num / denom;
+	const int mul = div * denom;
+	const int rem = num - mul;
+
+	if(rem > 0)
+		div += 1;
+
+	return div;
+}
+
+std::string iform(int n);
+
+void ListFiles(const char* fullpath, std::list<std::string>& files);
+
+#endif	//UTILS_H

@@ -1,7 +1,7 @@
 
 
 #include "../platform.h"
-#include "../draw/vertexarray.h"
+#include "../render/vertexarray.h"
 
 #define INC_0000		0
 #define INC_0001		1
@@ -21,11 +21,12 @@
 #define INCLINES		15
 
 extern VertexArray g_tileva[INCLINES];
-extern int g_currinc;
+extern int g_currincline;
 
-#define TILE_SIZE		(10*100)	//10 meters = 1,000 centimeters
-//#define TILE_RISE		(TILE_SIZE/3)
-#define TILE_DIAG		(sqrt(TILE_SIZE*TILE_SIZE*2))
+//#define g_tilesize		(10*100)	//10 meters = 1,000 centimeters
+extern int g_tilesize;
+//#define TILE_RISE		(g_tilesize/3)
+#define TILE_DIAG		(sqrt(g_tilesize*g_tilesize*2))
 //#define TILE_RISE		(tan(DEGTORAD(30))*TILE_DIAG/2)
 #define TILE_RISE		(tan(DEGTORAD(30))*TILE_DIAG/4)
 

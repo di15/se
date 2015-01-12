@@ -1,7 +1,7 @@
 
 
 #include "sesim.h"
-#include "../common/draw/shader.h"
+#include "../common/render/shader.h"
 #include "../common/platform.h"
 #include "../common/utils.h"
 #include "../common/math/3dmath.h"
@@ -14,7 +14,7 @@
 #include "../common/save/modelholder.h"
 #include "../common/save/compilemap.h"
 #include "../common/tool/rendersprite.h"
-#include "../common/draw/shadow.h"
+#include "../common/render/shadow.h"
 
 Brush g_copyB;
 ModelHolder g_copyM;
@@ -22,7 +22,7 @@ int g_edtool = EDTOOL_NONE;
 bool g_leads[LEADS_DIRS];
 
 // draw selected brushes filled bg
-void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
+void DrawFilled(EdMap* map, std::list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -54,15 +54,18 @@ void DrawFilled(EdMap* map, list<ModelHolder>& modelholder)
 	{
 		ModelHolder* pmh = *mhiter;
 		Model* m = &g_model[pmh->model];
+
+#if 1	//TODO
 		int maxframes = m->m_ms3d.m_totalFrames;
 
 		DrawVA(&pmh->frames[ g_renderframe % maxframes ], pmh->translation);
+#endif
 	}
 #endif
 }
 
 // draw brush outlines
-void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
+void DrawOutlines(EdMap* map, std::list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -193,7 +196,7 @@ void DrawOutlines(EdMap* map, list<ModelHolder>& modelholder)
 }
 
 // draw selected brush outlines
-void DrawSelOutlines(EdMap* map, list<ModelHolder>& modelholder)
+void DrawSelOutlines(EdMap* map, std::list<ModelHolder>& modelholder)
 {
 	//UseS(SHADER_COLOR3D);
 	Shader* shader = &g_shader[g_curS];
@@ -857,7 +860,7 @@ void DrawDrag(EdMap* map, Matrix* mvp, int w, int h, bool persp)
 {
 	Shader* shader = &g_shader[g_curS];
 
-	if(g_GUI.get("door edit")->m_opened)
+	if(g_gui.get("door edit")->m_opened)
 	{
 		if(g_selB.size() <= 0)
 			return;
@@ -886,8 +889,8 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	//CloseView("brush edit");
 
 	//g_applog<<"select brush ("<<line[0].x<<","<<line[0].y<<","<<line[0].z<<")->("<<line[1].x<<","<<line[1].y<<","<<line[1].z<<")"<<std::endl;
-	list<Brush*> selB;
-	list<ModelHolder*> selM;
+	std::list<Brush*> selB;
+	std::list<ModelHolder*> selM;
 
 	for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 	{
@@ -942,7 +945,7 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 				g_selB.clear();
 				g_selB.push_back(*i);
 				CloseSideView();
-				g_GUI.open("brush edit");
+				g_gui.open("brush edit");
 				return;
 			}
 
@@ -982,19 +985,32 @@ void SelectBrush(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	g_selM.clear();
 
 	//and then restart at model at the front
-	//if we previously selected a brush or if
-	//there aren't any brushes at all
+	//if we previously selected a brush (and 
+	//reached the last one) or if there aren't 
+	//any brushes at all
 	if(selM.size() > 0
-		&& (prevnB > 0 || map->m_brush.size() == 0))
+		&& (prevnB > 0 || selB.size() == 0))
 	{
 		g_selM.push_back( *selM.begin() );
+		return;
 	}
 	//or else the brush at the front.
 	else if(selB.size() > 0)
 	{
 		g_selB.push_back( *selB.begin() );
-		g_GUI.open("brush edit");
+		g_gui.open("brush edit");
+		return;
 	}
+	//else select model, if nothing is selected or model 
+	//was previously selected from another place (?)
+	//Edit: maybe we don't want to select anything after cycle through.
+#if 0
+	else if(selM.size() > 0)
+	{
+		g_selM.push_back( *selM.begin() );
+		return;
+	}
+#endif
 }
 
 bool SelectDrag_Door(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, bool persp, Brush* b, EdDoor* door)
@@ -1313,7 +1329,7 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 	g_dragD = -1;
 
 #if 0
-	if(g_GUI.get("door edit")->m_opened)
+	if(g_gui.get("door edit")->m_opened)
 	{
 		if(g_selB.size() <= 0)
 			goto nodoor;
@@ -1341,8 +1357,8 @@ bool SelectDrag(EdMap* map, Matrix* mvp, int w, int h, int x, int y, Vec3f eye, 
 		if(g_dragS >= 0)
 		{
 			CloseSideView();
-			g_GUI.open("brush edit");
-			g_GUI.open("brush side edit");
+			g_gui.open("brush edit");
+			g_gui.open("brush side edit");
 			RedoBSideGUI();
 		}
 

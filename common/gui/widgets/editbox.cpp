@@ -1,10 +1,9 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -13,6 +12,7 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
+
 #include "../gui.h"
 #include "../../sys/unicode.h"
 #include "../../debug.h"
@@ -24,11 +24,13 @@ EditBox::EditBox() : Widget()
 	m_name = "";
 	m_font = MAINFONT8;
 	m_value = "";
-	m_caret = m_value.length();
+	m_caret = m_value.texlen();
 	m_opened = false;
 	m_passw = false;
 	m_maxlen = 0;
 	reframefunc = NULL;
+	submitfunc = NULL;
+	changefunc3 = NULL;
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
@@ -38,30 +40,32 @@ EditBox::EditBox() : Widget()
 	//reframe();
 }
 
-EditBox::EditBox(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
+EditBox::EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down, int parm), void (*submitf)(), int parm) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_EDITBOX;
 	m_name = n;
 	m_font = f;
 	m_value = t;
-	m_caret = m_value.length();
+	m_caret = m_value.texlen();
 	m_opened = false;
 	m_passw = pw;
 	m_maxlen = maxl;
 	reframefunc = reframef;
+	submitfunc = submitf;
+	changefunc3 = change3;
 	m_scroll[0] = 0;
 	m_highl[0] = 0;
 	m_highl[1] = 0;
 	CreateTexture(m_frametex, "gui/frame.jpg", true, false);
 	m_param = parm;
-	changefunc2 = change2;
+	changefunc2 = NULL;
 	reframe();
 }
 
-std::string EditBox::drawvalue()
+RichText EditBox::drawvalue()
 {
-#if 1
+	/*
 	std::string val = m_value;
 
 	if(m_passw)
@@ -71,13 +75,12 @@ std::string EditBox::drawvalue()
 			val.append("*");
 	}
 
-	return val;
-#else
+	return val;*/
+
 	if(!m_passw)
 		return m_value;
 
 	return m_value.pwver();
-#endif
 }
 
 void EditBox::draw()
@@ -94,20 +97,17 @@ void EditBox::draw()
 		//glColor4f(0.8f, 0.8f, 0.8f, 1);
 		glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 0.8f, 0.8f, 0.8f, 1);
 
-	std::string val = drawvalue();
+	RichText val = drawvalue();
 
 	//if(m_opened)
 	//	g_applog<<"op m_caret="<<m_caret<<std::endl;
 
-	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], val.c_str(), NULL, m_opened ? m_caret : -1);
+	DrawShadowedTextF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, NULL, m_opened ? m_caret : -1);
 
 	//glColor4f(1, 1, 1, 1);
 	//glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
 
-	//if(m_highl[0] != m_highl[1])
-	//	g_applog<<"highl "<<m_highl[0]<<"->"<<m_highl[1]<<std::endl;
-
-	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], val.c_str(), m_highl[0], m_highl[1]);
+	HighlightF(m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3], &val, m_highl[0], m_highl[1]);
 }
 
 //#define MOUSESC_DEBUG
@@ -132,10 +132,10 @@ void EditBox::frameupd()
 		{
 			m_scroll[0] -= fmax(1, g_font[m_font].gheight/4.0f);
 
-			std::string val = drawvalue();
-			int vallen = val.length();
+			RichText val = drawvalue();
+			int vallen = val.texlen();
 
-			int endx = EndX(val.c_str(), vallen, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+			int endx = EndX(&val, vallen, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 			if(endx < m_pos[2])
 				m_scroll[0] += m_pos[2] - endx;
@@ -157,8 +157,8 @@ void EditBox::frameupd()
 
 		if(movedcar)
 		{
-			std::string val = drawvalue();
-			int newcaret = MatchGlyphF(val.c_str(), m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+			RichText val = drawvalue();
+			int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 			if(newcaret > m_caret)
 			{
@@ -174,23 +174,21 @@ void EditBox::frameupd()
 	}
 }
 
-void EditBox::inev(InEv* ev)
+void EditBox::inev(InEv* ie)
 {
 //#ifdef MOUSESC_DEBUG
 	//g_applog<<"editbox mousemove"<<std::endl;
 	//g_applog.flush();
 //#endif
 
-	//InfoMessage("e", "e");
-
-	if(ev->type == INEV_MOUSEMOVE)
+	if(ie->type == INEV_MOUSEMOVE)
 	{
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
 			if(m_ldown)
 			{
-				std::string val = drawvalue();
-				int newcaret = MatchGlyphF(val.c_str(), m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+				RichText val = drawvalue();
+				int newcaret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 				if(newcaret > m_caret)
 				{
@@ -207,7 +205,7 @@ void EditBox::inev(InEv* ev)
 					//g_applog.flush();
 				}
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
@@ -217,7 +215,7 @@ void EditBox::inev(InEv* ev)
 
 				g_mouseoveraction = true;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
@@ -228,7 +226,7 @@ void EditBox::inev(InEv* ev)
 			}
 		}
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT)
 	{
 		if(m_opened)
 		{
@@ -236,28 +234,28 @@ void EditBox::inev(InEv* ev)
 			m_highl[0] = m_highl[1] = 0;
 		}
 
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
 			if(m_over)
 			{
 				m_ldown = true;
 
-				std::string val = drawvalue();
+				RichText val = drawvalue();
 
 				//m_highl[1] = MatchGlyphF(m_value.c_str(), m_font, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 				//m_highl[0] = m_highl[1];
 				//m_caret = m_highl[1];
-				m_caret = MatchGlyphF(val.c_str(), m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
+				m_caret = MatchGlyphF(&val, m_font, g_mouse.x, m_pos[0]+m_scroll[0], m_pos[1], m_pos[0], m_pos[1], m_pos[2], m_pos[3]);
 
 				m_highl[0] = 0;
 				m_highl[1] = 0;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 		}
 	}
-	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//if(m_over && m_ldown)
 		if(m_ldown)
@@ -269,7 +267,7 @@ void EditBox::inev(InEv* ev)
 				m_caret = -1;
 			}
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			gainfocus();
 
 			return;
@@ -279,28 +277,24 @@ void EditBox::inev(InEv* ev)
 
 		if(m_opened)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 	}
-	else if(ev->type == INEV_KEYDOWN && !ev->intercepted)
+	else if(ie->type == INEV_KEYDOWN && !ie->intercepted)
 	{
-		//InfoMessage("k0", "k0");
 		if(!m_opened)
 			return;
 
-		int len = m_value.length();
+		int len = m_value.texlen();
 
 		if(m_caret > len)
 			m_caret = len;
 
-
-		//InfoMessage("k1", "k1");
-
-		if(ev->key == SDLK_F1)
+		if(ie->key == SDLK_F1)
 			return;
 
-		if(ev->key == SDLK_LEFT)
+		if(ie->key == SDLK_LEFT)
 		{
 			if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 			{
@@ -309,14 +303,14 @@ void EditBox::inev(InEv* ev)
 			}
 			else if(m_caret <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
 				m_caret --;
 
-			std::string val = drawvalue();
-			int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+			RichText val = drawvalue();
+			int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 			//g_applog<<"left endx = "<<endx<<"/"<<m_pos[0]<<std::endl;
 			//g_applog.flush();
@@ -324,9 +318,9 @@ void EditBox::inev(InEv* ev)
 			if(endx <= m_pos[0])
 				m_scroll[0] += m_pos[0] - endx + 1;
 		}
-		else if(ev->key == SDLK_RIGHT)
+		else if(ie->key == SDLK_RIGHT)
 		{
-			int len = m_value.length();
+			int len = m_value.texlen();
 
 			if(m_highl[0] > 0 && m_highl[0] != m_highl[1])
 			{
@@ -335,57 +329,52 @@ void EditBox::inev(InEv* ev)
 			}
 			else if(m_caret >= len)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 			else
 				m_caret ++;
 
-			std::string val = drawvalue();
-			int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+			RichText val = drawvalue();
+			int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 			if(endx >= m_pos[2])
 				m_scroll[0] -= endx - m_pos[2] + 1;
 		}
-		else if(ev->key == SDLK_DELETE)
+		else if(ie->key == SDLK_DELETE)
 		{
-			len = m_value.length();
+			len = m_value.texlen();
 
 			//g_applog<<"vk del"<<std::endl;
 			//g_applog.flush();
 
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && m_caret >= len || len <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
 			delnext();
 
-#if 0
 			if(!m_passw)
 				m_value = ParseTags(m_value, &m_caret);
-#else
-#endif
 		}
-		if(ev->key == SDLK_BACKSPACE)
+		if(ie->key == SDLK_BACKSPACE)
 		{
-			len = m_value.length();
+			len = m_value.texlen();
 
 			if((m_highl[1] <= 0 || m_highl[0] == m_highl[1]) && len <= 0)
 			{
-				ev->intercepted = true;
+				ie->intercepted = true;
 				return;
 			}
 
 			delprev();
 
-#if 0
 			if(!m_passw)
 				m_value = ParseTags(m_value, &m_caret);
-#endif
 		}/*
-		 else if(ev->key == SDLK_DELETE)
+		 else if(ie->key == SDLK_DELETE)
 		 {
 		 len = m_value.texlen();
 
@@ -400,128 +389,103 @@ void EditBox::inev(InEv* ev)
 		 if(!m_passw)
 		 m_value = ParseTags(m_value, &m_caret);
 		 }*/
-		else if(ev->key == SDLK_LSHIFT || ev->key == SDLK_RSHIFT)
+		else if(ie->key == SDLK_LSHIFT || ie->key == SDLK_RSHIFT)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
-		else if(ev->key == SDLK_CAPSLOCK)
+		else if(ie->key == SDLK_CAPSLOCK)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
-		else if(ev->key == SDLK_RETURN)
+		else if(ie->key == SDLK_RETURN || ie->key == SDLK_RETURN2)
 		{
-			ev->intercepted = true;
+			ie->intercepted = true;
+			if(submitfunc)
+				submitfunc();
 			return;
 		}
 #if 0
-		else if(ev->key == 190 && !g_keys[SDLK_SHIFT])
+		else if(ie->key == 190 && !g_keys[SDLK_SHIFT])
 		{
 			//placechar('.');
 		}
 #endif
 
-		//InfoMessage("k", "k");
-
-        if(ev->scancode == SDL_SCANCODE_C && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-        //if(ev->key == SDLK_c && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-            //if(ev->key == 3)	//copy
-        {
-            copyval();
-			ev->intercepted = true;
-			return;
-        }
-        else if(ev->scancode == SDL_SCANCODE_V && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-        //else if(ev->key == SDLK_v && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-            //else if(ev->key == 22)	//paste
-        {
-            pasteval();
-			ev->intercepted = true;
-			return;
-        }
-        else if(ev->scancode == SDL_SCANCODE_A && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-        //else if(ev->key == SDLK_a && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-            //else if(ev->key == 1)	//select all
-        {
-            selectall();
-			ev->intercepted = true;
-			return;
-        }
-
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
 
-        if(ev->scancode != SDL_SCANCODE_LCTRL && ev->scancode != SDL_SCANCODE_RCTRL)
-            ev->intercepted = true;
+		if(changefunc3 != NULL)
+			changefunc3(ie->key, ie->scancode, true, m_param);
+
+		ie->intercepted = true;
 	}
-	else if(ev->type == INEV_KEYUP && !ev->intercepted)
+	else if(ie->type == INEV_KEYUP && !ie->intercepted)
 	{
 		if(!m_opened)
 			return;
 
-		ev->intercepted = true;
+		if(changefunc3 != NULL)
+			changefunc3(ie->key, ie->scancode, false, m_param);
+
+		ie->intercepted = true;
 	}
-	else if(ev->type == INEV_TEXTIN && !ev->intercepted)
+	else if(ie->type == INEV_TEXTIN && !ie->intercepted)
 	{
 		if(!m_opened)
 			return;
 
-		ev->intercepted = true;
+		ie->intercepted = true;
 
-		int len = m_value.length();
+		int len = m_value.texlen();
 
 		if(m_caret > len)
 			m_caret = len;
 
-		//g_applog<<"vk "<<ev->key<<std::endl;
+		//g_applog<<"vk "<<ie->key<<std::endl;
 		//g_applog.flush();
 
 
 #if 0
-		if(ev->key == SDLK_SPACE)
+		if(ie->key == SDLK_SPACE)
 		{
 			placechar(' ');
 		}
 		else
 #endif
-		{
 
 #ifdef PASTE_DEBUG
-			g_applog<<"charin "<<(char)ev->key<<" ("<<ev->key<<")"<<std::endl;
-			g_applog.flush();
+			g_applog<<"charin "<<(char)ie->key<<" ("<<ie->key<<")"<<std::endl;
+		g_applog.flush();
 #endif
 
 #if 0
-			if(ev->scancode == SDL_SCANCODE_C && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-			//if(ev->key == 3)	//copy
-			{
-				copyval();
-			}
-			else if(ev->scancode == SDL_SCANCODE_V && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-			//else if(ev->key == 22)	//paste
-			{
-				pasteval();
-			}
-			else if(ev->scancode == SDL_SCANCODE_A && (g_keys[SDL_SCANCODE_LCTRL] || g_keys[SDL_SCANCODE_RCTRL]))
-			//else if(ev->key == 1)	//select all
-			{
-				selectall();
-			}
-			else
-#endif
-
-#if 0
-			unsigned int* ustr = ToUTF32((const unsigned char*)ev->text.c_str(), ev->text.length());
-			//std::string addstr(RichTextP(UString(ustr)));	//Why does MSVS2012 not accept this?
-			std::string addstr = std::string(ustr);
-			delete [] ustr;
-
-			placestr(&addstr);
-#else
-			placestr(&ev->text);
-#endif
+		//if(ie->key == 'C' && g_keys[SDLK_CONTROL])
+		if(ie->key == 3)	//copy
+		{
+			copyval();
 		}
+		//else if(ie->key == 'V' && g_keys[SDLK_CONTROL])
+		else if(ie->key == 22)	//paste
+		{
+			pasteval();
+		}
+		//else if(ie->key == 'A' && g_keys[SDLK_CONTROL])
+		else if(ie->key == 1)	//select all
+		{
+			selectall();
+		}
+		else
+#endif
+		//unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str(), ie->text.length());
+		unsigned int* ustr = ToUTF32((const unsigned char*)ie->text.c_str());
+		//RichText addstr(RichPart(UString(ustr)));	//Why does MSVS2012 not accept this?
+		RichText addstr = RichText(RichPart(UString(ustr)));
+		unsigned int first = ustr[0];
+		delete [] ustr;
+
+		placestr(&addstr);
 
 		if(changefunc != NULL)
 			changefunc();
@@ -529,29 +493,78 @@ void EditBox::inev(InEv* ev)
 		if(changefunc2 != NULL)
 			changefunc2(m_param);
 
-		ev->intercepted = true;
+		if(changefunc3 != NULL)
+			changefunc3(first, 0, true, m_param);
+
+		ie->intercepted = true;
+	}
+	else if(ie->type == INEV_PASTE && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		pasteval();
+	}
+	else if(ie->type == INEV_COPY && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		copyval();
+	}
+	else if(ie->type == INEV_SELALL && !ie->intercepted)
+	{
+		if(!m_opened)
+			return;
+
+		ie->intercepted = true;
+
+		int len = m_value.texlen();
+
+		if(m_caret > len)
+			m_caret = len;
+
+		selectall();
 	}
 }
 
-void EditBox::placestr(const std::string* str)
+void EditBox::placestr(const RichText* str)
 {
-	int len = m_value.length();
+	int len = m_value.texlen();
 
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
 		len -= m_highl[1] - m_highl[0];
 	}
 
-	int addlen = str->length();
+	if(len < 0)
+		len = 0;
+
+	int addlen = str->texlen();
 	if(addlen + len >= m_maxlen)
 		addlen = m_maxlen - len;
 
-	std::string addstr = str->substr(0, addlen);
+	RichText addstr = str->substr(0, addlen);
 
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
-		std::string before = m_value.substr(0, m_highl[0]);
-		std::string after = m_value.substr(m_highl[1]-1, m_value.length()-m_highl[1]);
+		RichText before = m_value.substr(0, m_highl[0]);
+		//RichText after = m_value.substr(m_highl[1]-1, m_value.texlen()-m_highl[1]);
+		RichText after = m_value.substr(m_highl[1], m_value.texlen()-m_highl[1]);
 		m_value = before + addstr + after;
 
 		m_caret = m_highl[0] + addlen;
@@ -564,23 +577,32 @@ void EditBox::placestr(const std::string* str)
 			return;
 		}
 
-		std::string before = m_value.substr(0, m_caret);
-		std::string after = m_value.substr(m_caret, m_value.length()-m_caret);
+		RichText before = m_value.substr(0, m_caret);
+		RichText after = m_value.substr(m_caret, m_value.texlen()-m_caret);
 		m_value = before + addstr + after;
 		m_caret += addlen;
 
 		//LogRich(&m_value);
 	}
 
-	std::string val = drawvalue();
-	int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+	if(!m_passw)
+		m_value = ParseTags(m_value, &m_caret);
+
+	RichText val = drawvalue();
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 	if(endx >= m_pos[2])
 		m_scroll[0] -= endx - m_pos[2] + 1;
 }
 
+#if 0
 void EditBox::changevalue(const char* str)
 {
+	int len = m_value.texlen();
+
+	if(len >= m_maxlen)
+		return;
+
 	int setlen = strlen(str);
 	if(setlen >= m_maxlen)
 		setlen = m_maxlen;
@@ -593,21 +615,35 @@ void EditBox::changevalue(const char* str)
 	for(int i=0; i<setlen; i++)
 		setstr[i] = str[i];
 	setstr[setlen] = '\0';
+
 	m_value = setstr;
 	m_highl[0] = m_highl[1] = 0;
 	m_caret = 0;
 
 	delete [] setstr;
 }
+#else
+
+void EditBox::changevalue(const RichText* str)
+{
+	int setlen = str->texlen();
+	if(setlen >= m_maxlen)
+		setlen = m_maxlen;
+
+	m_value = str->substr(0, setlen);
+	m_highl[0] = m_highl[1] = 0;
+	m_caret = 0;
+}
+#endif
 
 bool EditBox::delnext()
 {
-	int len = m_value.length();
+	int len = m_value.texlen();
 
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
-		std::string before = m_value.substr(0, m_highl[0]);
-		std::string after = m_value.substr(m_highl[1], len-m_highl[1]);
+		RichText before = m_value.substr(0, m_highl[0]);
+		RichText after = m_value.substr(m_highl[1], len-m_highl[1]);
 		m_value = before + after;
 
 		m_caret = m_highl[0];
@@ -617,13 +653,13 @@ bool EditBox::delnext()
 		return true;
 	else
 	{
-		std::string before = m_value.substr(0, m_caret);
-		std::string after = m_value.substr(m_caret+1, len-m_caret);
+		RichText before = m_value.substr(0, m_caret);
+		RichText after = m_value.substr(m_caret+1, len-m_caret);
 		m_value = before + after;
 	}
 
-	std::string val = drawvalue();
-	int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+	RichText val = drawvalue();
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 	if(endx <= m_pos[0])
 		m_scroll[0] += m_pos[0] - endx + 1;
@@ -635,12 +671,12 @@ bool EditBox::delnext()
 
 bool EditBox::delprev()
 {
-	int len = m_value.length();
+	int len = m_value.texlen();
 
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
-		std::string before = m_value.substr(0, m_highl[0]);
-		std::string after = m_value.substr(m_highl[1], len-m_highl[1]);
+		RichText before = m_value.substr(0, m_highl[0]);
+		RichText after = m_value.substr(m_highl[1], len-m_highl[1]);
 		m_value = before + after;
 
 		m_caret = m_highl[0];
@@ -650,8 +686,8 @@ bool EditBox::delprev()
 		return true;
 	else
 	{
-		std::string before = m_value.substr(0, m_caret-1);
-		std::string after = m_value.substr(m_caret, len-m_caret);
+		RichText before = m_value.substr(0, m_caret-1);
+		RichText after = m_value.substr(m_caret, len-m_caret);
 		m_value = before + after;
 
 		//g_applog<<"before newval="<<before.rawstr()<<" texlen="<<before.texlen()<<std::endl;
@@ -662,8 +698,8 @@ bool EditBox::delprev()
 		m_caret--;
 	}
 
-	std::string val = drawvalue();
-	int endx = EndX(val.c_str(), m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+	RichText val = drawvalue();
+	int endx = EndX(&val, m_caret, m_font, m_pos[0]+m_scroll[0], m_pos[1]);
 
 	if(endx <= m_pos[0])
 		m_scroll[0] += m_pos[0] - endx + 1;
@@ -682,142 +718,67 @@ void EditBox::copyval()
 	g_applog.flush();
 #endif
 
-#if 0
 	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
 	{
-		std::string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
-		std::string rawhighl = highl.rawstr();
-		const size_t len = strlen(rawhighl.c_str())+1;
-		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-		memcpy(GlobalLock(hMem), rawhighl.c_str(), len);
-		GlobalUnlock(hMem);
-		OpenClipboard(0);
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hMem);
-		CloseClipboard();
+		RichText highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
+		SDL_SetClipboardText( highl.rawstr().c_str() );
 	}
 	else
 	{
-		const char* output = "";
-		const size_t len = strlen(output)+1;
-		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-		memcpy(GlobalLock(hMem), output, len);
-		GlobalUnlock(hMem);
-		OpenClipboard(0);
-		EmptyClipboard();
-		SetClipboardData(CF_TEXT, hMem);
-		CloseClipboard();
+		SDL_SetClipboardText( "" );
 	}
-#else
-	if(m_highl[1] > 0 && m_highl[0] != m_highl[1])
-	{
-		std::string highl = m_value.substr(m_highl[0], m_highl[1]-m_highl[0]);
-		//std::string rawhighl = highl.rawstr();
-		//const size_t len = strlen(rawhighl.c_str())+1;
-		SDL_SetClipboardText( highl.c_str() );
-		//InfoMessage("g", "g");
-	}
-	else
-	{
-		return;
-	}
-#endif
 
 	//return true;
 }
 
 void EditBox::pasteval()
 {
-#if 0
-#ifdef PASTE_DEBUG
-	g_applog<<"paste"<<std::endl;
-#endif
-	OpenClipboard(NULL);
+	//InfoMess("pa", SDL_GetClipboardText());
 
-#ifdef PASTE_DEBUG
-	g_applog<<"paste1"<<std::endl;
-#endif
-	HANDLE clip0 = GetClipboardData(CF_TEXT);
+	unsigned int* ustr = ToUTF32( (unsigned char*)SDL_GetClipboardText() ); 
+	RichText rstr = RichText(UString(ustr));
+	
+	//InfoMess("pa2", SDL_GetClipboardText());
 
-#ifdef PASTE_DEBUG
-	g_applog<<"paste2"<<std::endl;
-#endif
-	//HANDLE h = GlobalLock(clip0);
-	//placestr((char*)clip0);
-	char* str = (char*)GlobalLock(clip0);
-#ifdef PASTE_DEBUG
-	g_applog<<"paste3"<<std::endl;
-	g_applog<<str<<std::endl;
-#endif
+	delete [] ustr;
+	
+	//InfoMess("pa3", SDL_GetClipboardText());
 
-	//placestr(str);
+	placestr( &rstr );
 
-#ifdef PASTE_DEBUG
-	g_applog<<"place str ";
-	g_applog<<str<<std::endl;
-	g_applog.flush();
-	g_applog.flush();
-#endif
+	//InfoMess("pa4", SDL_GetClipboardText());
 
 	if(!m_passw)
 		m_value = ParseTags(m_value, &m_caret);
-
-	GlobalUnlock(clip0);
-	CloseClipboard();
-
-	//return true;
-#else
-#ifdef PASTE_DEBUG
-	g_applog<<"paste"<<std::endl;
-#endif
-
-	//InfoMessage("p", "p");
-
-	//HANDLE h = GlobalLock(clip0);
-	//placestr((char*)clip0);
-	char* str = SDL_GetClipboardText();
-#ifdef PASTE_DEBUG
-	g_applog<<"paste3"<<std::endl;
-	g_applog<<str<<std::endl;
-#endif
-	std::string sstr(str);
-
-	placestr(&sstr);
-
-
-#ifdef PASTE_DEBUG
-	g_applog<<"place str ";
-	g_applog<<str<<std::endl;
-	g_applog.flush();
-	g_applog.flush();
-#endif
-
-	SDL_free(str);
-
-	//if(!m_passw)
-	//	m_value = ParseTags(m_value, &m_caret);
-
-	//GlobalUnlock(clip0);
-	//CloseClipboard();
-
-	//return true;
-#endif
+	
+	//InfoMess("pa5", SDL_GetClipboardText());
 }
 
 void EditBox::selectall()
 {
+	//InfoMess("sa", "sa1");
+
 	m_highl[0] = 0;
-	m_highl[1] = m_value.length()+1;
+	m_highl[1] = m_value.texlen()+1;
 	m_caret = -1;
 
-	std::string val = drawvalue();
-	int endx = EndX(val.c_str(), m_value.length(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+	//InfoMess("sa", "sa2");
+
+	RichText val = drawvalue();
+	
+	//InfoMess("sa", "sa3");
+
+	int endx = EndX(&val, m_value.texlen(), m_font, m_pos[0]+m_scroll[0], m_pos[1]);
+
+	//InfoMess("sa", "sa4");
 
 	if(endx <= m_pos[2])
 		m_scroll[0] += m_pos[2] - endx - 1;
 
 	if(m_scroll[0] >= 0)
 		m_scroll[0] = 0;
+
+	//InfoMess("sa", "sa5");
 
 	//return true;
 }
@@ -844,10 +805,10 @@ void EditBox::gainfocus()
 		m_opened = true;
 		SDL_StartTextInput();
 		SDL_Rect r;
-		r.x = m_pos[0];
-		r.y = m_pos[3];
-		r.w = g_width - m_pos[0];
-		r.h = g_height - m_pos[3];
+		r.x = (int)m_pos[0];
+		r.y = (int)m_pos[3];
+		r.w = (int)(g_width - m_pos[0]);
+		r.h = (int)(g_height - m_pos[3]);
 		SDL_SetTextInputRect(&r);
 		g_kbfocus++;
 	}

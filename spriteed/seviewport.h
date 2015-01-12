@@ -41,20 +41,20 @@
 #define VIEWPORT_ANGLE45O	6
 #define VIEWPORT_TYPES		7
 
-class ViewportT
+class VpType
 {
 public:
 	Vec3f m_offset;
 	Vec3f m_up;
 	char m_label[32];
 
-	ViewportT(){}
-	ViewportT(Vec3f offset, Vec3f up, const char* label);
+	VpType(){}
+	VpType(Vec3f offset, Vec3f up, const char* label);
 };
 
-extern ViewportT g_viewportT[VIEWPORT_TYPES];
+extern VpType g_vptype[VIEWPORT_TYPES];
 
-class Viewport
+class VpWrap
 {
 public:
 	int m_type;
@@ -65,8 +65,8 @@ public:
 	Vec2i m_curmouse;
 	bool m_drag;
 
-	Viewport();
-	Viewport(int type);
+	VpWrap();
+	VpWrap(int type);
 	Vec3f up();
 	Vec3f up2();
 	Vec3f strafe();
@@ -75,7 +75,7 @@ public:
 	Vec3f pos();
 };
 
-extern Viewport g_viewport[4];
+extern VpWrap g_viewport[4];
 //extern Vec3f g_focus;
 
 void DrawViewport(int which, int x, int y, int width, int height);

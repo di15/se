@@ -12,17 +12,17 @@
 #include "../common/save/save.h"
 #include "../common/save/saveedm.h"
 #include "../common/sim/sim.h"
-#include "../common/draw/sortb.h"
+#include "../common/render/sortb.h"
 #include "undo.h"
 #include "../common/save/compilemap.h"
-#include "../common/draw/shadow.h"
+#include "../common/render/shadow.h"
 #include "../common/sim/tile.h"
 #include "../common/save/modelholder.h"
 #include "../common/tool/compilebl.h"
 #include "../common/save/savesprite.h"
 #include "../common/tool/rendersprite.h"
-#include "../common/draw/screenshot.h"
-#include "../common/gui/widgets/choosefile.h"
+#include "../common/render/screenshot.h"
+//#include "../common/gui/widgets/choosefile.h"
 
 int g_projtype = PROJ_ORTHO;
 bool g_showsky = false;
@@ -103,18 +103,18 @@ void MouseLeftButtonUp()
 {
 }
 
-void Change_RotDeg(int dummy)
+void Change_RotDeg(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 }
 
-void Change_Zoom(int dummy)
+void Change_Zoom(unsigned int key, unsigned int scancode, bool down, int parm)
 {
-	Widget* zoombox = g_GUI.get("editor")->get("top panel")->get("zoom");
+	Widget* zoombox = g_gui.get("editor")->get("top panel")->get("zoom");
 
 	//if(zoombox->m_value.c_str()[0] == '\0')
 	//	return;
 
-	g_zoom = StrToFloat(zoombox->m_value.c_str());
+	g_zoom = StrToFloat(zoombox->m_value.rawstr().c_str());
 
 	if(g_zoom <= 0.0f)
 		g_zoom = 1.0f;
@@ -123,7 +123,7 @@ void Change_Zoom(int dummy)
 //void Change_SnapGrid(int dummy)
 void Change_SnapGrid()
 {
-	Widget* snapgbox = g_GUI.get("editor")->get("top panel")->get("snapgrid");
+	Widget* snapgbox = g_gui.get("editor")->get("top panel")->get("snapgrid");
 
 	//if(snapgbox->m_value.c_str()[0] == '\0')
 	//	return;
@@ -140,11 +140,11 @@ void Change_SnapGrid()
 		g_snapgrid = 1;
 }
 
-void Change_MaxElev(int dummy)
+void Change_MaxElev(unsigned int key, unsigned int scancode, bool down, int parm)
 {
-	Widget* maxelevbox = g_GUI.get("editor")->get("top panel")->get("maxelev");
+	Widget* maxelevbox = g_gui.get("editor")->get("top panel")->get("maxelev");
 
-	g_maxelev = StrToFloat(maxelevbox->m_value.c_str());
+	g_maxelev = StrToFloat(maxelevbox->m_value.rawstr().c_str());
 }
 
 void SkipLogo()
@@ -155,8 +155,8 @@ void SkipLogo()
 	//g_mode = LOADING;
 	//OpenSoleView("loading");
 	g_mode = EDITOR;
-	g_GUI.closeall();
-	g_GUI.open("editor");
+	g_gui.closeall();
+	g_gui.open("editor");
 	//OpenAnotherView("brush edit");
 }
 
@@ -169,12 +169,12 @@ void UpdateLogo()
 	if(stage < 60)
 	{
 		float a = (float)stage / 60.0f;
-		g_GUI.get("logo")->get("logo")->m_rgba[3] = a;
+		g_gui.get("logo")->get("logo")->m_rgba[3] = a;
 	}
 	else if(stage < 120)
 	{
 		float a = 1.0f - (float)(stage-60) / 60.0f;
-		g_GUI.get("logo")->get("logo")->m_rgba[3] = a;
+		g_gui.get("logo")->get("logo")->m_rgba[3] = a;
 	}
 	else
 		SkipLogo();
@@ -193,10 +193,10 @@ void Click_NewBrush()
 	Brush b;
 	BrushSide top(Vec3f(0,1,0), pos + Vec3f(0,STOREY_HEIGHT,0));
 	BrushSide bottom(Vec3f(0,-1,0), pos + Vec3f(0,0,0));
-	BrushSide left(Vec3f(-1,0,0), pos + Vec3f(-TILE_SIZE/2.0f,0,0));
-	BrushSide right(Vec3f(1,0,0), pos + Vec3f(TILE_SIZE/2.0f,0,0));
-	BrushSide front(Vec3f(0,0,1), pos + Vec3f(0,0,TILE_SIZE/2.0f));
-	BrushSide back(Vec3f(0,0,-1), pos + Vec3f(0,0,-TILE_SIZE/2.0f));
+	BrushSide left(Vec3f(-1,0,0), pos + Vec3f(-g_tilesize/2.0f,0,0));
+	BrushSide right(Vec3f(1,0,0), pos + Vec3f(g_tilesize/2.0f,0,0));
+	BrushSide front(Vec3f(0,0,1), pos + Vec3f(0,0,g_tilesize/2.0f));
+	BrushSide back(Vec3f(0,0,-1), pos + Vec3f(0,0,-g_tilesize/2.0f));
 	b.add(top);		//0
 	b.add(bottom);	//1
 	b.add(left);	//2
@@ -211,7 +211,7 @@ void Click_NewBrush()
 	//auto i = g_edmap.m_brush.rbegin();
 	//g_selB.push_back(&*i);
 
-	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	VpType* t = &g_vptype[VIEWPORT_ANGLE45O];
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 	//LinkLatestUndo();
@@ -236,7 +236,7 @@ void Click_LoadEdMap()
 	if(LoadEdMap(filepath, &g_edmap))
 		strcpy(g_lastsave, filepath);
 
-	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	VpType* t = &g_vptype[VIEWPORT_ANGLE45O];
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 	ClearUndo();
@@ -451,7 +451,7 @@ void Click_BChooseTex()
 	LinkPrevUndo();
 
 	unsigned int diffuseindex;
-	string relativepath = MakeRelative(filepath);
+	std::string relativepath = MakeRelative(filepath);
 	CreateTexture(diffuseindex, relativepath.c_str(), false, true);
 	unsigned int texname = g_texture[diffuseindex].texname;
 
@@ -460,7 +460,7 @@ void Click_BChooseTex()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load diffuse texture %s", relativepath.c_str());
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char specpath[MAX_PATH+1];
@@ -476,7 +476,7 @@ void Click_BChooseTex()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load specular texture %s", specpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char normpath[MAX_PATH+1];
@@ -492,7 +492,7 @@ void Click_BChooseTex()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load normal texture %s", normpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char ownpath[MAX_PATH+1];
@@ -508,7 +508,7 @@ void Click_BChooseTex()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load team color texture %s", normpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	if(g_sel1b == NULL)
@@ -589,9 +589,9 @@ void Click_FitToFace()
 
 void CloseSideView()
 {
-	g_GUI.close("brush side edit");
-	g_GUI.close("brush edit");
-	g_GUI.close("door edit");
+	g_gui.close("brush side edit");
+	g_gui.close("brush edit");
+	g_gui.close("door edit");
 }
 
 void Click_DoorView()
@@ -604,6 +604,8 @@ void Click_DoorView()
 
 void CopyBrush()
 {
+	//InfoMess("cp","cb");
+
 	if(g_selB.size() <= 0 && g_selM.size() <= 0)
 		return;
 
@@ -685,10 +687,16 @@ void Click_CutBrush()
 bool OpenFileDialog(char* initdir, char* filepath)
 {
 #ifdef PLATFORM_WIN
+	memset(filepath, 0, sizeof(char)*MAX_PATH);
+
+	SDL_SysWMinfo info;
+	SDL_GetWindowWMInfo(g_window, &info);
+
 	OPENFILENAME ofn;
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	ofn.lStructSize = sizeof ( ofn );
+	//ofn.hwndOwner = info.info.win.window;
 	ofn.hwndOwner = NULL;
 	ofn.lpstrInitialDir = initdir;
 	ofn.lpstrFile = filepath;
@@ -703,7 +711,23 @@ bool OpenFileDialog(char* initdir, char* filepath)
 	ofn.Flags = OFN_PATHMUSTEXIST|OFN_FILEMUSTEXIST;
 
 	if(!GetOpenFileName(&ofn))
+	{
+#if 0
+		int e = CommDlgExtendedError();
+		char msg[128];
+		sprintf(msg, "cmdlge %d", e);
+		InfoMess(msg,msg);
+#endif
+
 		return false;
+	}
+	
+#if 0
+	int e = CommDlgExtendedError();
+	char msg[128];
+	sprintf(msg, "cmdlgne %d", e);
+	InfoMess(msg,msg);
+#endif
 
 	return true;
 #elif defined( PLATFORM_LINUX )
@@ -760,11 +784,17 @@ bool OpenFileDialog(char* initdir, char* filepath)
 bool SaveFileDialog(char* initdir, char* filepath)
 {
 #ifdef PLATFORM_WIN
+	memset(filepath, 0, sizeof(char)*MAX_PATH);
+
+	SDL_SysWMinfo info;
+	SDL_GetWindowWMInfo(g_window, &info);
+
 	OPENFILENAME ofn;
 	ZeroMemory( &ofn , sizeof( ofn));
 
 	ofn.lStructSize = sizeof ( ofn );
-	ofn.hwndOwner = NULL  ;
+	//ofn.hwndOwner = info.info.win.window;
+	ofn.hwndOwner = NULL;
 	ofn.lpstrInitialDir = initdir;
 	ofn.lpstrFile = filepath;
 	//ofn.lpstrFile[0] = '\0';
@@ -848,7 +878,7 @@ void Click_AddMS3D()
 	if(!OpenFileDialog(initdir, filepath))
 		return;
 
-	string relative = MakeRelative(filepath);
+	std::string relative = MakeRelative(filepath);
 
 	g_applog<<"relative "<<relative<<std::endl;
 
@@ -859,7 +889,7 @@ void Click_AddMS3D()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load model %s", relative.c_str());
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 
 		return;
 	}
@@ -903,8 +933,8 @@ void RotateBrushes(float radians, Vec3f axis)
 
 		centroid = centroid / (float)b->m_nsides;
 
-		list<float> oldus;
-		list<float> oldvs;
+		std::list<float> oldus;
+		std::list<float> oldvs;
 
 		for(int j=0; j<b->m_nsides; j++)
 		{
@@ -982,7 +1012,7 @@ void RotateBrushes(float radians, Vec3f axis)
 
 void Click_RotXCCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(1, 0, 0));
@@ -992,7 +1022,7 @@ void Click_RotXCCW()
 
 void Click_RotXCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(1, 0, 0));
@@ -1002,7 +1032,7 @@ void Click_RotXCW()
 
 void Click_RotYCCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 1, 0));
@@ -1012,7 +1042,7 @@ void Click_RotYCCW()
 
 void Click_RotYCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 1, 0));
@@ -1022,7 +1052,7 @@ void Click_RotYCW()
 
 void Click_RotZCCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(degrees), Vec3f(0, 0, 1));
@@ -1032,7 +1062,7 @@ void Click_RotZCCW()
 
 void Click_RotZCW()
 {
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	if(g_selB.size() > 0)
 		RotateBrushes(DEGTORAD(-degrees), Vec3f(0, 0, 1));
@@ -1044,7 +1074,7 @@ void Click_RotateTex()
 {
 	LinkPrevUndo();
 
-	float degrees = StrToFloat(g_GUI.get("editor")->get("top panel")->get("rotdeg")->m_value.c_str());
+	float degrees = StrToFloat(g_gui.get("editor")->get("top panel")->get("rotdeg")->m_value.rawstr().c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1076,27 +1106,29 @@ void RedoBSideGUI()
 	if(g_dragS < 0)
 		return;
 	
-	if(!g_GUI.get("brush side edit"))	InfoMessage("e", "no bse");
-	if(!g_GUI.get("brush side edit")->get("left panel"))	InfoMessage("e", "no lp");
-	if(!g_GUI.get("brush side edit")->get("left panel")->get("u equation"))	InfoMessage("e", "no ue");
-	if(!g_GUI.get("brush side edit")->get("left panel")->get("v equation"))	InfoMessage("e", "no ve");
+	if(!g_gui.get("brush side edit"))	InfoMess("e", "no bse");
+	if(!g_gui.get("brush side edit")->get("left panel"))	InfoMess("e", "no lp");
+	if(!g_gui.get("brush side edit")->get("left panel")->get("u equation"))	InfoMess("e", "no ue");
+	if(!g_gui.get("brush side edit")->get("left panel")->get("v equation"))	InfoMess("e", "no ve");
 
-	EditBox* uwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("u equation");
-	EditBox* vwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("v equation");
+	EditBox* uwidg = (EditBox*)g_gui.get("brush side edit")->get("left panel")->get("u equation");
+	EditBox* vwidg = (EditBox*)g_gui.get("brush side edit")->get("left panel")->get("v equation");
 
 	Plane* tceq = g_sel1b->m_sides[g_dragS].m_tceq;
 
 	char tceqstr[256];
 	sprintf(tceqstr, "%f %f %f %f", tceq[0].m_normal.x, tceq[0].m_normal.y, tceq[0].m_normal.z, tceq[0].m_d);
-	uwidg->changevalue(tceqstr);
+	RichText tceqrstr = RichText(tceqstr);
+	uwidg->changevalue(&tceqrstr);
 	sprintf(tceqstr, "%f %f %f %f", tceq[1].m_normal.x, tceq[1].m_normal.y, tceq[1].m_normal.z, tceq[1].m_d);
-	vwidg->changevalue(tceqstr);
+	tceqrstr = RichText(tceqstr);
+	vwidg->changevalue(&tceqrstr);
 
 	uwidg->m_scroll[0] = 0;
 	vwidg->m_scroll[0] = 0;
 }
 
-void Change_TexEq(int c)
+void Change_TexEq(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 	if(g_sel1b == NULL)
 		return;
@@ -1104,15 +1136,17 @@ void Change_TexEq(int c)
 	if(g_dragS < 0)
 		return;
 
-	EditBox* uwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("u equation");
-	EditBox* vwidg = (EditBox*)g_GUI.get("brush side edit")->get("left panel")->get("v equation");
+	LinkPrevUndo();
+
+	EditBox* uwidg = (EditBox*)g_gui.get("brush side edit")->get("left panel")->get("u equation");
+	EditBox* vwidg = (EditBox*)g_gui.get("brush side edit")->get("left panel")->get("v equation");
 
 	float A = 0;
 	float B = 0;
 	float C = 0;
 	float D = 0;
 
-	sscanf(uwidg->m_value.c_str(), "%f %f %f %f", &A, &B, &C, &D);
+	sscanf(uwidg->m_value.rawstr().c_str(), "%f %f %f %f", &A, &B, &C, &D);
 
 	Plane* tceq = g_sel1b->m_sides[g_dragS].m_tceq;
 	tceq[0].m_normal.x = A;
@@ -1125,7 +1159,7 @@ void Change_TexEq(int c)
 	C = 0;
 	D = 0;
 
-	sscanf(vwidg->m_value.c_str(), "%f %f %f %f", &A, &B, &C, &D);
+	sscanf(vwidg->m_value.rawstr().c_str(), "%f %f %f %f", &A, &B, &C, &D);
 
 	tceq[1].m_normal.x = A;
 	tceq[1].m_normal.y = B;
@@ -1142,7 +1176,7 @@ void Change_SelComp()
 
 int GetComponent()
 {
-	int c = g_GUI.get("brush side edit")->get("left panel")->get("select component")->m_selected;
+	int c = g_gui.get("brush side edit")->get("left panel")->get("select component")->m_selected;
 
 	if(c != 0 && c != 1)
 		c = 0;
@@ -1157,10 +1191,12 @@ void Click_ScaleTex()
 
 	if(g_dragS < 0)
 		return;
+	
+	LinkPrevUndo();
 
 	int c = GetComponent();
 
-	float scale = 1.0f/StrToFloat(g_GUI.get("brush side edit")->get("left panel")->get("texture scale")->m_value.c_str());
+	float scale = 1.0f/StrToFloat(g_gui.get("brush side edit")->get("left panel")->get("texture scale")->m_value.rawstr().c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1185,10 +1221,12 @@ void Click_ShiftTex()
 
 	if(g_dragS < 0)
 		return;
+	
+	LinkPrevUndo();
 
 	int c = GetComponent();
 
-	float shift = StrToFloat(g_GUI.get("brush side edit")->get("left panel")->get("texture shift")->m_value.c_str());
+	float shift = StrToFloat(g_gui.get("brush side edit")->get("left panel")->get("texture shift")->m_value.rawstr().c_str());
 
 	Brush* b = g_sel1b;
 	BrushSide* s = &b->m_sides[g_dragS];
@@ -1202,7 +1240,7 @@ void Click_ShiftTex()
 
 void Change_ShowSky()
 {
-	Widget* showskchbox = g_GUI.get("editor")->get("top panel")->get("showsky");
+	Widget* showskchbox = g_gui.get("editor")->get("top panel")->get("showsky");
 
 	g_showsky = (bool)showskchbox->m_selected;
 }
@@ -1219,7 +1257,7 @@ void Click_ProjOrtho()
 
 void Click_ResetView()
 {
-	ResetView();
+	ResetView(false);
 }
 
 void Click_Explode()
@@ -1252,10 +1290,10 @@ void Click_SetDoor()
 
 	float opendeg = 90;
 
-	ViewLayer* dooredview = (ViewLayer*)g_GUI.get("door edit");
+	ViewLayer* dooredview = (ViewLayer*)g_gui.get("door edit");
 	Frame* leftpanel = (Frame*)dooredview->get("left panel");
 	EditBox* opendegedit = (EditBox*)leftpanel->get("opendeg");
-	opendeg = StrToFloat(opendegedit->m_value.c_str());
+	opendeg = StrToFloat(opendegedit->m_value.rawstr().c_str());
 
 	door->opendeg = opendeg;
 
@@ -1322,8 +1360,8 @@ void Click_OpenCloseDoor()
 		//char msg[128];
 		//sprintf(msg, "point(%f,%f,%f) axis(%f,%f,%f)
 
-		list<float> oldus;
-		list<float> oldvs;
+		std::list<float> oldus;
+		std::list<float> oldvs;
 
 		for(int j=0; j<transformed.m_nsides; j++)
 		{
@@ -1870,8 +1908,9 @@ void Click_AddTile()
 	LinkPrevUndo();
 
 	unsigned int diffuseindex;
-	string relativepath = MakeRelative(filepath);
-	CreateTexture(diffuseindex, relativepath.c_str(), false, true);
+	std::string relativepath = MakeRelative(filepath);
+	CreateTexture(diffuseindex, relativepath.c_str(), false, true);	//with mipmaps, linear filter
+	//CreateTexture(diffuseindex, relativepath.c_str(), false, false);	//no mipmaps, nearest filter
 	unsigned int texname = g_texture[diffuseindex].texname;
 
 	if(diffuseindex == 0)
@@ -1879,7 +1918,7 @@ void Click_AddTile()
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load diffuse texture %s", relativepath.c_str());
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char specpath[MAX_PATH+1];
@@ -1888,14 +1927,15 @@ void Click_AddTile()
 	strcat(specpath, ".spec.jpg");
 
 	unsigned int specindex;
-	CreateTexture(specindex, specpath, false, true);
+	CreateTexture(specindex, specpath, false, true);	//with mipmaps, linear filter
+	//CreateTexture(specindex, specpath, false, false);	//no mipmaps, nearest filter
 
 	if(specindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load specular texture %s", specpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char normpath[MAX_PATH+1];
@@ -1905,13 +1945,14 @@ void Click_AddTile()
 
 	unsigned int normindex;
 	CreateTexture(normindex, normpath, false, true);
+	//CreateTexture(normindex, normpath, false, false);
 
 	if(normindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load normal texture %s", normpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 
 	char ownpath[MAX_PATH+1];
@@ -1921,13 +1962,14 @@ void Click_AddTile()
 
 	unsigned int ownindex;
 	CreateTexture(ownindex, ownpath, false, true);
+	//CreateTexture(ownindex, ownpath, false, false);
 
 	if(ownindex == 0)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Couldn't load team color texture %s", normpath);
 
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 	}
 	
 	g_tiletexs[TEX_DIFF] = diffuseindex;
@@ -1936,7 +1978,7 @@ void Click_AddTile()
 	g_tiletexs[TEX_TEAM] = ownindex;
 }
 
-void Change_Frames(int dummy)
+void Change_Frames(unsigned int key, unsigned int scancode, bool down, int parm)
 {
 }
 
@@ -2092,61 +2134,20 @@ void Click_CompileModel()
 #ifdef DEMO
 	MessageBox(g_hWnd, "feature disabled ;)", "demo", NULL);
 #else
-#ifdef PLATFORM_WIN
-        OPENFILENAME ofn;
+	char filepath[MAX_PATH+1];
+	char initdir[MAX_PATH+1];
+	FullPath("export models\\", initdir);
+	CorrectSlashes(initdir);
+	//strcpy(filepath, initdir);
+	FullPath("export models\\export", filepath);
+	CorrectSlashes(filepath);
 
-        char filepath[MAX_PATH+1];
+	if(!SaveFileDialog(initdir, filepath))
+		return;
 
-        ZeroMemory( &ofn , sizeof( ofn));
-
-        char initdir[MAX_PATH+1];
-        FullPath("export models\\", initdir);
-        CorrectSlashes(initdir);
-        //strcpy(filepath, initdir);
-        FullPath("export models\\export", filepath);
-        CorrectSlashes(filepath);
-
-        ofn.lStructSize = sizeof ( ofn );
-        ofn.hwndOwner = NULL  ;
-        ofn.lpstrInitialDir = initdir;
-        ofn.lpstrFile = filepath;
-        //ofn.lpstrFile[0] = '\0';
-        ofn.nMaxFile = sizeof( filepath );
-        //ofn.lpstrFilter = "Save\0*.bl\0All\0*.*\0";
-        ofn.lpstrFilter = "All\0*.*\0";
-        ofn.nFilterIndex =1;
-        ofn.lpstrFileTitle = NULL;
-        ofn.nMaxFileTitle = MAX_PATH;        //0;
-        ofn.lpstrInitialDir = NULL;
-        ofn.Flags = OFN_OVERWRITEPROMPT;
-
-        if(!GetSaveFileName(&ofn))
-                return;
-
-        //CorrectSlashes(filepath);
-        //SaveEdBuilding(filepath, &g_edbldg);
-		CompileModel(filepath, &g_edmap, g_modelholder);
-#elif defined( PLATFORM_LINUX )
-	GtkWidget *dialog;
-
-     dialog = gtk_file_chooser_dialog_new ("Open File",
-     				      NULL,
-     				      GTK_FILE_CHOOSER_ACTION_OPEN,
-     				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-     				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-     				      NULL);
-
-     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
-       {
-         char *filename;
-
-         filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-         //open_file (filename);
-         g_free (filename);
-       }
-
-     gtk_widget_destroy (dialog);
-#endif
+	//CorrectSlashes(filepath);
+	//SaveEdBuilding(filepath, &g_edbldg);
+	CompileModel(filepath, &g_edmap, g_modelholder);	//TODO: update
 #endif
 }
 
@@ -2167,29 +2168,29 @@ void FillGUI()
 	g_applog<<"assign keys"<<std::endl;
 	g_applog.flush();
 
-	g_GUI.assignanykey(&AnyKeyDown, &AnyKeyUp);
+	g_gui.assignanykey(&AnyKeyDown, &AnyKeyUp);
 
 	g_applog<<"1,";
 	g_applog.flush();
 
-	g_GUI.assignkey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
+	g_gui.assignkey(SDL_SCANCODE_F1, SaveScreenshot, NULL);
 	g_applog<<"2,";
 	g_applog.flush();
-	g_GUI.assignkey(SDL_SCANCODE_ESCAPE, &Escape, NULL);
+	g_gui.assignkey(SDL_SCANCODE_ESCAPE, &Escape, NULL);
 	g_applog<<"3,";
 	g_applog.flush();
-	g_GUI.assignkey(SDL_SCANCODE_DELETE, &Delete, NULL);
+	g_gui.assignkey(SDL_SCANCODE_DELETE, &Delete, NULL);
 	g_applog<<"4,";
 	g_applog.flush();
-	g_GUI.assignkey(SDL_SCANCODE_C, Down_C, NULL);
+	g_gui.assignkey(SDL_SCANCODE_C, Down_C, NULL);
 	g_applog<<"5,";
 	g_applog.flush();
-	g_GUI.assignkey(SDL_SCANCODE_V, Down_V, NULL);
+	g_gui.assignkey(SDL_SCANCODE_V, Down_V, NULL);
 	g_applog<<"5,";
 	g_applog.flush();
 	//AssignMouseWheel(&MouseWheel);
 	//AssignMouseMove(&MouseMove);
-	g_GUI.assignlbutton(&MouseLeftButtonDown, &MouseLeftButtonUp);
+	g_gui.assignlbutton(&MouseLeftButtonDown, &MouseLeftButtonUp);
 	//AssignRButton(NULL, &MouseRightButtonUp);
 	g_applog<<"6,"<<std::endl;
 	g_applog.flush();
@@ -2199,8 +2200,8 @@ void FillGUI()
 	g_applog<<"logo..."<<std::endl;
 	g_applog.flush();
 
-	g_GUI.add(new ViewLayer(&g_GUI, "logo"));
-	ViewLayer* logoview = (ViewLayer*)g_GUI.get("logo");
+	g_gui.add(new ViewLayer(&g_gui, "logo"));
+	ViewLayer* logoview = (ViewLayer*)g_gui.get("logo");
 	//Image::Image(Widget* parent, const char* nm, const char* filepath, bool clamp, void (*reframef)(Widget* thisw), float r, float g, float b, float a, float texleft, float textop, float texright, float texbottom) : Widget()
 
 	logoview->add(new Image(NULL, "logo", "gui/dmd.jpg", true, Resize_Logo, 1,1,1,0));
@@ -2208,15 +2209,15 @@ void FillGUI()
 	g_applog<<"loading..."<<std::endl;
 	g_applog.flush();
 
-	g_GUI.add(new ViewLayer(&g_GUI, "loading"));
-	ViewLayer* loadingview = (ViewLayer*)g_GUI.get("loading");
+	g_gui.add(new ViewLayer(&g_gui, "loading"));
+	ViewLayer* loadingview = (ViewLayer*)g_gui.get("loading");
 	loadingview->add(new Text(NULL, "status", "Loading...", MAINFONT8, Resize_LoadingText));
 
-	g_GUI.add(new ViewLayer(&g_GUI, "editor"));
-	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
+	g_gui.add(new ViewLayer(&g_gui, "editor"));
+	ViewLayer* edview = (ViewLayer*)g_gui.get("editor");
 
-	edview->add(new Frame(NULL, "top panel", Resize_TopPanel));
-	edview->add(new Frame(NULL, "left panel", Resize_LeftPanel));
+	edview->add(new Frame(edview, "top panel", Resize_TopPanel));
+	edview->add(new Frame(edview, "left panel", Resize_LeftPanel));
 
 	Widget* toppanel = edview->get("top panel");
 	Widget* leftpanel = edview->get("left panel");
@@ -2226,46 +2227,47 @@ void FillGUI()
 
 //Button(Widget* parent, const char* name, const char* filepath, const std::string label, const std::string tooltip, int f, int style, void (*reframef)(Widget* thisw), void (*click)(), void (*click2)(int p), void (*overf)(), void (*overf2)(int p), void (*out)(), int parm) : Widget()
 
-	toppanel->add(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, BUTTON_BGIMAGE, Resize_LoadButton, Click_LoadEdMap, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, BUTTON_BGIMAGE, Resize_SaveButton, Click_SaveEdMap, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, BUTTON_BGIMAGE, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "load", "gui/load.png", "", "Load",												MAINFONT8, BUST_LINEBASED, Resize_LoadButton, Click_LoadEdMap, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "save", "gui/save.png", "", "Save",												MAINFONT8, BUST_LINEBASED, Resize_SaveButton, Click_SaveEdMap, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "qsave", "gui/qsave.png", "", "Quick save",										MAINFONT8, BUST_LINEBASED, Resize_QSaveButton, Click_QSaveEdMap, NULL, NULL, NULL, NULL, -1));
 #if 1
-	toppanel->add(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, BUTTON_BGIMAGE, Resize_CompileMapButton, Click_CompileModel, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/build.png", "", "Export model",									MAINFONT8, BUST_LINEBASED, Resize_CompileMapButton, Click_CompileModel, NULL, NULL, NULL, NULL, -1));
 #endif
-	toppanel->add(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildbuilding.png", "", "Export building/tree/animation sprites",	MAINFONT8, BUST_LINEBASED, Resize_ExportBldgButton, Click_ExportBuildingSprite, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildunit.png", "", "Export unit/animation sprites from 8 sides",	MAINFONT8, BUST_LINEBASED, Resize_ExportUnitButton, Click_ExportUnitSprites, NULL, NULL, NULL, NULL, -1));
 #if 1
-	toppanel->add(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExportTileButton, Click_ExportTileSprites, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tiles with applicable inclines and rotations",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRoadButton, Click_ExportRoadSprites, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildtile.png", "", "Export tile with inclines",					MAINFONT8, BUST_LINEBASED, Resize_ExportTileButton, Click_ExportTileSprites, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "build", "gui/buildroad.png", "", "Export road tiles with applicable inclines and rotations",	MAINFONT8, BUST_LINEBASED, Resize_ExportRoadButton, Click_ExportRoadSprites, NULL, NULL, NULL, NULL, -1));
 #if 0
-	toppanel->add(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, BUTTON_BGIMAGE, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
-	toppanel->add(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, BUTTON_BGIMAGE, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
-	//toppanel->add(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, BUTTON_BGIMAGE, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildridge.png", "", "Export ridge with inclines from 4 sides",	MAINFONT8, BUST_LINEBASED, Resize_ExportRidgeButton, Click_CompileMap, NULL, NULL));
+	toppanel->add(new Button(toppanel, "build", "gui/buildwater.png", "", "Export water tile with inclines",			MAINFONT8, BUST_LINEBASED, Resize_ExportWaterButton, Click_CompileMap, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "run", "gui/run.png", "", "Compile and run",									MAINFONT8, BUST_LINEBASED, Resize_CompileRunButton, Click_CompileRunMap, NULL, NULL));
 #endif
 	#endif
-	toppanel->add(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, BUTTON_BGIMAGE, Resize_UndoButton, Undo, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, BUTTON_BGIMAGE, Resize_RedoButton, Redo, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, BUTTON_BGIMAGE, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",									MAINFONT8, BUTTON_BGIMAGE, Resize_CutBrushButton, Click_CutBrush, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "newent", "gui/newent.png", "", "Add milkshape3d model",							MAINFONT8, BUTTON_BGIMAGE, Resize_NewEntityButton, Click_AddMS3D, NULL, NULL, NULL, NULL, -1));
-	//toppanel->add(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, BUTTON_BGIMAGE, Resize_SelEntButton, NULL, NULL, NULL));
-	//toppanel->add(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",						MAINFONT8, BUTTON_BGIMAGE, Resize_SelBrushButton, NULL, NULL, NULL));
-	//toppanel->add(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, BUTTON_BGIMAGE, Resize_SelEntBrushButton, NULL, NULL, NULL));
-	toppanel->add(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotXCCWButton, Click_RotXCCW, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotXCWButton, Click_RotXCW, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotYCCWButton, Click_RotYCCW, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotYCWButton, Click_RotYCW, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",			MAINFONT8, BUTTON_BGIMAGE, Resize_RotZCCWButton, Click_RotZCCW, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",					MAINFONT8, BUTTON_BGIMAGE, Resize_RotZCWButton, Click_RotZCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "undo", "gui/undo.png", "", "Undo",												MAINFONT8, BUST_LINEBASED, Resize_UndoButton, Undo, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "redo", "gui/redo.png", "", "Redo",												MAINFONT8, BUST_LINEBASED, Resize_RedoButton, Redo, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "newbrush", "gui/newbrush.png", "", "New brush",									MAINFONT8, BUST_LINEBASED, Resize_NewBrushButton, &Click_NewBrush, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "cutbrush", "gui/cutbrush.png", "", "Cut brush",									MAINFONT8, BUST_LINEBASED, Resize_CutBrushButton, Click_CutBrush, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "newent", "gui/newent.png", "", "Add milkshape3d model",							MAINFONT8, BUST_LINEBASED, Resize_NewEntityButton, Click_AddMS3D, NULL, NULL, NULL, NULL, -1));
+	//toppanel->add(new Button(toppanel, "selent", "gui/selent.png", "", "Select entities only",						MAINFONT8, BUST_LINEBASED, Resize_SelEntButton, NULL, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "selbrush", "gui/selbrush.png", "", "Select brushes only",						MAINFONT8, BUST_LINEBASED, Resize_SelBrushButton, NULL, NULL, NULL));
+	//toppanel->add(new Button(toppanel, "selentbrush", "gui/selentbrush.png", "", "Select entities and brushes",		MAINFONT8, BUST_LINEBASED, Resize_SelEntBrushButton, NULL, NULL, NULL));
+	toppanel->add(new Button(toppanel, "rotxccw", "gui/rotxccw.png", "", "Rotate counter-clockwise on x axis",			MAINFONT8, BUST_LINEBASED, Resize_RotXCCWButton, Click_RotXCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotxcw", "gui/rotxcw.png", "", "Rotate clockwise on x axis",					MAINFONT8, BUST_LINEBASED, Resize_RotXCWButton, Click_RotXCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotyccw", "gui/rotyccw.png", "", "Rotate counter-clockwise on y axis",			MAINFONT8, BUST_LINEBASED, Resize_RotYCCWButton, Click_RotYCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotycw", "gui/rotycw.png", "", "Rotate clockwise on y axis",					MAINFONT8, BUST_LINEBASED, Resize_RotYCWButton, Click_RotYCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotzccw", "gui/rotzccw.png", "", "Rotate counter-clockwise on z axis",			MAINFONT8, BUST_LINEBASED, Resize_RotZCCWButton, Click_RotZCCW, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "rotzcw", "gui/rotzcw.png", "", "Rotate clockwise on z axis",					MAINFONT8, BUST_LINEBASED, Resize_RotZCWButton, Click_RotZCW, NULL, NULL, NULL, NULL, -1));
 
-//EditBox::EditBox(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change2)(int p), int parm) : Widget()
+//EditBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool pw, int maxl, void (*change3)(unsigned int key, unsigned int scancode, bool down, int parm), void (*submitf)(), int parm);
 
-	toppanel->add(new EditBox(toppanel, "rotdeg", "15",															MAINFONT8, Resize_RotDegEditBox, false, 6, &Change_RotDeg, 0));
-	toppanel->add(new Text(toppanel, "rotdegtext", "degrees",													MAINFONT8, Resize_RotDegText));
-	toppanel->add(new EditBox(toppanel, "zoom", "1",															MAINFONT8, Resize_ZoomEditBox, false, 6, &Change_Zoom, 0));
-	toppanel->add(new Text(toppanel, "zoomtext", "zoom",														MAINFONT8, Resize_ZoomText));
-	toppanel->add(new DropDownS(toppanel, "snapgrid",															MAINFONT8, Resize_SnapGridEditBox, Change_SnapGrid));
-	DropDownS* snapgs = (DropDownS*)toppanel->get("snapgrid");
+
+	toppanel->add(new EditBox(toppanel, "rotdeg", RichText("15"),															MAINFONT8, Resize_RotDegEditBox, false, 6, &Change_RotDeg, NULL, 0));
+	toppanel->add(new Text(toppanel, "rotdegtext", RichText("degrees"),													MAINFONT8, Resize_RotDegText));
+	toppanel->add(new EditBox(toppanel, "zoom", RichText("1"),															MAINFONT8, Resize_ZoomEditBox, false, 6, &Change_Zoom, NULL, 0));
+	toppanel->add(new Text(toppanel, "zoomtext", RichText("zoom"),														MAINFONT8, Resize_ZoomText));
+	toppanel->add(new DropList(toppanel, "snapgrid",															MAINFONT8, Resize_SnapGridEditBox, Change_SnapGrid));
+	DropList* snapgs = (DropList*)toppanel->get("snapgrid");
 	//snapgs->m_options.push_back("4 m");	//0
 	//snapgs->m_options.push_back("2 m");	//1
 	//snapgs->m_options.push_back("1 m");	//2
@@ -2278,7 +2280,7 @@ void FillGUI()
 	//snapgs->select(4);
 
 	float cm_scales[] = CM_SCALES;
-	string cm_scales_txt[] = CM_SCALES_TXT;
+	std::string cm_scales_txt[] = CM_SCALES_TXT;
 
 	for(int j=0; j<sizeof(cm_scales)/sizeof(float); j++)
 	{
@@ -2289,24 +2291,24 @@ void FillGUI()
 	snapgs->m_selected = 6;
 
 	//toppanel->add(new EditBox(toppanel, "snapgrid", "25",														MAINFONT8, Margin(0+32*i++), Margin(32), Margin(32+32*i++), Margin(32+16), false, 6, &Change_SnapGrid, 0));
-	toppanel->add(new Text(toppanel, "snapgrid text", "snap grid",													MAINFONT8, Resize_SnapGridText));
-	toppanel->add(new EditBox(toppanel, "maxelev", "10000",														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, 0));
-	toppanel->add(new Text(toppanel, "maxelev text", "max elev.",													MAINFONT8, Resize_MaxElevText));
-	toppanel->add(new CheckBox(toppanel, "showsky", "show sky",													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
+	toppanel->add(new Text(toppanel, "snapgrid text", RichText("snap grid"),													MAINFONT8, Resize_SnapGridText));
+	toppanel->add(new EditBox(toppanel, "maxelev", RichText("10000"),														MAINFONT8, Resize_MaxElevEditBox, false, 6, &Change_MaxElev, NULL, 0));
+	toppanel->add(new Text(toppanel, "maxelev text", RichText("max elev."),													MAINFONT8, Resize_MaxElevText));
+	toppanel->add(new CheckBox(toppanel, "showsky", RichText("show sky"),													MAINFONT8, Resize_ShowSkyCheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_ShowSky));
 
-	toppanel->add(new Button(toppanel, "persp", "gui/projpersp.png", "", "Perspective projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "ortho", "gui/projortho.png", "", "Orthographic projection",				MAINFONT8, BUTTON_BGIMAGE, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL, NULL, NULL, -1));
-	toppanel->add(new Button(toppanel, "resetview", "gui/resetview.png", "", "Reset view",						MAINFONT8, BUTTON_BGIMAGE, Resize_ResetViewButton, Click_ResetView, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "persp", "gui/projpersp.png", RichText(""), RichText("Perspective projection"),				MAINFONT8, BUST_LINEBASED, Resize_PerspProjButton, Click_ProjPersp, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "ortho", "gui/projortho.png", RichText(""), RichText("Orthographic projection"),				MAINFONT8, BUST_LINEBASED, Resize_OrthoProjButton, Click_ProjOrtho, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "resetview", "gui/resetview.png", RichText(""), RichText("Reset view"),						MAINFONT8, BUST_LINEBASED, Resize_ResetViewButton, Click_ResetView, NULL, NULL, NULL, NULL, -1));
 
 	toppanel->add(new Text(toppanel, "frames text", "frames",														MAINFONT8, Resize_FramesText));
-	toppanel->add(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, 0));
+	toppanel->add(new EditBox(toppanel, "frames", "1",															MAINFONT8, Resize_FramesEditBox, false, 6, &Change_Frames, NULL, 0));
 
 #if 0
-	toppanel->add(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, BUTTON_BGIMAGE, Resize_ExplodeButton, Click_Explode, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "explosion", "gui/explosion.png", "", "Explode crater",					MAINFONT8, BUST_LINEBASED, Resize_ExplodeButton, Click_Explode, NULL, NULL, NULL, NULL, -1));
 #endif
 
 	
-	toppanel->add(new Button(toppanel, "addtile", "gui/addtile.png", "", "Add tile texture",					MAINFONT8, BUTTON_BGIMAGE, Resize_AddTileButton, Click_AddTile, NULL, NULL, NULL, NULL, -1));
+	toppanel->add(new Button(toppanel, "addtile", "gui/addtile.png", "", "Add tile texture",					MAINFONT8, BUST_LINEBASED, Resize_AddTileButton, Click_AddTile, NULL, NULL, NULL, NULL, -1));
 	
 	toppanel->add(new CheckBox(toppanel, "NE", "Leads NE",													MAINFONT8, Resize_LeadsNECheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
 	toppanel->add(new CheckBox(toppanel, "SE", "Leads SE",													MAINFONT8, Resize_LeadsSECheckBox, 0, 1.0f, 1.0f, 1.0f, 1.0f, &Change_Leads));
@@ -2321,73 +2323,75 @@ void FillGUI()
 	Widget* viewportsframe = edview->get("viewports frame");
 
 #if 0
-ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
-					 void (*drawf)(int p, int x, int y, int w, int h),
-					 bool (*ldownf)(int p, int x, int y, int w, int h),
-					 bool (*lupf)(int p, int x, int y, int w, int h),
-					 bool (*mousemovef)(int p, int x, int y, int w, int h),
-					 bool (*rdownf)(int p, int relx, int rely, int w, int h),
-					 bool (*rupf)(int p, int relx, int rely, int w, int h),
-					 bool (*mousewf)(int p, int d),
-					 int parm)
+Viewport(Widget* parent, const char* n, void (*reframef)(Widget* thisw),
+	          void (*drawf)(int p, int x, int y, int w, int h),
+	          bool (*ldownf)(int p, int relx, int rely, int w, int h),
+	          bool (*lupf)(int p, int relx, int rely, int w, int h),
+	          bool (*mousemovef)(int p, int relx, int rely, int w, int h),
+	          bool (*rdownf)(int p, int relx, int rely, int w, int h),
+	          bool (*rupf)(int p, int relx, int rely, int w, int h),
+	          bool (*mousewf)(int p, int d),
+	          int parm)
 #endif
 
-	viewportsframe->add(new ViewportW(viewportsframe, "bottom left viewport",	Resize_BottomLeftViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 0));
-	viewportsframe->add(new ViewportW(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 1));
-	viewportsframe->add(new ViewportW(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 2));
-	viewportsframe->add(new ViewportW(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, NULL, NULL, 3));
+	viewportsframe->add(new Viewport(viewportsframe, "bottom left viewport",	Resize_BottomLeftViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, 0));
+	viewportsframe->add(new Viewport(viewportsframe, "top left viewport",		Resize_TopLeftViewport,		&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, 1));
+	viewportsframe->add(new Viewport(viewportsframe, "bottom right viewport",	Resize_BottomRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, 2));
+	viewportsframe->add(new Viewport(viewportsframe, "top right viewport",		Resize_TopRightViewport,	&DrawViewport, &ViewportLDown, &ViewportLUp, &ViewportMousemove, &ViewportRDown, &ViewportRUp, ViewportMousewheel, 3));
 
-	g_viewportT[VIEWPORT_FRONT] = ViewportT(Vec3f(0, 0, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Front");
-	g_viewportT[VIEWPORT_TOP] = ViewportT(Vec3f(0, MAX_DISTANCE/3, 0), Vec3f(0, 0, -1), "Top");
-	g_viewportT[VIEWPORT_LEFT] = ViewportT(Vec3f(MAX_DISTANCE/3, 0, 0), Vec3f(0, 1, 0), "Left");
-	//g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(MAX_DISTANCE/3, MAX_DISTANCE/3, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Angle");
-	g_viewportT[VIEWPORT_ANGLE45O] = ViewportT(Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3), Vec3f(0, 1, 0), "Angle");
+	g_vptype[VIEWPORT_FRONT] = VpType(Vec3f(0, 0, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Front");
+	g_vptype[VIEWPORT_TOP] = VpType(Vec3f(0, MAX_DISTANCE/3, 0), Vec3f(0, 0, -1), "Top");
+	g_vptype[VIEWPORT_LEFT] = VpType(Vec3f(MAX_DISTANCE/3, 0, 0), Vec3f(0, 1, 0), "Left");
+	//g_vptype[VIEWPORT_ANGLE45O] = VpType(Vec3f(MAX_DISTANCE/3, MAX_DISTANCE/3, MAX_DISTANCE/3), Vec3f(0, 1, 0), "Angle");
+	g_vptype[VIEWPORT_ANGLE45O] = VpType(Vec3f(1000.0f/3, 1000.0f/3, 1000.0f/3), Vec3f(0, 1, 0), "Angle");
 	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
-	ResetView();
+	ResetView(false);
 
-	g_viewport[0] = Viewport(VIEWPORT_FRONT);
-	g_viewport[1] = Viewport(VIEWPORT_TOP);
-	g_viewport[2] = Viewport(VIEWPORT_LEFT);
-	g_viewport[3] = Viewport(VIEWPORT_ANGLE45O);
+	g_viewport[0] = VpWrap(VIEWPORT_FRONT);
+	g_viewport[1] = VpWrap(VIEWPORT_TOP);
+	g_viewport[2] = VpWrap(VIEWPORT_LEFT);
+	g_viewport[3] = VpWrap(VIEWPORT_ANGLE45O);
 
 	viewportsframe->add(new Image(viewportsframe, "h divider", "gui/filled.jpg", true, Resize_HDivider));
 	viewportsframe->add(new Image(viewportsframe, "v divider", "gui/filled.jpg", true, Resize_VDivider));
 
-	g_GUI.add(new ViewLayer(&g_GUI, "brush edit"));
-	ViewLayer* brusheditview = (ViewLayer*)g_GUI.get("brush edit");
+	g_gui.add(new ViewLayer(&g_gui, "brush edit"));
+	ViewLayer* brusheditview = (ViewLayer*)g_gui.get("brush edit");
 	brusheditview->add(new Frame(NULL, "left panel", Resize_BrushEditFrame));
 
 	leftpanel = brusheditview->get("left panel");
 	//leftpanel->add(new EditBox(leftpanel, "texture path", "no texture", MAINFONT8, Margin(0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, 0), Margin(LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), false, 64, NULL, -1));
 	//i++;
-	leftpanel->add(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, BUTTON_BGIMAGE, Resize_ChooseTexButton, Click_BChooseTex, NULL, NULL, NULL, NULL, -1));
-	leftpanel->add(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, BUTTON_BGIMAGE, Resize_FitToFaceButton, Click_FitToFace, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new Button(leftpanel, "choose texture", "gui/transp.png", "Choose Texture", "Choose texture", MAINFONT8, BUST_LINEBASED, Resize_ChooseTexButton, Click_BChooseTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new Button(leftpanel, "fit to face", "gui/fittoface.png", "", "Fit to face",	MAINFONT8, BUST_LINEBASED, Resize_FitToFaceButton, Click_FitToFace, NULL, NULL, NULL, NULL, -1));
 	//leftpanel->add(new Button(leftpanel, "door view", "gui/door.png", "", "Door view",	MAINFONT8, Margin(0+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i), Margin(32+32*j), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, f->gheight*i+32), Click_DoorView, NULL, NULL));
 
-	g_GUI.add(new ViewLayer(&g_GUI, "brush side edit"));
-	ViewLayer* brushsideeditview = (ViewLayer*)g_GUI.get("brush side edit");
+	g_gui.add(new ViewLayer(&g_gui, "brush side edit"));
+	ViewLayer* brushsideeditview = (ViewLayer*)g_gui.get("brush side edit");
 	brushsideeditview->add(new Frame(brushsideeditview, "left panel", Resize_BrushSideEditFrame));
 
 	leftpanel = brushsideeditview->get("left panel");
-	leftpanel->add(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, BUTTON_BGIMAGE, Resize_RotateTexButton, Click_RotateTex, NULL, NULL, NULL, NULL, -1));
-	leftpanel->add(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, 0));
-	leftpanel->add(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Resize_TexEqEditBox2, false, 256, Change_TexEq, 1));
-	leftpanel->add(new DropDownS(leftpanel, "select component", MAINFONT8, Resize_SelComponentDropDownS, Change_SelComp));
+	leftpanel->add(new Button(leftpanel, "rotate texture", "gui/transp.png", "Rotate Texture", "Rotate texture", MAINFONT8, BUST_LINEBASED, Resize_RotateTexButton, Click_RotateTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new EditBox(leftpanel, "u equation", "A B C D", MAINFONT8, Resize_TexEqEditBox1, false, 256, Change_TexEq, NULL, 0));
+	leftpanel->add(new EditBox(leftpanel, "v equation", "A B C D", MAINFONT8, Resize_TexEqEditBox2, false, 256, Change_TexEq, NULL, 1));
+	leftpanel->add(new DropList(leftpanel, "select component", MAINFONT8, Resize_SelComponentDropDownS, Change_SelComp));
 	Widget* selcompwidg = leftpanel->get("select component");
 	selcompwidg->m_options.push_back("u component");
 	selcompwidg->m_options.push_back("v component");
-	leftpanel->add(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, 0));
-	leftpanel->add(new Button(leftpanel, "texture scale button", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL, NULL, NULL, -1));
-	leftpanel->add(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, 0));
-	leftpanel->add(new Button(leftpanel, "texture shift button", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, BUTTON_BGIMAGE, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new EditBox(leftpanel, "texture scale", "1", MAINFONT8, Resize_TexScaleEditBox, false, 10, NULL, NULL, 0));
+	leftpanel->add(new Button(leftpanel, "texture scale button", "gui/transp.png", "Scale", "Scale texture component", MAINFONT8, BUST_LINEBASED, Resize_ScaleTexButton, Click_ScaleTex, NULL, NULL, NULL, NULL, -1));
+	leftpanel->add(new EditBox(leftpanel, "texture shift", "0.05", MAINFONT8, Resize_TexShiftEditBox, false, 10, NULL, NULL, 0));
+	leftpanel->add(new Button(leftpanel, "texture shift button", "gui/transp.png", "Shift", "Shift texture component", MAINFONT8, BUST_LINEBASED, Resize_TexShiftButton, Click_ShiftTex, NULL, NULL, NULL, NULL, -1));
 
-	g_GUI.add(new ViewLayer(&g_GUI, "choose file"));
-	ViewLayer* choosefileview = (ViewLayer*)g_GUI.get("choose file");
+#if 0
+	g_gui.add(new ViewLayer(&g_gui, "choose file"));
+	ViewLayer* choosefileview = (ViewLayer*)g_gui.get("choose file");
 	choosefileview->add(new ChooseFile(choosefileview, "choose file", Resize_ChooseFile, Callback_ChooseFile));
+#endif
 
 #if 1
-	g_GUI.add(new ViewLayer(&g_GUI, "door edit"));
-	ViewLayer* dooreditview = (ViewLayer*)g_GUI.get("door edit");
+	g_gui.add(new ViewLayer(&g_gui, "door edit"));
+	ViewLayer* dooreditview = (ViewLayer*)g_gui.get("door edit");
 #if 0
 	dooreditview->add(new Frame(NULL, "left panel", Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, 0), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_PIXELS, TOP_PANEL_HEIGHT), Margin(MARGIN_SOURCE_WIDTH, MARGIN_FUNC_PIXELS, LEFT_PANEL_WIDTH), Margin(MARGIN_SOURCE_HEIGHT, MARGIN_FUNC_RATIO, 1)));
 
@@ -2406,45 +2410,45 @@ ViewportW::ViewportW(Widget* parent, const char* n, void (*reframef)(Widget* thi
 #endif
 #endif
 
-	g_GUI.add(new ViewLayer(&g_GUI, "render"));
-	ViewLayer* renderview = (ViewLayer*)g_GUI.get("render");
+	g_gui.add(new ViewLayer(&g_gui, "render"));
+	ViewLayer* renderview = (ViewLayer*)g_gui.get("render");
 
-	renderview->add(new ViewportW(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3));
+	renderview->add(new Viewport(NULL, "render viewport",	Resize_FullViewport, &DrawViewport, NULL, NULL, NULL, NULL, NULL, NULL, 3));
 
-	g_GUI.closeall();
-	g_GUI.open("loading");
+	g_gui.closeall();
+	g_gui.open("loading");
 	//OpenAnotherView("brush edit view");
 }
 
 int GetNumFrames()
 {
-	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
+	ViewLayer* edview = (ViewLayer*)g_gui.get("editor");
 
 	Widget* toppanel = edview->get("top panel");
 
 	Widget* frameseditbox = toppanel->get("frames");
 
-	int nframes = StrToInt(frameseditbox->m_value.c_str());
+	int nframes = StrToInt(frameseditbox->m_value.rawstr().c_str());
 
 	return nframes;
 }
 
 void SetNumFrames(int nframes)
 {
-	ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
+	ViewLayer* edview = (ViewLayer*)g_gui.get("editor");
 
-	if(!edview)  ErrorMessage("Error", "edview not found");
+	if(!edview)  ErrMess("Error", "edview not found");
 
 	Widget* toppanel = edview->get("top panel");
 
-	if(!toppanel)  ErrorMessage("Error", "toppanel not found");
+	if(!toppanel)  ErrMess("Error", "toppanel not found");
 
 	EditBox* frameseditbox = (EditBox*)toppanel->get("frames");
 
-	if(!frameseditbox)  ErrorMessage("Error", "frameseditbox not found");
+	if(!frameseditbox)  ErrMess("Error", "frameseditbox not found");
 
 	char nframesstr[128];
 	sprintf(nframesstr, "%d", nframes);
 
-	frameseditbox->changevalue(nframesstr);
+	frameseditbox->changevalue(&RichText(nframesstr));
 }

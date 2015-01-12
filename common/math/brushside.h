@@ -8,8 +8,8 @@
 #include "plane.h"
 #include "polygon.h"
 #include "triangle.h"
-#include "../draw/model.h"
-#include "../draw/vertexarray.h"
+#include "../render/model.h"
+#include "../render/vertexarray.h"
 
 //tex coord equation - not used
 class TexCEq

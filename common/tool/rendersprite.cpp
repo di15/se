@@ -11,10 +11,10 @@
 #include "../../spriteed/segui.h"
 #include "../sim/tile.h"
 #include "../math/camera.h"
-#include "../draw/shadow.h"
+#include "../render/shadow.h"
 #include "../math/vec4f.h"
-#include "../draw/screenshot.h"
-#include "../draw/sortb.h"
+#include "../render/screenshot.h"
+#include "../render/sortb.h"
 #include "../../spriteed/seviewport.h"
 #include "../debug.h"
 
@@ -34,16 +34,17 @@ float g_transpkey[3] = {255.0f/255.0f, 127.0f/255.0f, 255.0f/255.0f};
 Vec3f g_origlightpos;
 Camera g_origcam;
 int g_rendside;
+bool g_antialias = true;
 
 bool g_warned = false;
 
-unsigned int g_rendertex;
-unsigned int g_renderdepthtex;
-unsigned int g_renderrb;
-unsigned int g_renderfb;
+unsigned int g_rendertex[4];
+unsigned int g_renderdepthtex[4];
+unsigned int g_renderrb[4];
+unsigned int g_renderfb[4];
 bool g_renderbs = false;
 
-void MakeFBO()
+void MakeFBO(int sample, int rendstage)
 {
 	if(g_renderbs)
 		return;
@@ -109,9 +110,9 @@ void MakeFBO()
 #endif
 #else   //OpenGL 1.4 way
 
-        glGenTextures(1, &g_rendertex);
-        glBindTexture(GL_TEXTURE_2D, g_rendertex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, g_deswidth, g_desheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glGenTextures(1, &g_rendertex[sample]);
+        glBindTexture(GL_TEXTURE_2D, g_rendertex[sample]);
+        glTexImage2D(GL_TEXTURE_2D, 0, rendstage == RENDSTAGE_COLOR ? GL_RGBA8 : GL_RGBA8, g_deswidth, g_desheight, 0, rendstage == RENDSTAGE_COLOR ? GL_RGBA : GL_RGBA, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -119,8 +120,8 @@ void MakeFBO()
 
         //g_applog<<"gge1 "<<glGetError()<<std::endl;
 
-        glGenTextures(1, &g_renderdepthtex);
-        glBindTexture(GL_TEXTURE_2D, g_renderdepthtex);
+        glGenTextures(1, &g_renderdepthtex[sample]);
+        glBindTexture(GL_TEXTURE_2D, g_renderdepthtex[sample]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, g_deswidth, g_desheight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -131,11 +132,11 @@ void MakeFBO()
         //glDrawBuffer(GL_NONE); // No color buffer is drawn
         //glReadBuffer(GL_NONE);
 
-        glGenFramebuffers(1, &g_renderfb);
-        glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
+        glGenFramebuffers(1, &g_renderfb[sample]);
+        glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb[sample]);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_rendertex, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, g_renderdepthtex, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, g_rendertex[sample], 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, g_renderdepthtex[sample], 0);
 
         //g_applog<<"gge3 "<<glGetError()<<std::endl;
 
@@ -146,10 +147,10 @@ void MakeFBO()
 
         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
-            ErrorMessage("Error", "Couldn't create framebuffer for render.");
+            ErrMess("Error", "Couldn't create framebuffer for render.");
             return;
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
 
 #ifdef DEBUG
@@ -159,7 +160,7 @@ void MakeFBO()
 	}
 }
 
-void DelFBO()
+void DelFBO(int sample)
 {
 #if 0
 	CheckGLError(__FILE__, __LINE__);
@@ -178,12 +179,12 @@ void DelFBO()
 	CheckGLError(__FILE__, __LINE__);
 #else
 	//Delete resources
-	glDeleteTextures(1, &g_rendertex);
-	glDeleteTextures(1, &g_renderdepthtex);
+	glDeleteTextures(1, &g_rendertex[sample]);
+	glDeleteTextures(1, &g_renderdepthtex[sample]);
 	//glDeleteRenderbuffers(1, &g_renderrb);
 	//Bind 0, which means render to back buffer, as a result, fb is unbound
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	glDeleteFramebuffers(1, &g_renderfb);
+	glDeleteFramebuffers(1, &g_renderfb[sample]);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
@@ -194,6 +195,8 @@ void DelFBO()
 
 bool CallResize(int w, int h)
 {
+	//return false;	//don't resize, has bad consequences when resizing with ANTIALIAS_UPSCALE=4
+
 	int maxsz[] = {0,0};
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, maxsz);
 
@@ -202,7 +205,7 @@ bool CallResize(int w, int h)
 		g_warned = true;
 		char msg[1024];
 		sprintf(msg, "The required texture size of %dx%d exceeds or approaches your system's supported maximum of %d. You might not be able to finish the render. Reduce 1_tile_pixel_width in config.ini.", w, h, maxsz[0]);
-		WarningMessage("Warning", msg);
+		WarnMess("Warning", msg);
 	}
 
 #if 1
@@ -217,7 +220,7 @@ bool CallResize(int w, int h)
 	WindowRect.top=(long)0;
 	WindowRect.bottom=(long)h;
 #else
-    SDL_SetWindowSize(g_window, w, h);
+    //SDL_SetWindowSize(g_window, w, h);
 	Resize(w, h);
 #endif
 
@@ -330,10 +333,10 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 
 	g_zoom = 1;
 
-	Vec3f topleft(-TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f bottomleft(-TILE_SIZE/2, 0, TILE_SIZE/2);
-	Vec3f topright(TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f bottomright(TILE_SIZE/2, 0, TILE_SIZE/2);
+	Vec3f topleft(-g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f bottomleft(-g_tilesize/2, 0, g_tilesize/2);
+	Vec3f topright(g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f bottomright(g_tilesize/2, 0, g_tilesize/2);
 
 	int width;
 	int height;
@@ -346,7 +349,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 	//if(g_mode == EDITOR)
 	else
 	{
-		View* edview = g_GUI.get("editor");
+		View* edview = g_gui.get("editor");
 		Widget* viewportsframe = edview->get("viewports frame", WIDGET_FRAME);
 		Widget* toprightviewport = viewportsframe->get("top right viewport", WIDGET_VIEWPORT);
 		width = toprightviewport->m_pos[2] - toprightviewport->m_pos[0];
@@ -368,7 +371,7 @@ bool FitFocus(Vec2i vmin, Vec2i vmax)
 		projection = OrthoProj(-PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT*aspect/g_zoom, PROJ_RIGHT/g_zoom, -PROJ_RIGHT/g_zoom, MIN_DISTANCE, MAX_DISTANCE);
 	}
 
-	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
+	//VpWrap* v = &g_viewport[VIEWPORT_ANGLE45O];
 	//Vec3f viewvec = g_focus; //g_camera.m_view;
 	Vec3f viewvec = g_camera.m_view;
 	//Vec3f focusvec = v->focus();
@@ -456,7 +459,7 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	}
 #endif
 
-	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
+	//VpWrap* v = &g_viewport[VIEWPORT_ANGLE45O];
 	//Vec3f viewvec = g_focus; //g_camera.m_view;
 	Vec3f viewvec = g_camera.m_view;
 	//Vec3f focusvec = v->focus();
@@ -592,14 +595,16 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 		//m->usetex();
 		//DrawVA(&h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ], h->translation);
 
+#if 1	//TODO
 		VertexArray* va = &h->frames[ g_renderframe % m->m_ms3d.m_totalFrames ];
 
 		for(int i=0; i<va->numverts; i++)
 		{
 			Vec3f v = va->vertices[i] + h->translation;
 			Vec4f v4 = ScreenPos(&mvpmat, v, width, height, persp);
-
+			
 #ifdef DEBUG
+//#ifdef 1
 			g_applog<<"rf"<<g_renderframe<<" mdl v:"<<v.x<<","<<v.y<<","<<v.z<<std::endl;
 			g_applog<<"rf"<<g_renderframe<<" mdl v4:"<<v4.x<<","<<v4.y<<","<<v4.z<<","<<v4.w<<std::endl;
 #endif
@@ -636,10 +641,13 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 				setmm[3] = true;
 			}
 		}
+#endif	//TODO
 	}
 
+
+	if(g_tiletexs[TEX_DIFF] != 0)
 	{
-		VertexArray* va = &g_tileva[g_currinc];
+		VertexArray* va = &g_tileva[g_currincline];
 
 		for(int i=0; i<va->numverts; i++)
 		{
@@ -670,7 +678,19 @@ void AllScreenMinMax(Vec2i *vmin, Vec2i *vmax, int width, int height)
 	}
 #ifdef DEBUG
 	g_applog<<"rf"<<g_renderframe<<" setmm:"<<setmm[0]<<","<<setmm[1]<<","<<setmm[2]<<","<<setmm[3]<<std::endl;
+	g_applog<<"rfvminmax "<<vmin->x<<","<<vmin->y<<"->"<<vmax->x<<","<<vmax->y<<std::endl;
 #endif
+#endif
+
+#if 0
+	//not needed anymore, we upscale the render resolution,
+	//then downscale it to intended size.
+	if(g_antialias)
+	{
+		//make room for "blur pixels" around the edges
+		vmax->x++;
+		vmax->y++;
+	}
 #endif
 }
 
@@ -679,8 +699,8 @@ void PrepareRender(const char* fullpath, int rendtype)
 	//g_mode = PREREND_ADJFRAME;
 	g_rendertype = rendtype;
 	strcpy(g_renderbasename, fullpath);
-	g_GUI.closeall();
-	g_GUI.open("render");
+	g_gui.closeall();
+	g_gui.open("render");
 	//glClearColor(255.0f/255.0f, 127.0f/255.0f, 255.0f/255.0f, 1.0f);
 	g_renderframe = 0;
 	g_origlightpos = g_lightPos;
@@ -690,14 +710,15 @@ void PrepareRender(const char* fullpath, int rendtype)
 	g_origwidth = g_width;
 	g_origheight = g_height;
 	g_warned = false;
-	ResetView();
+	ResetView(true);
 	AdjustFrame();
 }
 
 void AdjustFrame()
 {
 	g_mode = PREREND_ADJFRAME;
-	ResetView();
+	//CallResize(MAX_TEXTURE, MAX_TEXTURE);
+	ResetView(true);
 	Vec2i vmin(g_width/2, g_height/2);
 	Vec2i vmax(g_width/2, g_height/2);
 
@@ -724,7 +745,8 @@ void SaveRender(int rendstage)
 	g_applog<<"sv r"<<std::endl;
 	g_applog.flush();
 #endif
-
+	
+	LoadedTex prescreen;
 	LoadedTex screen;
 
 #if 0
@@ -735,8 +757,14 @@ void SaveRender(int rendstage)
 	glReadPixels(0, 0, g_width, g_height, GL_RGB, GL_UNSIGNED_BYTE, screen.data);
 	FlipImage(&screen);
 #else
-	AllocTex(&screen, g_width, g_height, 4);
-	memset(screen.data, 0, g_width * g_height * 4);
+	int channels = 4;
+
+	if(rendstage == RENDSTAGE_TEAM)
+		channels = 1;
+
+	//Must read RGBA from FBO, can't read GL_RED directly for team colour mask for some reason
+	AllocTex(&prescreen, g_width, g_height, 4);
+	memset(prescreen.data, 0, g_width * g_height * 4);
 
 	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	//glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -744,19 +772,53 @@ void SaveRender(int rendstage)
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	glReadPixels(0, 0, g_width, g_height, GL_RGBA, GL_UNSIGNED_BYTE, screen.data);
+	glReadPixels(0, 0, g_width, g_height, channels == 4 ? GL_RGBA : GL_RGBA, GL_UNSIGNED_BYTE, prescreen.data);
 #ifdef DEBUG
 	CheckGLError(__FILE__, __LINE__);
 #endif
-	FlipImage(&screen);
+	FlipImage(&prescreen);
 #endif
+
+	AllocTex(&screen, g_width, g_height, channels);
+	memset(screen.data, 0, g_width * g_height * channels);
+
+	//Convert to 1-channel if team colour mask render
+	for(int x=0; x<g_width; x++)
+		for(int y=0; y<g_height; y++)
+		{
+			int i = ( x + y * g_width ) * 4;
+			int i2 = ( x + y * g_width ) * channels;
+
+			for(int c=0; c<channels; c++)
+				screen.data[i2+c] = prescreen.data[i+c];
+		}
 
 	Vec2i clipsz;
 	clipsz.x = g_clipmax.x - g_clipmin.x;
 	clipsz.y = g_clipmax.y - g_clipmin.y;
 
+#ifdef DEBUG
+	char msg[128];
+	sprintf(msg, "clipsz %d,%d->%d,%d sz(%d,%d)", g_clipmin.x, g_clipmin.y, g_clipmax.x, g_clipmax.y, clipsz.x, clipsz.y);
+	g_applog<<msg<<std::endl;
+	//InfoMess(msg, msg);
+#endif
+
 	int imagew = Max2Pow(clipsz.x);
 	int imageh = Max2Pow(clipsz.y);
+
+#if 0
+	int downimagew = imagew;
+	int downimageh = imageh;
+	Vec2i downclipsz = clipsz;
+
+	if(g_antialias)
+	{
+		//deal with non-power-of-2 upscales.
+		downclipsz = clipsz / ANTIALIAS_UPSCALE;
+
+	}
+#endif
 
 #ifdef DEBUG
 	g_applog<<"rf"<<g_renderframe<<" gwh"<<g_width<<","<<g_height<<" clipxymm "<<g_clipmin.x<<","<<g_clipmin.y<<"->"<<g_clipmax.x<<","<<g_clipmax.y<<" clipsz "<<clipsz.x<<","<<clipsz.y<<" imgwh "<<imagew<<","<<imageh<<std::endl;
@@ -767,7 +829,7 @@ void SaveRender(int rendstage)
 #endif
 
 	LoadedTex sprite;
-	AllocTex(&sprite, imagew, imageh, 4);
+	AllocTex(&sprite, imagew, imageh, channels);
 
 	int transpkey[3] = {(int)(g_transpkey[0]*255), (int)(g_transpkey[1]*255), (int)(g_transpkey[2]*255)};
 
@@ -787,11 +849,16 @@ void SaveRender(int rendstage)
 	for(int x=0; x<imagew; x++)
 		for(int y=0; y<imageh; y++)
 		{
-			int index = 4 * ( y * imagew + x );
+			int index = channels * ( y * imagew + x );
+#if 0
 			sprite.data[index + 0] = transpkey[0];
 			sprite.data[index + 1] = transpkey[1];
 			sprite.data[index + 2] = transpkey[2];
 			sprite.data[index + 3] = 0;
+#else
+			for(int c=0; c<channels; c++)
+				sprite.data[index + c] = 0;
+#endif
 		}
 #endif
 
@@ -799,24 +866,144 @@ void SaveRender(int rendstage)
 	for(int x=0; x<clipsz.x; x++)
 		for(int y=0; y<clipsz.y; y++)
 		{
-			int index = 4 * ( y * imagew + x );
-			int index2 = 4 * ( (y+yoff) * g_width + (x+xoff) );
+			int index = channels * ( y * imagew + x );
+			int index2 = channels * ( (y+yoff) * g_width + (x+xoff) );
 
-#if 1
-			if(screen.data[index2+0] == transpkey[0]
+#if 0
+			//should have RGBA in FBO
+			if(channels >= 3 
+			&& screen.data[index2+0] == transpkey[0]
 			&& screen.data[index2+1] == transpkey[1]
 			&& screen.data[index2+2] == transpkey[2])
 				continue;
 #endif
 			//g_applog<<" access "<<(x+xoff)<<","<<(y+yoff)<<" of "<<g_width<<","<<g_height<<" "<<std::endl;
 			//g_applog.flush();
-
-			sprite.data[index+0] = screen.data[index2+0];
-			sprite.data[index+1] = screen.data[index2+1];
-			sprite.data[index+2] = screen.data[index2+2];
-			sprite.data[index+3] = screen.data[index2+3];
+			
+			for(int c=0; c<channels; c++)
+				sprite.data[index+c] = screen.data[index2+c];
 		}
 #endif
+
+	int finalimagew = imagew;
+	int finalimageh = imageh;
+	Vec2i finalclipsz = clipsz;
+	Vec2i finalclipmin = g_clipmin;
+	Vec2i finalclipmax = g_clipmax;
+	Vec2i finalcenter = g_spritecenter;
+
+	LoadedTex finalsprite;
+
+	if(g_antialias)
+	{
+		//downsample the sprite
+		//and update the clip paramaters.
+		
+		int downimagew = imagew / ANTIALIAS_UPSCALE;
+		int downimageh = imageh / ANTIALIAS_UPSCALE;
+		Vec2i downclipsz = clipsz / ANTIALIAS_UPSCALE;
+		Vec2i downclipmin = g_clipmin / ANTIALIAS_UPSCALE;
+		Vec2i downclipmax = g_clipmax / ANTIALIAS_UPSCALE;
+		
+		AllocTex(&finalsprite, downimagew, downimageh, channels);
+
+		for(int x=0; x<downimagew; x++)
+			for(int y=0; y<downimageh; y++)
+			{
+				int index = channels * ( y * downimagew + x );
+#if 0
+				sprite.data[index + 0] = transpkey[0];
+				sprite.data[index + 1] = transpkey[1];
+				sprite.data[index + 2] = transpkey[2];
+				sprite.data[index + 3] = 0;
+#else
+				for(int c=0; c<channels; c++)
+					finalsprite.data[index + c] = 0;
+#endif
+			}
+
+		for(int downx=0; downx<downclipsz.x; downx++)
+			for(int downy=0; downy<downclipsz.y; downy++)
+			{
+				int downindex = channels * ( downy * downimagew + downx );
+				//int upindex2 = 4 * ( (y+yoff) * g_width + (x+xoff) );
+
+				unsigned int samples[4] = {0,0,0,0};
+
+				int contributions = 0;
+
+				for(int upx=0; upx<ANTIALIAS_UPSCALE; upx++)
+					for(int upy=0; upy<ANTIALIAS_UPSCALE; upy++)
+					{
+						int upindex = channels * ( (downy*ANTIALIAS_UPSCALE + upy) * imagew + (downx*ANTIALIAS_UPSCALE + upx) );
+
+						unsigned char* uppixel = &sprite.data[upindex];
+						
+						//if it's a transparent pixel, we don't want to 
+						//blend in the transparency key color.
+						//instead, blend in black.
+						if(channels == 4 
+						&& 
+							((uppixel[0] == transpkey[0]
+							&& uppixel[1] == transpkey[1]
+							&& uppixel[2] == transpkey[2])
+							||
+							(uppixel[3] == 0))
+						)
+						{
+							samples[0] += 0;
+							samples[1] += 0;
+							samples[2] += 0;
+							samples[3] += 0;
+						}
+						else
+						{
+							for(int c=0; c<channels; c++)
+								samples[c] += uppixel[c];
+							contributions++;
+						}
+					}
+
+				//average the samples
+				if(contributions > 0)
+					for(int c=0; c<channels; c++)
+						samples[c] /= contributions;
+	#if 0
+				//should have RGBA in FBO
+				if(screen.data[index2+0] == transpkey[0]
+				&& screen.data[index2+1] == transpkey[1]
+				&& screen.data[index2+2] == transpkey[2])
+					continue;
+	#endif
+				//g_applog<<" access "<<(x+xoff)<<","<<(y+yoff)<<" of "<<g_width<<","<<g_height<<" "<<std::endl;
+				//g_applog.flush();
+
+				for(int c=0; c<channels; c++)
+					finalsprite.data[downindex+c] = samples[c];
+			}
+
+		
+		finalimagew = downimagew;
+		finalimageh = downimageh;
+		finalclipsz = downclipsz;
+		finalclipmin = downclipmin;
+		finalclipmax = downclipmax;
+		finalcenter = finalcenter / ANTIALIAS_UPSCALE;
+	}
+	else
+	{
+		//no downsampling.
+		AllocTex(&finalsprite, imagew, imageh, channels);
+
+		for(int x=0; x<imagew; x++)
+			for(int y=0; y<imageh; y++)
+			{
+				int index = channels * ( y * imagew + x );
+				
+				for(int c=0; c<channels; c++)
+					finalsprite.data[index + c] = sprite.data[index + c];
+			}
+	}
 
 	char fullpath[MAX_PATH+1];
 
@@ -831,46 +1018,55 @@ void SaveRender(int rendstage)
 	if(g_rendertype == RENDER_UNIT)
 		sprintf(side, "_si%d", g_rendside);
 	
-	string incline = "";
+	std::string incline = "";
 
 	if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
 	{
-		if(g_currinc == INC_0000)	incline = "_inc0000";
-		else if(g_currinc == INC_0001)	incline = "_inc0001";
-		else if(g_currinc == INC_0010)	incline = "_inc0010";
-		else if(g_currinc == INC_0011)	incline = "_inc0011";
-		else if(g_currinc == INC_0100)	incline = "_inc0100";
-		else if(g_currinc == INC_0101)	incline = "_inc0101";
-		else if(g_currinc == INC_0110)	incline = "_inc0110";
-		else if(g_currinc == INC_0111)	incline = "_inc0111";
-		else if(g_currinc == INC_1000)	incline = "_inc1000";
-		else if(g_currinc == INC_1001)	incline = "_inc1001";
-		else if(g_currinc == INC_1010)	incline = "_inc1010";
-		else if(g_currinc == INC_1011)	incline = "_inc1011";
-		else if(g_currinc == INC_1100)	incline = "_inc1100";
-		else if(g_currinc == INC_1101)	incline = "_inc1101";
-		else if(g_currinc == INC_1110)	incline = "_inc1110";
+		if(g_currincline == INC_0000)	incline = "_inc0000";
+		else if(g_currincline == INC_0001)	incline = "_inc0001";
+		else if(g_currincline == INC_0010)	incline = "_inc0010";
+		else if(g_currincline == INC_0011)	incline = "_inc0011";
+		else if(g_currincline == INC_0100)	incline = "_inc0100";
+		else if(g_currincline == INC_0101)	incline = "_inc0101";
+		else if(g_currincline == INC_0110)	incline = "_inc0110";
+		else if(g_currincline == INC_0111)	incline = "_inc0111";
+		else if(g_currincline == INC_1000)	incline = "_inc1000";
+		else if(g_currincline == INC_1001)	incline = "_inc1001";
+		else if(g_currincline == INC_1010)	incline = "_inc1010";
+		else if(g_currincline == INC_1011)	incline = "_inc1011";
+		else if(g_currincline == INC_1100)	incline = "_inc1100";
+		else if(g_currincline == INC_1101)	incline = "_inc1101";
+		else if(g_currincline == INC_1110)	incline = "_inc1110";
 	}
 
-	string stage = "";
+	std::string stage = "";
 
 	if(rendstage == RENDSTAGE_TEAM)
 		stage = "_team";
 
 	sprintf(fullpath, "%s%s%s%s%s.png", g_renderbasename, side, frame, incline.c_str(), stage.c_str());
-	SavePNG(fullpath, &sprite);
+	SavePNG(fullpath, &finalsprite);
 	//sprite.channels = 3;
 	//sprintf(fullpath, "%s_si%d_fr%03d-rgb.png", g_renderbasename, g_rendside, g_renderframe);
 	//SavePNG(fullpath, &sprite);
 
 	sprintf(fullpath, "%s%s%s%s.txt", g_renderbasename, side, frame, incline.c_str());
-	ofstream ofs(fullpath, ios_base::out);
-	ofs<<g_spritecenter.x<<" "<<g_spritecenter.y<<std::endl<<imagew<<" "<<imageh<<std::endl<<clipsz.x<<" "<<clipsz.y;
+	std::ofstream ofs(fullpath, std::ios_base::out);
+	ofs<<finalcenter.x<<" "<<finalcenter.y<<std::endl;
+	ofs<<finalimagew<<" "<<finalimageh<<std::endl;
+	ofs<<finalclipsz.x<<" "<<finalclipsz.y<<std::endl;
+	ofs<<finalclipmin.x<<" "<<finalclipmin.y<<" "<<finalclipmax.x<<" "<<finalclipmax.y;
 }
 
-void SpriteRender(int rendstage)
+void SpriteRender(int rendstage, Vec3f offset)
 {
-	glClearColor(g_transpkey[0],g_transpkey[1],g_transpkey[2],0);
+	glViewport(0, 0, g_width, g_height);
+	if(rendstage == RENDSTAGE_TEAM)
+		glClearColor(0,0,0,0);
+		//glClearColor(g_transpkey[0],g_transpkey[1],g_transpkey[2],1);
+	else if(rendstage == RENDSTAGE_COLOR)
+		//glClearColor(g_transpkey[0],g_transpkey[1],g_transpkey[2],0);
+		glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -885,8 +1081,8 @@ void SpriteRender(int rendstage)
 		float aspect = fabsf((float)g_width / (float)g_height);
 		Matrix projection;
 
-		Viewport* v = &g_viewport[3];
-		ViewportT* t = &g_viewportT[v->m_type];
+		VpWrap* v = &g_viewport[3];
+		VpType* t = &g_vptype[v->m_type];
 
 		bool persp = false;
 
@@ -904,10 +1100,10 @@ void SpriteRender(int rendstage)
 
 		//Vec3f viewvec = g_focus;	//g_camera.m_view;
 		//Vec3f viewvec = g_camera.m_view;
-		Vec3f focusvec = v->focus();
+		Vec3f focusvec = v->focus() + offset;
 		//Vec3f posvec = g_focus + t->m_offset;
 		//Vec3f posvec = g_camera.m_pos;
-		Vec3f posvec = v->pos();
+		Vec3f posvec = v->pos() + offset;
 
 		//if(v->m_type != VIEWPORT_ANGLE45O)
 		//	posvec = g_camera.m_view + t->m_offset;
@@ -972,20 +1168,28 @@ void SpriteRender(int rendstage)
 
 void UpdateRender()
 {
-	ResetView();
+	ResetView(true);
 	g_lightPos = Rotate(g_lightPos, g_rendside*DEGTORAD(45.0), 0, 1, 0);
 	g_camera.rotateabout(Vec3f(0,0,0), g_rendside*DEGTORAD(45.0), 0, 1, 0);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 
 	//AllScreenMinMax needs to be called again because the pixels center of rendering depends on the window width and height, influencing the clip min/max
 	AllScreenMinMax(&g_clipmin, &g_clipmax, g_width, g_height);
+
+#if 0
+	char msg[128];
+	sprintf(msg, "clip %d,%d->%d,%d", g_clipmin.x, g_clipmin.y, g_clipmax.x, g_clipmax.y);
+	InfoMess(msg, msg);
+#endif
+
+	//Because we're always centered on origin, we can do this:
 	g_spritecenter.x = g_width/2 - g_clipmin.x;
 	g_spritecenter.y = g_height/2 - g_clipmin.y;
 
 	APPMODE oldmode = g_mode;
 	g_mode = EDITOR;
 	Draw();
-	Draw();
+	Draw();	//double buffered
 	g_mode = oldmode;
 #if 0
 	Draw();
@@ -994,7 +1198,7 @@ void UpdateRender()
 	DrawViewport(3, 0, 0, g_width, g_height);
 	EndS();
 #else
-	glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb);
+	//glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb[0]);
 #ifdef DEBUG
 	g_applog<<__FILE__<<":"<<__LINE__<<"check frame buf stat: "<<glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT)<<std::endl;
 	CheckGLError(__FILE__, __LINE__);
@@ -1009,32 +1213,54 @@ void UpdateRender()
 	CheckGLError(__FILE__, __LINE__);
 #endif
 
-	MakeFBO();
-	SpriteRender(RENDSTAGE_COLOR);
-	SaveRender(RENDSTAGE_COLOR);
-	DelFBO();
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
+	//get clip coordinates now that we've adjusted screen size (?)
+	//AllScreenMinMax(&g_clipmin, &g_clipmax, g_width, g_height);
+
+#if 0
+	char msg[128];
+	sprintf(msg, "clip %d,%d->%d,%d", g_clipmin.x, g_clipmin.y, g_clipmax.x, g_clipmax.y);
+	InfoMess(msg, msg);
 #endif
-	if(g_rendertype != RENDER_TERRTILE)
+
+	Vec3f offset;
+
+	//g_1tilewidth
+	//TILE_RISE
+
+	//if(!g_antialias)
 	{
-		MakeFBO();
-		SpriteRender(RENDSTAGE_TEAM);
-		SaveRender(RENDSTAGE_TEAM);
-		DelFBO();
+		MakeFBO(0, RENDSTAGE_COLOR);
+		glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb[0]);
+		SpriteRender(RENDSTAGE_COLOR, offset);
+		SaveRender(RENDSTAGE_COLOR);
+		DelFBO(0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+	#endif
+		if(g_rendertype != RENDER_TERRTILE)
+		{
+			MakeFBO(0, RENDSTAGE_TEAM);
+			glBindFramebuffer(GL_FRAMEBUFFER, g_renderfb[0]);
+			SpriteRender(RENDSTAGE_TEAM, offset);
+			SaveRender(RENDSTAGE_TEAM);
+			DelFBO(0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+	#ifdef DEBUG
+		CheckGLError(__FILE__, __LINE__);
+	#endif
+	#endif
 	}
-#ifdef DEBUG
-	CheckGLError(__FILE__, __LINE__);
-#endif
-#endif
 
 	if(g_rendertype == RENDER_UNIT || g_rendertype == RENDER_BUILDING)
 		g_renderframe++;
 	else if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
-		g_currinc++;
+		g_currincline++;
 
+	//If we're continuing the next render side or frame, or the end in other render types
 	if(((g_rendertype == RENDER_UNIT || g_rendertype == RENDER_BUILDING) && g_renderframe >= g_renderframes) ||
-		((g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD) && g_currinc >= INCLINES))
+		((g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD) && g_currincline >= INCLINES))
 	{
 		if(g_rendside < 7 && g_rendertype == RENDER_UNIT)
 		{
@@ -1044,7 +1270,7 @@ void UpdateRender()
 		}
 		else if(g_rendertype == RENDER_TERRTILE || g_rendertype == RENDER_ROAD)
 		{
-			g_currinc = 0;
+			g_currincline = 0;
 			EndRender();
 		}
 		else
@@ -1061,13 +1287,13 @@ void UpdateRender()
 void EndRender()
 {
 	g_mode = EDITOR;
-	g_GUI.closeall();
-	g_GUI.open("editor");
+	g_gui.closeall();
+	g_gui.open("editor");
 	g_renderframe = 0;
 	g_lightPos = g_origlightpos;
 	g_camera = g_origcam;
 	CallResize(g_origwidth, g_origheight);
-	ResetView();
+	ResetView(false);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
-	g_GUI.reframe();
+	g_gui.reframe();
 }

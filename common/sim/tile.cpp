@@ -1,14 +1,15 @@
 
 #include "tile.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../platform.h"
 #include "../texture.h"
-#include "../draw/shadow.h"
+#include "../render/shadow.h"
 
 VertexArray g_tileva[INCLINES];
-//int g_currinc = INC_1011;
-int g_currinc = 0;
+//int g_currincline = INC_1011;
+int g_currincline = 0;
 unsigned int g_tiletexs[TEX_TYPES] = {0,0,0,0};
+int g_tilesize = 10 * 100;	//10 meters
 
 void MakeTiles()
 {
@@ -18,23 +19,23 @@ void MakeTiles()
 	}
 	
 #if 1
-	Vec3f low_n = Vec3f(-TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f low_s = Vec3f(TILE_SIZE/2, 0, TILE_SIZE/2);
-	Vec3f low_e = Vec3f(TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f low_w = Vec3f(-TILE_SIZE/2, 0, TILE_SIZE/2);
-	Vec3f high_n = Vec3f(-TILE_SIZE/2, TILE_RISE, -TILE_SIZE/2);
-	Vec3f high_s = Vec3f(TILE_SIZE/2, TILE_RISE, TILE_SIZE/2);
-	Vec3f high_e = Vec3f(TILE_SIZE/2, TILE_RISE, -TILE_SIZE/2);
-	Vec3f high_w = Vec3f(-TILE_SIZE/2, TILE_RISE, TILE_SIZE/2);
+	Vec3f low_n = Vec3f(-g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f low_s = Vec3f(g_tilesize/2, 0, g_tilesize/2);
+	Vec3f low_e = Vec3f(g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f low_w = Vec3f(-g_tilesize/2, 0, g_tilesize/2);
+	Vec3f high_n = Vec3f(-g_tilesize/2, TILE_RISE, -g_tilesize/2);
+	Vec3f high_s = Vec3f(g_tilesize/2, TILE_RISE, g_tilesize/2);
+	Vec3f high_e = Vec3f(g_tilesize/2, TILE_RISE, -g_tilesize/2);
+	Vec3f high_w = Vec3f(-g_tilesize/2, TILE_RISE, g_tilesize/2);
 #else
-	Vec3f low_n = Vec3f(-TILE_SIZE/1.99, 0, -TILE_SIZE/1.99);
-	Vec3f low_s = Vec3f(TILE_SIZE/1.99, 0, TILE_SIZE/1.99);
-	Vec3f low_e = Vec3f(TILE_SIZE/1.99, 0, -TILE_SIZE/1.99);
-	Vec3f low_w = Vec3f(-TILE_SIZE/1.99, 0, TILE_SIZE/1.99);
-	Vec3f high_n = Vec3f(-TILE_SIZE/1.99, TILE_RISE, -TILE_SIZE/1.99);
-	Vec3f high_s = Vec3f(TILE_SIZE/1.99, TILE_RISE, TILE_SIZE/1.99);
-	Vec3f high_e = Vec3f(TILE_SIZE/1.99, TILE_RISE, -TILE_SIZE/1.99);
-	Vec3f high_w = Vec3f(-TILE_SIZE/1.99, TILE_RISE, TILE_SIZE/1.99);
+	Vec3f low_n = Vec3f(-g_tilesize/1.99, 0, -g_tilesize/1.99);
+	Vec3f low_s = Vec3f(g_tilesize/1.99, 0, g_tilesize/1.99);
+	Vec3f low_e = Vec3f(g_tilesize/1.99, 0, -g_tilesize/1.99);
+	Vec3f low_w = Vec3f(-g_tilesize/1.99, 0, g_tilesize/1.99);
+	Vec3f high_n = Vec3f(-g_tilesize/1.99, TILE_RISE, -g_tilesize/1.99);
+	Vec3f high_s = Vec3f(g_tilesize/1.99, TILE_RISE, g_tilesize/1.99);
+	Vec3f high_e = Vec3f(g_tilesize/1.99, TILE_RISE, -g_tilesize/1.99);
+	Vec3f high_w = Vec3f(-g_tilesize/1.99, TILE_RISE, g_tilesize/1.99);
 #endif
 
 	bool cornerinc[4] = {0,0,0,0};
@@ -129,7 +130,7 @@ void MakeTiles()
 		for(int j=0; j<6; j++)
 		{
 			Vec3f v = va->vertices[j];
-			va->texcoords[j] = Vec2f(v.x / (float)TILE_SIZE + 0.5f, v.z / (float)TILE_SIZE + 0.5f);
+			va->texcoords[j] = Vec2f(v.x / (float)g_tilesize + 0.5f, v.z / (float)g_tilesize + 0.5f);
 		}
 
 		Vec3f tri1[3];
@@ -194,7 +195,7 @@ void DrawTile()
 	glBindTexture(GL_TEXTURE_2D, g_texture[g_tiletexs[TEX_TEAM]].texname);
 	glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_OWNERMAP], 3);
 
-	VertexArray* va = &g_tileva[g_currinc];
+	VertexArray* va = &g_tileva[g_currincline];
 
 	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
 	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);

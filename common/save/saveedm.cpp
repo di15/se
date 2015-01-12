@@ -5,7 +5,7 @@
 #include "../platform.h"
 #include "../math/polygon.h"
 #include "../texture.h"
-#include "../draw/vertexarray.h"
+#include "../render/vertexarray.h"
 #include "../utils.h"
 #include "saveedm.h"
 #include "../save/edmap.h"
@@ -514,7 +514,7 @@ void ScaleAll(float factor)
 
 	char msg[128];
 	sprintf(msg, "scaled %f", factor);
-	InfoMessage("asd", msg);
+	InfoMess("asd", msg);
 }
 
 bool LoadEdMap(const char* fullpath, EdMap* map)
@@ -534,7 +534,7 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	if(tag[0] != realtag[0] ||  tag[1] != realtag[1] || tag[2] != realtag[2] || tag[3] != realtag[3] || tag[4] != realtag[4])
 	{
 		fclose(fp);
-		ErrorMessage("Error", "Not a project file (invalid header tag).");
+		ErrMess("Error", "Not a project file (invalid header tag).");
 		return false;
 	}
 
@@ -545,7 +545,7 @@ bool LoadEdMap(const char* fullpath, EdMap* map)
 	{
 		fclose(fp);
 		char msg[128];
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 

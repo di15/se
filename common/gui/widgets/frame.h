@@ -1,4 +1,3 @@
-
 #ifndef FRAME_H
 #define FRAME_H
 
@@ -11,7 +10,7 @@ public:
 
 	void draw();
 	void drawover();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void frameupd();
 };
 

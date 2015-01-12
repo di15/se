@@ -1,10 +1,9 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -44,8 +43,8 @@ void Frame::frameupd()
 		(*i)->frameupd();
 }
 
-void Frame::inev(InEv* ev)
+void Frame::inev(InEv* ie)
 {
 	for(auto i=m_subwidg.rbegin(); i!=m_subwidg.rend(); i++)
-		(*i)->inev(ev);
+		(*i)->inev(ie);
 }

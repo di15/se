@@ -5,7 +5,7 @@
 #include "debug.h"
 #include "utils.h"
 #include "platform.h"
-#include "draw/shader.h"
+#include "render/shader.h"
 
 void LastNum(const char* l)
 {
@@ -35,7 +35,7 @@ void CheckGLError(const char* file, int line)
 {
 	//char msg[2048];
 	//sprintf(msg, "Failed to allocate memory in %s on line %d.", file, line);
-	//ErrorMessage("Out of memory", msg);
+	//ErrMess("Out of memory", msg);
 	int error = glGetError();
 
 	if(error == GL_NO_ERROR)
@@ -47,6 +47,6 @@ void CheckGLError(const char* file, int line)
 
 GLvoid APIENTRY GLMessageHandler(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 {
-   //ErrorMessage("GL Error", message);
+   //ErrMess("GL Error", message);
    g_applog<<"GL Message: "<<message<<std::endl;
 }

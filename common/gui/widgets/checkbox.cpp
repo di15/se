@@ -1,10 +1,9 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -14,7 +13,8 @@
 #include "textblock.h"
 #include "touchlistener.h"
 
-CheckBox::CheckBox(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), int sel, float r, float g, float b, float a, void (*change)()) : Widget()
+
+CheckBox::CheckBox(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), int sel, float r, float g, float b, float a, void (*change)()) : Widget()
 {
 	m_parent = parent;
 	m_type = WIDGET_CHECKBOX;
@@ -36,7 +36,7 @@ CheckBox::CheckBox(Widget* parent, const char* n, const std::string t, int f, vo
 
 int CheckBox::square()
 {
-	return g_font[m_font].gheight;
+	return (int)g_font[m_font].gheight;
 }
 
 void CheckBox::draw()
@@ -46,19 +46,19 @@ void CheckBox::draw()
 	if(m_selected > 0)
 		DrawImage(g_texture[m_filledtex].texname, m_pos[0], m_pos[1], m_pos[0]+square(), m_pos[1]+square());
 
-	DrawShadowedText(m_font, m_pos[0]+square()+5, m_pos[1], m_text.c_str());
+	DrawShadowedText(m_font, m_pos[0]+square()+5, m_pos[1], &m_text);
 }
 
-void CheckBox::inev(InEv* ev)
+void CheckBox::inev(InEv* ie)
 {
-	if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
+	if(ie->type == INEV_MOUSEMOVE && !ie->intercepted)
 	{
 		if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] &&
-				g_mouse.x <= m_pos[2] &&
-				g_mouse.y <= m_pos[3])
+		                g_mouse.x <= m_pos[2] &&
+		                g_mouse.y <= m_pos[3])
 		{
 			m_over = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 		else
@@ -67,16 +67,16 @@ void CheckBox::inev(InEv* ev)
 			return;
 		}
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		if(m_over)
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 	}
-	else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		if(m_over && m_ldown)
 		{
@@ -90,7 +90,7 @@ void CheckBox::inev(InEv* ev)
 
 			m_ldown = false;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 

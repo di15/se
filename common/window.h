@@ -16,7 +16,7 @@
 #define FIELD_OF_VIEW		45.0f
 #define PROJ_RIGHT			(500)	//(30*12.5f)
 
-extern double g_frameinterval;
+extern double g_drawfrinterval;
 extern int g_width;
 extern int g_height;
 extern int g_bpp;
@@ -42,7 +42,7 @@ extern std::vector<Resolution> g_resolution;
 extern std::vector<int> g_bpps;
 
 extern bool g_keyintercepted;
-extern bool g_keys[256];
+extern bool g_keys[SDL_NUM_SCANCODES];
 extern bool g_mousekeys[3];
 
 void AddRes(int w, int h);

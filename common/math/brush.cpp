@@ -459,18 +459,51 @@ void Brush::getsides(int* nsides, BrushSide** sides)
 
 void Brush::removeside(int i)
 {
-	BrushSide* newsides = new BrushSide[m_nsides-1];
-	if(!newsides) OutOfMem(__FILE__, __LINE__);
+#ifdef REMOVESIDE_DEBUG
+	g_log<<"remove side 1 "<<i<<endl;
+	g_log.flush();
+#endif
 
+	BrushSide* newsides = new BrushSide[m_nsides-1];
+
+#if 0
 	memcpy(&newsides[0], &m_sides[0], sizeof(BrushSide)*i);
 	memcpy(&newsides[i], &m_sides[i+1], sizeof(BrushSide)*(m_nsides-i-1));
 
 	m_nsides --;
 	m_sides = newsides;
+#endif
+	
+#ifdef REMOVESIDE_DEBUG
+	g_log<<"remove side 2 "<<i<<endl;
+	g_log.flush();
+#endif
+
+	for(int j=0; j<i; j++)
+		newsides[j] = m_sides[j];
+	
+#ifdef REMOVESIDE_DEBUG
+	g_log<<"remove side 3 "<<i<<endl;
+	g_log.flush();
+#endif
+		
+	for(int j=i+1; j<m_nsides; j++)
+		newsides[j-1] = m_sides[j];
+	
+#ifdef REMOVESIDE_DEBUG
+	g_log<<"remove side 4 "<<i<<endl;
+	g_log.flush();
+#endif
+
+	m_nsides --;
+
+	delete [] m_sides;
+
+	m_sides = newsides;
 
 #ifdef REMOVESIDE_DEBUG
-	g_applog<<"remove "<<i<<std::endl;
-	g_applog.flush();
+	g_log<<"removed side "<<i<<endl;
+	g_log.flush();
 #endif
 }
 

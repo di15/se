@@ -21,12 +21,14 @@ public:
 		m_opened = false;
 		m_type = WIDGET_VIEWLAYER;
 		m_parent = parent;
+		
+		reframe();
 	}
 
-	void draw();
-	void drawover();
-	void inev(InEv* ev);
-	void reframe();
+	virtual void draw();
+	virtual void drawover();
+	virtual void inev(InEv* ie);
+	virtual void reframe();
 };
 
 #endif

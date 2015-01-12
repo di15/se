@@ -1,4 +1,3 @@
-
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
@@ -10,7 +9,7 @@ public:
 	int m_highl[2];	// highlighted (selected) text
 	UString m_compos;	//composition for unicode text
 
-	TextArea(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), float r=1, float g=1, float b=1, float a=1, void (*change)()=NULL);
+	TextArea(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), float r=1, float g=1, float b=1, float a=1, void (*change)()=NULL);
 
 	void draw();
 	int rowsshown();
@@ -33,9 +32,10 @@ public:
 	void copyval();
 	void pasteval();
 	void selectall();
-	void placestr(const char* str);
+	//void placestr(const char* str);
+	void placestr(const RichText* str);
 	void placechar(unsigned int k);
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void close();
 	void gainfocus();
 	void losefocus();

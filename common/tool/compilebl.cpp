@@ -192,6 +192,8 @@ static int ntris = 0;
 static std::list<unsigned int> uniquetexs;
 static TexFitInfo texfitinfo[TEXTURES];
 
+#if 1	//commented, until I update the code to use ModelPart and etc.
+
 void CountTrisModel(std::list<ModelHolder> &modelholders)
 {
 	for(auto mhiter = modelholders.begin(); mhiter != modelholders.end(); mhiter++)
@@ -976,10 +978,10 @@ void CompileModel(const char* fullfile, EdMap* map, std::list<ModelHolder> &mode
 	normfull = fullpath + std::string(basename) + ".norm.jpg";
 	ownfull = fullpath + std::string(basename) + ".team.png";
 
-	//string diffpath = string(basename) + ".jpg";
-	//string diffpathpng = string(basename) + ".png";
-	//string specpath = string(basename) + ".spec.jpg";
-	//string normpath = string(basename) + ".norm.jpg";
+	//std::string diffpath = std::string(basename) + ".jpg";
+	//std::string diffpathpng = std::string(basename) + ".png";
+	//std::string specpath = std::string(basename) + ".spec.jpg";
+	//std::string normpath = std::string(basename) + ".norm.jpg";
 
 	CreateTexture(notexindex, "textures/notex.jpg", false, true);
 
@@ -1049,3 +1051,5 @@ void CompileModel(const char* fullfile, EdMap* map, std::list<ModelHolder> &mode
 
 	CleanupModelCompile();
 }
+
+#endif

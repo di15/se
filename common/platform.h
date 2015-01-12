@@ -30,7 +30,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include <commdlg.h>
-#include "sys/dirent.h"
+#include <dirent.h>	//located in libs/win/dirent-1.20.1/include/
 #endif
 
 #ifdef PLATFORM_LINUX
@@ -78,6 +78,7 @@
 #include <SDL2/SDL_opengl.h>
 //#include <GL/glut.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_syswm.h>
 #endif
 
 #ifdef PLATFORM_MAC
@@ -85,6 +86,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_net.h>
+#include <SDL2/SDL_syswm.h>
 #endif
 
 #ifdef PLATFORM_WIN
@@ -92,6 +94,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 //#include <SDL_net.h>
+#include <SDL_syswm.h>
 #endif
 #endif
 
@@ -99,11 +102,19 @@
 #include <gl/glaux.h>
 #endif
 
+#if 1
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#endif
+
 #ifdef PLATFORM_WIN
 #pragma comment(lib, "x86/SDL2.lib")
 #pragma comment(lib, "x86/SDL2main.lib")
 //#pragma comment(lib, "SDL.lib")
 //#pragma comment(lib, "SDLmain.lib")
+//#pragma comment(lib, "lib32/assimp.lib")
+#pragma comment(lib, "assimp_release-dll_win32/assimp.lib")
 #pragma comment(lib, "glew32.lib")
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "ws2_32.lib")
@@ -151,7 +162,7 @@ extern SDL_GLContext g_glcontext;
 
 #define SPECBUMPSHADOW
 
-//#define DEBUG
+#define DEBUG
 //#define GLDEBUG
 #ifndef GLDEBUG
 #define CheckGLError(a,b); (void)0;

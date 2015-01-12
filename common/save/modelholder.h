@@ -3,7 +3,7 @@
 #ifndef MODELHOLDER_H
 #define MODELHOLDER_H
 
-#include "../draw/model.h"
+#include "../render/model.h"
 #include "../platform.h"
 
 class ModelHolder

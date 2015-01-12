@@ -1,4 +1,3 @@
-
 #ifndef LINK_H
 #define LINK_H
 
@@ -7,7 +6,7 @@
 class Link : public Widget
 {
 public:
-	Link(Widget* parent, const char* name, const std::string t, int f, void (*reframef)(Widget* thisw), void (*click)()) : Widget()
+	Link(Widget* parent, const char* name, const RichText t, int f, void (*reframef)(Widget* thisw), void (*click)()) : Widget()
 	{
 		m_parent = parent;
 		m_type = WIDGET_LINK;
@@ -22,7 +21,7 @@ public:
 	}
 
 	void draw();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 };
 
 #endif

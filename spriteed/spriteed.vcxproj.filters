@@ -10,9 +10,6 @@
     <Filter Include="source\common">
       <UniqueIdentifier>{716d98e8-f3d3-41f2-9e24-cc508f45ffeb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\common\draw">
-      <UniqueIdentifier>{c4e4899f-79f7-45af-a2de-9ecd38edd4ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\common\sim">
       <UniqueIdentifier>{8bdf5d1a-3d08-4e33-996a-94f647fc6040}</UniqueIdentifier>
     </Filter>
@@ -31,14 +28,17 @@
     <Filter Include="source\common\tool">
       <UniqueIdentifier>{e2fa7e36-af1b-4eba-b990-611fe72fb06e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\common\gui">
-      <UniqueIdentifier>{e754902d-4ba1-4d4b-8aef-39230f3e8c69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="source\common\gui\widgets">
-      <UniqueIdentifier>{64fa9fe1-7e53-4592-a3f0-3ab774b29489}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\common\sys">
       <UniqueIdentifier>{9d40d7f9-5580-41b5-85cc-ab12d1b6cf1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\gui">
+      <UniqueIdentifier>{c49065aa-ecca-4068-b678-d5ae7da42896}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\gui\widgets">
+      <UniqueIdentifier>{66b4970b-b459-4c0b-84cf-6432d0c2acbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\common\render">
+      <UniqueIdentifier>{862dd683-b385-41bc-b067-010a32bbfb05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,39 +84,6 @@
     </ClCompile>
     <ClCompile Include="..\common\window.cpp">
       <Filter>source\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\billboard.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\foliage.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\model.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\ms3d.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\particle.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\projectile.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\shader.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\shadow.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\sortb.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\vertexarray.cpp">
-      <Filter>source\common\draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\draw\water.cpp">
-      <Filter>source\common\draw</Filter>
     </ClCompile>
     <ClCompile Include="..\common\math\3dmath.cpp">
       <Filter>source\common\math</Filter>
@@ -223,8 +190,20 @@
     <ClCompile Include="..\common\sim\explocrater.cpp">
       <Filter>source\common\sim</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\draw\screenshot.cpp">
-      <Filter>source\common\draw</Filter>
+    <ClCompile Include="..\common\sys\dirent.c">
+      <Filter>source\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\unicode.cpp">
+      <Filter>source\common\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\ustring.cpp">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sim\road.cpp">
+      <Filter>source\common\sim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\cursor.cpp">
+      <Filter>source\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\draw2d.cpp">
       <Filter>source\common\gui</Filter>
@@ -235,7 +214,16 @@
     <ClCompile Include="..\common\gui\gui.cpp">
       <Filter>source\common\gui</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\gui\icon.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
     <ClCompile Include="..\common\gui\inevent.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\richtext.cpp">
+      <Filter>source\common\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\gui\sprite.cpp">
       <Filter>source\common\gui</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\viewlayer.cpp">
@@ -253,10 +241,7 @@
     <ClCompile Include="..\common\gui\widgets\checkbox.cpp">
       <Filter>source\common\gui\widgets</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\choosefile.cpp">
-      <Filter>source\common\gui\widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\gui\widgets\dropdowns.cpp">
+    <ClCompile Include="..\common\gui\widgets\droplist.cpp">
       <Filter>source\common\gui\widgets</Filter>
     </ClCompile>
     <ClCompile Include="..\common\gui\widgets\editbox.cpp">
@@ -301,17 +286,53 @@
     <ClCompile Include="..\common\gui\widgets\windoww.cpp">
       <Filter>source\common\gui\widgets</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sys\dirent.c">
+    <ClCompile Include="..\common\render\billboard.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\foliage.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\model.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\ms3d.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\particle.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\projectile.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\screenshot.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\shader.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\shadow.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\sortb.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\vertexarray.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\render\water.cpp">
+      <Filter>source\common\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\sys\checksum.cpp">
       <Filter>source\common\sys</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sys\unicode.cpp">
+    <ClCompile Include="..\common\sys\mempool.cpp">
       <Filter>source\common\sys</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ustring.cpp">
-      <Filter>source\common</Filter>
+    <ClCompile Include="..\common\sys\regress.cpp">
+      <Filter>source\common\sys</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\sim\road.cpp">
-      <Filter>source\common\sim</Filter>
+    <ClCompile Include="..\common\sys\utf8.cpp">
+      <Filter>source\common\sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -350,39 +371,6 @@
     </ClInclude>
     <ClInclude Include="..\common\window.h">
       <Filter>source\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\billboard.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\foliage.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\model.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\ms3d.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\particle.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\projectile.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\shader.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\shadow.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\sortb.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\vertexarray.h">
-      <Filter>source\common\draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\draw\water.h">
-      <Filter>source\common\draw</Filter>
     </ClInclude>
     <ClInclude Include="..\common\math\3dmath.h">
       <Filter>source\common\math</Filter>
@@ -498,8 +486,20 @@
     <ClInclude Include="..\common\sim\explocrater.h">
       <Filter>source\common\sim</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\draw\screenshot.h">
-      <Filter>source\common\draw</Filter>
+    <ClInclude Include="..\common\sys\dirent.h">
+      <Filter>source\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\unicode.h">
+      <Filter>source\common\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\ustring.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sim\road.h">
+      <Filter>source\common\sim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\cursor.h">
+      <Filter>source\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\draw2d.h">
       <Filter>source\common\gui</Filter>
@@ -510,7 +510,16 @@
     <ClInclude Include="..\common\gui\gui.h">
       <Filter>source\common\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\gui\icon.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
     <ClInclude Include="..\common\gui\inevent.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\richtext.h">
+      <Filter>source\common\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\gui\sprite.h">
       <Filter>source\common\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\viewlayer.h">
@@ -528,10 +537,7 @@
     <ClInclude Include="..\common\gui\widgets\checkbox.h">
       <Filter>source\common\gui\widgets</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\choosefile.h">
-      <Filter>source\common\gui\widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\gui\widgets\dropdowns.h">
+    <ClInclude Include="..\common\gui\widgets\droplist.h">
       <Filter>source\common\gui\widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\common\gui\widgets\editbox.h">
@@ -576,17 +582,50 @@
     <ClInclude Include="..\common\gui\widgets\windoww.h">
       <Filter>source\common\gui\widgets</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sys\dirent.h">
+    <ClInclude Include="..\common\render\billboard.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\foliage.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\model.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\ms3d.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\particle.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\projectile.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\screenshot.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\shader.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\shadow.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\sortb.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\vertexarray.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\render\water.h">
+      <Filter>source\common\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\sys\checksum.h">
       <Filter>source\common\sys</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\sys\unicode.h">
+    <ClInclude Include="..\common\sys\mempool.h">
       <Filter>source\common\sys</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\ustring.h">
-      <Filter>source\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\sim\road.h">
-      <Filter>source\common\sim</Filter>
+    <ClInclude Include="..\common\sys\utf8.h">
+      <Filter>source\common\sys</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

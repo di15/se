@@ -14,9 +14,9 @@ extern float g_transpkey[3];
 
 extern int g_deswidth;
 extern int g_desheight;
-extern unsigned int g_rendertex;
-extern unsigned int g_renderrb;
-extern unsigned int g_renderfb;
+extern unsigned int g_rendertex[4];
+extern unsigned int g_renderrb[4];
+extern unsigned int g_renderfb[4];
 
 #define RENDER_BUILDING		0
 #define RENDER_UNIT			1
@@ -25,6 +25,19 @@ extern unsigned int g_renderfb;
 
 #define RENDSTAGE_COLOR		0
 #define RENDSTAGE_TEAM		1
+
+extern bool g_antialias;
+
+//should be a power of two,
+//otherwise there's some space-saving optimizations i could've made
+//in SaveRender();... checking if downsample size fits in a smaller image.
+//edit: MUST be a power of two. until i fix it.
+#define ANTIALIAS_UPSCALE	4
+
+//Arbitrary max texture size, needed for determining upscale vertex screen coordinates.
+//If it's too small for the upscale sprite, the coordinates won't fit and the sprite won't be rendered at those points.
+#define MAX_TEXTURE		4096
+
 
 void AdjustFrame();
 void PrepareRender(const char* fullpath, int rendtype);

@@ -1,5 +1,5 @@
 
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../texture.h"
 #include "entity.h"
 #include "entitytype.h"
@@ -9,7 +9,7 @@
 #include "../math/plane.h"
 
 // Selected entity list
-list<int> g_selection;
+std::list<int> g_selection;
 
 // Selection circle texture index
 unsigned int g_circle = 0;

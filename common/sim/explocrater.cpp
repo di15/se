@@ -1,6 +1,6 @@
 
 
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../platform.h"
 #include "../utils.h"
 #include "../math/3dmath.h"
@@ -12,7 +12,7 @@
 #include "../../spriteed/segui.h"
 #include "../../spriteed/sesim.h"
 
-void MakeCrater(Vec3f center, list<Plane> &crater, float radius, int sides)
+void MakeCrater(Vec3f center, std::list<Plane> &crater, float radius, int sides)
 {
 	BrushSide down(Vec3f(0.0f, -1.0f, 0.0f), center + Vec3f(0, -radius, 0));
 
@@ -28,7 +28,7 @@ void MakeCrater(Vec3f center, list<Plane> &crater, float radius, int sides)
 		}
 }
 
-bool BrushInCrater(Brush* b, list<Plane> &crater)
+bool BrushInCrater(Brush* b, std::list<Plane> &crater)
 {
 	bool intersect = true;
 
@@ -95,10 +95,10 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	if(!hitB)
 		return;
 
-	list<Plane> crater;
+	std::list<Plane> crater;
 	MakeCrater(line[1], crater, 100.0f, 6);
 
-	list<Brush> hitBs;
+	std::list<Brush> hitBs;
 
 	//for(auto b=map->m_brush.begin(); b!=map->m_brush.end(); b++)
 
@@ -136,16 +136,16 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 #if 1
 	for(auto b=hitBs.begin(); b!=hitBs.end(); b=hitBs.erase(b))
 	{
-		list<Brush> outfrags;
-		list<Brush> infrags;
+		std::list<Brush> outfrags;
+		std::list<Brush> infrags;
 
 		infrags.push_back(*b);
 
 		for(auto ep=crater.begin(); ep!=crater.end(); ep++)
 		{
 			Vec3f pop = PointOnPlane(*ep);
-			list<Brush> nextoutfrags;
-			list<Brush> nextinfrags;
+			std::list<Brush> nextoutfrags;
+			std::list<Brush> nextinfrags;
 
 			BrushSide news0(ep->m_normal, pop);
 			BrushSide news1(Vec3f(0,0,0)-ep->m_normal, pop);
@@ -266,7 +266,7 @@ void ExplodeCrater(EdMap* map, Vec3f line[], Vec3f vmin, Vec3f vmax)
 	BrushSide news0(cuttingp.m_normal, pop);
 	BrushSide news1(Vec3f(0,0,0)-cuttingp.m_normal, pop);
 
-	vector<Brush*> newsel;
+	std::vector<Brush*> newsel;
 
 	for(auto i=g_selB.begin(); i!=g_selB.end(); )
 	{

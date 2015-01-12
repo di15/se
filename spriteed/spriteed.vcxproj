@@ -18,29 +18,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\common\debug.cpp" />
-    <ClCompile Include="..\common\draw\billboard.cpp" />
-    <ClCompile Include="..\common\draw\foliage.cpp" />
-    <ClCompile Include="..\common\draw\model.cpp" />
-    <ClCompile Include="..\common\draw\ms3d.cpp" />
-    <ClCompile Include="..\common\draw\particle.cpp" />
-    <ClCompile Include="..\common\draw\projectile.cpp" />
-    <ClCompile Include="..\common\draw\screenshot.cpp" />
-    <ClCompile Include="..\common\draw\shader.cpp" />
-    <ClCompile Include="..\common\draw\shadow.cpp" />
-    <ClCompile Include="..\common\draw\sortb.cpp" />
-    <ClCompile Include="..\common\draw\vertexarray.cpp" />
-    <ClCompile Include="..\common\draw\water.cpp" />
+    <ClCompile Include="..\common\gui\cursor.cpp" />
     <ClCompile Include="..\common\gui\draw2d.cpp" />
     <ClCompile Include="..\common\gui\font.cpp" />
     <ClCompile Include="..\common\gui\gui.cpp" />
+    <ClCompile Include="..\common\gui\icon.cpp" />
     <ClCompile Include="..\common\gui\inevent.cpp" />
+    <ClCompile Include="..\common\gui\richtext.cpp" />
+    <ClCompile Include="..\common\gui\sprite.cpp" />
     <ClCompile Include="..\common\gui\viewlayer.cpp" />
     <ClCompile Include="..\common\gui\widget.cpp" />
     <ClCompile Include="..\common\gui\widgets\barbutton.cpp" />
     <ClCompile Include="..\common\gui\widgets\button.cpp" />
     <ClCompile Include="..\common\gui\widgets\checkbox.cpp" />
-    <ClCompile Include="..\common\gui\widgets\choosefile.cpp" />
-    <ClCompile Include="..\common\gui\widgets\dropdowns.cpp" />
+    <ClCompile Include="..\common\gui\widgets\droplist.cpp" />
     <ClCompile Include="..\common\gui\widgets\editbox.cpp" />
     <ClCompile Include="..\common\gui\widgets\frame.cpp" />
     <ClCompile Include="..\common\gui\widgets\hscrollbar.cpp" />
@@ -71,6 +62,18 @@
     <ClCompile Include="..\common\math\vec4f.cpp" />
     <ClCompile Include="..\common\phys\collider.cpp" />
     <ClCompile Include="..\common\platform.cpp" />
+    <ClCompile Include="..\common\render\billboard.cpp" />
+    <ClCompile Include="..\common\render\foliage.cpp" />
+    <ClCompile Include="..\common\render\model.cpp" />
+    <ClCompile Include="..\common\render\ms3d.cpp" />
+    <ClCompile Include="..\common\render\particle.cpp" />
+    <ClCompile Include="..\common\render\projectile.cpp" />
+    <ClCompile Include="..\common\render\screenshot.cpp" />
+    <ClCompile Include="..\common\render\shader.cpp" />
+    <ClCompile Include="..\common\render\shadow.cpp" />
+    <ClCompile Include="..\common\render\sortb.cpp" />
+    <ClCompile Include="..\common\render\vertexarray.cpp" />
+    <ClCompile Include="..\common\render\water.cpp" />
     <ClCompile Include="..\common\save\compilemap.cpp" />
     <ClCompile Include="..\common\save\edmap.cpp" />
     <ClCompile Include="..\common\save\modelholder.cpp" />
@@ -91,8 +94,12 @@
     <ClCompile Include="..\common\sim\statesoldier.cpp" />
     <ClCompile Include="..\common\sim\tile.cpp" />
     <ClCompile Include="..\common\sound.cpp" />
+    <ClCompile Include="..\common\sys\checksum.cpp" />
     <ClCompile Include="..\common\sys\dirent.c" />
+    <ClCompile Include="..\common\sys\mempool.cpp" />
+    <ClCompile Include="..\common\sys\regress.cpp" />
     <ClCompile Include="..\common\sys\unicode.cpp" />
+    <ClCompile Include="..\common\sys\utf8.cpp" />
     <ClCompile Include="..\common\texture.cpp" />
     <ClCompile Include="..\common\tool\compilebl.cpp" />
     <ClCompile Include="..\common\tool\rendersprite.cpp" />
@@ -107,29 +114,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\debug.h" />
-    <ClInclude Include="..\common\draw\billboard.h" />
-    <ClInclude Include="..\common\draw\foliage.h" />
-    <ClInclude Include="..\common\draw\model.h" />
-    <ClInclude Include="..\common\draw\ms3d.h" />
-    <ClInclude Include="..\common\draw\particle.h" />
-    <ClInclude Include="..\common\draw\projectile.h" />
-    <ClInclude Include="..\common\draw\screenshot.h" />
-    <ClInclude Include="..\common\draw\shader.h" />
-    <ClInclude Include="..\common\draw\shadow.h" />
-    <ClInclude Include="..\common\draw\sortb.h" />
-    <ClInclude Include="..\common\draw\vertexarray.h" />
-    <ClInclude Include="..\common\draw\water.h" />
+    <ClInclude Include="..\common\gui\cursor.h" />
     <ClInclude Include="..\common\gui\draw2d.h" />
     <ClInclude Include="..\common\gui\font.h" />
     <ClInclude Include="..\common\gui\gui.h" />
+    <ClInclude Include="..\common\gui\icon.h" />
     <ClInclude Include="..\common\gui\inevent.h" />
+    <ClInclude Include="..\common\gui\richtext.h" />
+    <ClInclude Include="..\common\gui\sprite.h" />
     <ClInclude Include="..\common\gui\viewlayer.h" />
     <ClInclude Include="..\common\gui\widget.h" />
     <ClInclude Include="..\common\gui\widgets\barbutton.h" />
     <ClInclude Include="..\common\gui\widgets\button.h" />
     <ClInclude Include="..\common\gui\widgets\checkbox.h" />
-    <ClInclude Include="..\common\gui\widgets\choosefile.h" />
-    <ClInclude Include="..\common\gui\widgets\dropdowns.h" />
+    <ClInclude Include="..\common\gui\widgets\droplist.h" />
     <ClInclude Include="..\common\gui\widgets\editbox.h" />
     <ClInclude Include="..\common\gui\widgets\frame.h" />
     <ClInclude Include="..\common\gui\widgets\hscrollbar.h" />
@@ -163,6 +161,18 @@
     <ClInclude Include="..\common\math\vec4f.h" />
     <ClInclude Include="..\common\phys\collider.h" />
     <ClInclude Include="..\common\platform.h" />
+    <ClInclude Include="..\common\render\billboard.h" />
+    <ClInclude Include="..\common\render\foliage.h" />
+    <ClInclude Include="..\common\render\model.h" />
+    <ClInclude Include="..\common\render\ms3d.h" />
+    <ClInclude Include="..\common\render\particle.h" />
+    <ClInclude Include="..\common\render\projectile.h" />
+    <ClInclude Include="..\common\render\screenshot.h" />
+    <ClInclude Include="..\common\render\shader.h" />
+    <ClInclude Include="..\common\render\shadow.h" />
+    <ClInclude Include="..\common\render\sortb.h" />
+    <ClInclude Include="..\common\render\vertexarray.h" />
+    <ClInclude Include="..\common\render\water.h" />
     <ClInclude Include="..\common\save\compilemap.h" />
     <ClInclude Include="..\common\save\edmap.h" />
     <ClInclude Include="..\common\save\modelholder.h" />
@@ -183,8 +193,11 @@
     <ClInclude Include="..\common\sim\statesoldier.h" />
     <ClInclude Include="..\common\sim\tile.h" />
     <ClInclude Include="..\common\sound.h" />
+    <ClInclude Include="..\common\sys\checksum.h" />
     <ClInclude Include="..\common\sys\dirent.h" />
+    <ClInclude Include="..\common\sys\mempool.h" />
     <ClInclude Include="..\common\sys\unicode.h" />
+    <ClInclude Include="..\common\sys\utf8.h" />
     <ClInclude Include="..\common\texture.h" />
     <ClInclude Include="..\common\tool\compilebl.h" />
     <ClInclude Include="..\common\tool\rendersprite.h" />
@@ -236,15 +249,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\GL;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\assimp--3.0.1270-sdk\include;$(SolutionDir)\libs\win\dirent-1.20.1\include\;$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\assimp--3.0.1270-sdk\lib;$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(SolutionDir)\libs\GL;$(LibraryPath)</LibraryPath>
     <TargetName>SpriteEdDbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>SpriteEd</TargetName>
-    <IncludePath>$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\win\SDL-1.2.15\lib\x86;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\libs\assimp--3.0.1270-sdk\include;$(SolutionDir)\libs\win\dirent-1.20.1\include\;$(SolutionDir)\libs\win\SDL2-2.0.3\include;$(SolutionDir)\libs\glew\include;$(SolutionDir)\libs\win\SDL-1.2.15\include;$(SolutionDir)\libs\;$(SolutionDir)\libs\libzip-0.11.1\lib;$(SolutionDir)\libs\lpng;$(SolutionDir)\libs\jpeglib;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\libs\assimp--3.0.1270-sdk\lib;$(SolutionDir)\libs\win\SDL2-2.0.3\lib;$(SolutionDir)\libs\glew\lib\Release\Win32;$(SolutionDir)\libs\GL;$(SolutionDir)\libs\zlib-1.2.5\build\Release;$(SolutionDir)\libs\libzip-0.11.1\build\lib\Release;$(SolutionDir)\libs\lpng\lib;$(SolutionDir)\libs\jpeglib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -260,6 +273,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Debug\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>
@@ -284,6 +298,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>false</DataExecutionPrevention>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Release\$(TargetFileName)" "$(SolutionDir)..\testfolder\$(TargetFileName)"</Command>

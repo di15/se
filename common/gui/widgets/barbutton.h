@@ -1,4 +1,3 @@
-
 #ifndef BARBUTTON_H
 #define BARBUTTON_H
 

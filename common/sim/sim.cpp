@@ -1,6 +1,6 @@
 
 
-#include "../draw/model.h"
+#include "../render/model.h"
 #include "../math/brush.h"
 #include "entitytype.h"
 #include "entity.h"
@@ -42,10 +42,15 @@ void InitOnce()
 
 }
 
+unsigned int g_temptex;
+
 void Queue()
 {
 	// 73 units to 188 cm (2.57 ratio)
 	//QueueModel(&themodel, "models/battlecomp/battlecomp.ms3d", Vec3f(2.57f,2.57f,2.57f), Vec3f(0,188,0));
 
 	QueueTexture(&g_circle, "gui/circle.png", true, true);
+
+	unsigned int temp;
+	CreateTexture(g_temptex, "renders/apt00_fr000_team.png", true, false);
 }

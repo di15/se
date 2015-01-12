@@ -4,7 +4,7 @@
 //
 
 #include "seviewport.h"
-#include "../common/draw/shader.h"
+#include "../common/render/shader.h"
 #include "../common/gui/gui.h"
 #include "../common/math/3dmath.h"
 #include "../common/window.h"
@@ -12,13 +12,13 @@
 #include "../common/gui/font.h"
 #include "../common/math/camera.h"
 #include "../common/math/matrix.h"
-#include "../common/draw/shadow.h"
+#include "../common/render/shadow.h"
 #include "../common/sim/map.h"
 #include "sesim.h"
 #include "../common/math/vec4f.h"
 #include "segui.h"
 #include "../common/math/brush.h"
-#include "../common/draw/sortb.h"
+#include "../common/render/sortb.h"
 #include "undo.h"
 #include "../common/math/frustum.h"
 #include "main.h"
@@ -26,28 +26,28 @@
 #include "../common/tool/rendersprite.h"
 #include "../common/debug.h"
 
-ViewportT g_viewportT[VIEWPORT_TYPES];
-Viewport g_viewport[4];
+VpType g_vptype[VIEWPORT_TYPES];
+VpWrap g_viewport[4];
 //Vec3f g_focus;
 static Vec3f accum(0,0,0);
 bool g_changed = false;
 UndoH g_beforechange;
 
-ViewportT::ViewportT(Vec3f offset, Vec3f up, const char* label)
+VpType::VpType(Vec3f offset, Vec3f up, const char* label)
 {
 	m_offset = offset;
 	m_up = up;
 	strcpy(m_label, label);
 }
 
-Viewport::Viewport()
+VpWrap::VpWrap()
 {
 	m_drag = false;
 	m_ldown = false;
 	m_rdown = false;
 }
 
-Viewport::Viewport(int type)
+VpWrap::VpWrap(int type)
 {
 	m_drag = false;
 	m_ldown = false;
@@ -56,10 +56,10 @@ Viewport::Viewport(int type)
 	m_type = type;
 }
 
-Vec3f Viewport::up()
+Vec3f VpWrap::up()
 {
 	Vec3f upvec = g_camera.m_up;
-	ViewportT* t = &g_viewportT[m_type];
+	VpType* t = &g_vptype[m_type];
 
 	if(m_type != VIEWPORT_ANGLE45O)
 		upvec = t->m_up;
@@ -67,10 +67,10 @@ Vec3f Viewport::up()
 	return upvec;
 }
 
-Vec3f Viewport::up2()
+Vec3f VpWrap::up2()
 {
 	Vec3f upvec = g_camera.up2();
-	ViewportT* t = &g_viewportT[m_type];
+	VpType* t = &g_vptype[m_type];
 
 	if(m_type != VIEWPORT_ANGLE45O)
 		upvec = t->m_up;
@@ -78,10 +78,10 @@ Vec3f Viewport::up2()
 	return upvec;
 }
 
-Vec3f Viewport::strafe()
+Vec3f VpWrap::strafe()
 {
 	Vec3f upvec = up();
-	ViewportT* t = &g_viewportT[m_type];
+	VpType* t = &g_vptype[m_type];
 	Vec3f sidevec = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, upvec));
 
 	if(m_type == VIEWPORT_ANGLE45O)
@@ -90,13 +90,13 @@ Vec3f Viewport::strafe()
 	return sidevec;
 }
 
-Vec3f Viewport::focus()
+Vec3f VpWrap::focus()
 {
 	Vec3f viewvec = g_camera.m_view;
 	return viewvec;
 }
 
-Vec3f Viewport::viewdir()
+Vec3f VpWrap::viewdir()
 {
 	Vec3f focusvec = focus();
 	Vec3f posvec = pos();
@@ -105,7 +105,7 @@ Vec3f Viewport::viewdir()
 	return focusvec-posvec;
 }
 
-Vec3f Viewport::pos()
+Vec3f VpWrap::pos()
 {
 	Vec3f posvec = g_camera.m_pos;
 
@@ -115,7 +115,7 @@ Vec3f Viewport::pos()
 		posvec = g_camera.m_view - dir * 1000.0f / g_zoom;
 	}
 
-	ViewportT* t = &g_viewportT[m_type];
+	VpType* t = &g_vptype[m_type];
 
 	if(m_type != VIEWPORT_ANGLE45O)
 		posvec = g_camera.m_view + t->m_offset;
@@ -262,8 +262,8 @@ void DrawViewport(int which, int x, int y, int width, int height)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
@@ -383,9 +383,9 @@ void DrawViewport(int which, int x, int y, int width, int height)
 		glDisableClientState(GL_NORMAL_ARRAY);
 		Shader* s = &g_shader[g_curS];
 
-		//if(s->m_slot[SSLOT_PROJECTION] == -1)	ErrorMessage("po", "po");
-		//if(s->m_slot[SSLOT_VIEWMAT] == -1)	ErrorMessage("v", "v");
-		//if(s->m_slot[SSLOT_MODELMAT] == -1)	ErrorMessage("m", "m");
+		//if(s->m_slot[SSLOT_PROJECTION] == -1)	ErrMess("po", "po");
+		//if(s->m_slot[SSLOT_VIEWMAT] == -1)	ErrMess("v", "v");
+		//if(s->m_slot[SSLOT_MODELMAT] == -1)	ErrMess("m", "m");
 
 #if 0
 		for(int i=0; i<16; i+=4)
@@ -573,7 +573,7 @@ void DrawViewport(int which, int x, int y, int width, int height)
 #endif
 
 	if(g_mode != RENDERING)
-		DrawShadowedText(MAINFONT8, 0, 0, t->m_label, NULL, -1);
+		DrawShadowedText(MAINFONT8, 0, 0, &RichText(t->m_label), NULL, -1);
 
 #ifdef DEBUG
 	LastNum(__FILE__, __LINE__);
@@ -595,7 +595,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 	accum = Vec3f(0,0,0);
 	g_changed = false;
 	WriteH(&g_beforechange);	//write undo history
-	Viewport* v = &g_viewport[which];
+	VpWrap* v = &g_viewport[which];
 	v->m_ldown = true;
 	v->m_lastmouse = Vec2i(relx, rely);
 	v->m_curmouse = Vec2i(relx, rely);
@@ -609,7 +609,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 		return true;
 	}
 
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpType* t = &g_vptype[v->m_type];
 
 	//g_applog<<"vp["<<which<<"] l down"<<std::endl;
 	//g_applog.flush();
@@ -665,7 +665,7 @@ bool ViewportLDown(int which, int relx, int rely, int width, int height)
 
 bool ViewportRDown(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
+	VpWrap* v = &g_viewport[which];
 	v->m_rdown = true;
 	v->m_lastmouse = Vec2i(relx, rely);
 	v->m_curmouse = Vec2i(relx, rely);
@@ -681,7 +681,7 @@ void CutBrushes(Plane cuttingp)
 	BrushSide news0(cuttingp.m_normal, pop);
 	BrushSide news1(Vec3f(0,0,0)-cuttingp.m_normal, pop);
 
-	vector<Brush*> newsel;
+	std::vector<Brush*> newsel;
 
 	for(auto i=g_selB.begin(); i!=g_selB.end(); )
 	{
@@ -740,8 +740,8 @@ void CutBrushes(Plane cuttingp)
 
 void ViewportLUp_CutBrush(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	//Vec3f viewvec = g_focus;	//g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view - g_camera.m_pos;
@@ -796,8 +796,8 @@ void ViewportLUp_CutBrush(int which, int relx, int rely, int width, int height)
 
 void ViewportLUp_Explosion(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	//Vec3f viewvec = g_focus;	//g_camera.m_view;
 	//Vec3f viewvec = g_camera.m_view - g_camera.m_pos;
@@ -857,8 +857,8 @@ void ViewportLUp_Explosion(int which, int relx, int rely, int width, int height)
 
 void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	float aspect = fabsf((float)width / (float)height);
 
@@ -933,8 +933,8 @@ void ViewportLUp_SelectBrush(int which, int relx, int rely, int width, int heigh
 
 bool ViewportLUp(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	if(v->m_ldown)
 	{
@@ -977,8 +977,8 @@ bool ViewportLUp(int which, int relx, int rely, int width, int height)
 
 bool ViewportRUp(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	v->m_rdown = false;
 
@@ -987,8 +987,8 @@ bool ViewportRUp(int which, int relx, int rely, int width, int height)
 
 bool ViewportMousewheel(int which, int delta)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	//if(v->m_type == VIEWPORT_ANGLE45O)
 	{
@@ -1001,8 +1001,8 @@ bool ViewportMousewheel(int which, int delta)
 
 void ViewportTranslate(int which, int dx, int dy, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	//Vec3f strafe = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, t->m_up));
 
@@ -1030,8 +1030,8 @@ void ViewportTranslate(int which, int dx, int dy, int width, int height)
 
 void ViewportRotate(int which, int dx, int dy)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 	/*
 	Vec3f view = Normalize( Vec3f(0,0,0)-t->m_offset );
 
@@ -1262,8 +1262,8 @@ void DragV(Brush* b, BrushSide* s, int j, Vec3f& newv, bool& mergedv, bool* inva
 
 void Drag_Brush(Brush* b, Vec3f newmove)
 {
-	list<float> oldus;
-	list<float> oldvs;
+	std::list<float> oldus;
+	std::list<float> oldvs;
 
 	for(int i=0; i<b->m_nsides; i++)
 	{
@@ -1307,7 +1307,7 @@ void Drag_Brush(Brush* b, Vec3f newmove)
 	b->remaptex();
 	PruneB(&g_edmap, g_sel1b);
 
-	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	VpType* t = &g_vptype[VIEWPORT_ANGLE45O];
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 }
@@ -1353,7 +1353,7 @@ void Drag_BrushVert(Brush* b, Vec3f newmove)
 	b->remaptex();
 	PruneB(&g_edmap, g_sel1b);
 
-	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	VpType* t = &g_vptype[VIEWPORT_ANGLE45O];
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 }
@@ -1368,7 +1368,7 @@ void Drag_BrushSide(Brush* b, Vec3f newmove)
 	b->remaptex();
 	PruneB(&g_edmap, g_sel1b);
 
-	ViewportT* t = &g_viewportT[VIEWPORT_ANGLE45O];
+	VpType* t = &g_vptype[VIEWPORT_ANGLE45O];
 	//SortEdB(&g_edmap, g_focus, g_focus + t->m_offset);
 	SortEdB(&g_edmap, g_camera.m_view, g_camera.m_pos);
 }
@@ -1460,8 +1460,8 @@ void Drag_ModelSide(ModelHolder* mh, Vec3f newmove)
 
 void Drag(int which, int dx, int dy, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
-	ViewportT* t = &g_viewportT[v->m_type];
+	VpWrap* v = &g_viewport[which];
+	VpType* t = &g_vptype[v->m_type];
 
 	//Vec3f strafe = Normalize(Cross(Vec3f(0,0,0)-t->m_offset, t->m_up));
 	Vec3f strafe = v->strafe();
@@ -1527,7 +1527,7 @@ void Drag(int which, int dx, int dy, int width, int height)
 
 bool ViewportMousemove(int which, int relx, int rely, int width, int height)
 {
-	Viewport* v = &g_viewport[which];
+	VpWrap* v = &g_viewport[which];
 
 	if(v->m_ldown)
 	{

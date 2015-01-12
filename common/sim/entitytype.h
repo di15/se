@@ -4,7 +4,7 @@
 #include "../math/vec3f.h"
 #include "../sound.h"
 #include "../phys/collider.h"
-#include "../draw/model.h"
+#include "../render/model.h"
 
 class EntityT
 {
@@ -19,8 +19,8 @@ public:
 	float animRate;
 	int item;
 	Vec3f centerOff;
-	//vector<Sound> openSound;
-	//vector<Sound> closeSound;
+	//std::vector<Sound> openSound;
+	//std::vector<Sound> closeSound;
 
 	EntityT();
 	EntityT(int collider, const char* modelFile, Vec3f modelScale, Vec3f modelOffset, Vec3f vMin, Vec3f vMax, float maxStep, float speed, float jump, float crouch, float animRate, int item);

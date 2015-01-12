@@ -49,7 +49,7 @@ public:
 	unsigned int m_specularm;
 	unsigned int m_normalm;
 	Plane m_tceq[2];
-	list<Triangle> m_frag;
+	std::list<Triangle> m_frag;
 	*/
 
 	cuts->m_diffusem = eds->m_diffusem;
@@ -160,10 +160,10 @@ void RemoveHiddenFrags(CutBrush* cutb, Brush* edb)
 	}
 }
 
-static list<CutBrush> cutbs;	//the cut brush sides
+static std::list<CutBrush> cutbs;	//the cut brush sides
 static int ntouch = 0;	//the number of touching brushes
 static EdMap* cmap;	//the map to compile
-static list<Brush> finalbs; //This will hold the final brushes
+static std::list<Brush> finalbs; //This will hold the final brushes
 
 void CutBrushes()
 {
@@ -288,7 +288,7 @@ void CompileMap(const char* full, EdMap* map)
 	CleanUpMapCompile();
 }
 
-void ResetView()
+void ResetView(bool checkupscale)
 {
 	//g_camera.position(1000.0f/3, 1000.0f/3, 1000.0f/3, 0, 0, 0, 0, 1, 0);
 
@@ -299,10 +299,10 @@ void ResetView()
 
 	g_zoom = 1;
 
-	Vec3f topleft(-TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f bottomleft(-TILE_SIZE/2, 0, TILE_SIZE/2);
-	Vec3f topright(TILE_SIZE/2, 0, -TILE_SIZE/2);
-	Vec3f bottomright(TILE_SIZE/2, 0, TILE_SIZE/2);
+	Vec3f topleft(-g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f bottomleft(-g_tilesize/2, 0, g_tilesize/2);
+	Vec3f topright(g_tilesize/2, 0, -g_tilesize/2);
+	Vec3f bottomright(g_tilesize/2, 0, g_tilesize/2);
 
 	int width;
 	int height;
@@ -315,7 +315,7 @@ void ResetView()
 	//if(g_mode == EDITOR)
 	else
 	{
-		ViewLayer* edview = (ViewLayer*)g_GUI.get("editor");
+		ViewLayer* edview = (ViewLayer*)g_gui.get("editor");
 		Widget* viewportsframe = edview->get("viewports frame");
 		Widget* toprightviewport = viewportsframe->get("top right viewport");
 		width = toprightviewport->m_pos[2] - toprightviewport->m_pos[0];
@@ -352,7 +352,7 @@ void ResetView()
 	}
 #endif
 
-	//Viewport* v = &g_viewport[VIEWPORT_ANGLE45O];
+	//VpWrap* v = &g_viewport[VIEWPORT_ANGLE45O];
 	//Vec3f viewvec = g_focus; //g_camera.m_view;
 	Vec3f viewvec = g_camera.m_view;
 	//Vec3f focusvec = v->focus();
@@ -411,6 +411,9 @@ void ResetView()
 	float zoomscale = (float)g_1tilewidth / xrange;
 
 	g_zoom *= zoomscale;
+
+	if(checkupscale && g_antialias)
+		g_zoom *= (float)ANTIALIAS_UPSCALE;
 
 #ifdef DEBUG
 	g_applog<<"zoom" <<g_zoom<<","<<zoomscale<<","<<xrange<<","<<topleft4.x<<","<<topleft.x<<","<<width<<","<<height<<std::endl;

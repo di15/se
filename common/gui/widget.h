@@ -4,11 +4,11 @@
 #include "../utils.h"
 #include "../texture.h"
 #include "font.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../window.h"
 #include "draw2d.h"
+#include "richtext.h"
 #include "inevent.h"
-#include "../ustring.h"
 
 #define MAX_OPTIONS_SHOWN	7
 
@@ -16,7 +16,7 @@
 #define WIDGET_BUTTON				2
 #define WIDGET_TEXT					3
 #define WIDGET_LINK					4
-#define WIDGET_DROPDOWNSELECTOR		5
+#define WIDGET_DROPLIST				5
 #define WIDGET_EDITBOX				6
 #define WIDGET_BARBUTTON			7
 #define WIDGET_HSCROLLER			8
@@ -34,10 +34,16 @@
 #define WIDGET_CONSTRUCTIONVIEW		20
 #define WIDGET_GUI					21
 #define WIDGET_VIEWLAYER			22
-#define WIDGET_CHOOSEFILE			23
+#define WIDGET_WINDOW				23
 #define WIDGET_VSCROLLBAR			24
 #define WIDGET_HSCROLLBAR			25
-#define WIDGET_WINDOW				26
+#define WIDGET_BUILDINGVIEW			26
+#define WIDGET_SVLISTVIEW			27
+#define WIDGET_NEWHOST				28
+#define WIDGET_TRUCKMGR				29
+#define WIDGET_SAVEVIEW				30
+#define WIDGET_LOADVIEW				31
+#define WIDGET_LOBBY				32
 
 #define CHCALL_VSCROLL				0
 #define CHCAlL_HSCROLL				1
@@ -57,18 +63,18 @@ public:
 	bool m_over;
 	bool m_ldown;	//was the left mouse button pressed while over this (i.e. drag)?
 	std::string m_name;
-	std::string m_text;
+	RichText m_text;
 	int m_font;
-	unsigned int m_frametex, m_filledtex, m_uptex;
+	unsigned int m_frametex, m_filledtex, m_uptex, m_downtex;
 	bool m_opened;
-	std::vector<std::string> m_options;
+	std::vector<RichText> m_options;
 	int m_selected;
 	float m_scroll[2];
 	bool m_mousescroll;
 	float m_vel[2];
 	int m_param;
 	float m_rgba[4];
-	std::string m_value;
+	RichText m_value;
 	int m_caret;
 	bool m_passw;
 	int m_maxlen;
@@ -76,7 +82,7 @@ public:
 	std::list<Widget*> m_subwidg;
 	int m_lines;
 	int m_alignment;
-	std::string m_label;
+	RichText m_label;
 	bool m_popup;
 
 	void (*clickfunc)();
@@ -106,16 +112,13 @@ public:
 
 	virtual ~Widget()
 	{
-		for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-			delete *i;
-
-		m_subwidg.clear();
+		freech();
 	}
 
 	virtual void draw()	{}
 	virtual void drawover()	{}
-	virtual void inev(InEv* ev) {}
-	virtual void frameupd()	{}
+	virtual void inev(InEv* ie) {}
+	virtual void frameupd();
 	virtual void reframe();	//resized or moved
 	virtual void subframe(float* fr)
 	{
@@ -124,7 +127,14 @@ public:
 	virtual Widget* get(const char* name);
 	virtual void add(Widget* neww);
 	virtual void close();
+	virtual void open();
 	virtual void chcall(Widget* ch, int type, void* data);	//child callback
+	virtual void freech();	//free subwidget children
+	virtual void tofront();	//only used for windows. edit: needed for everything since droplist uses it on parent tree.
+	virtual void subdraw(){}
+	virtual void subdrawover(){}
+	virtual void subreframe(){}
+	virtual void subinev(InEv* ie){}
 };
 
 void CenterLabel(Widget* w);

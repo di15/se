@@ -17,7 +17,8 @@ public:
 	~UndoH();
 };
 
-#define MAX_UNDO		16
+//#define g_maxundo		16
+extern int g_maxundo;
 
 void LinkPrevUndo(UndoH* tosave=NULL);	//call this BEFORE the change is made
 void LinkLatestUndo();	//called by undo itself

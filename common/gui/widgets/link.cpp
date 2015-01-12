@@ -1,11 +1,9 @@
-
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -14,6 +12,8 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
+
+
 
 void Link::draw()
 {
@@ -35,7 +35,7 @@ void Link::draw()
 		color[2] = 0.8f;
 	}
 
-	DrawShadowedText(m_font, m_pos[0], m_pos[1], m_text.c_str(), color);
+	DrawShadowedText(m_font, m_pos[0], m_pos[1], &m_text, color);
 
 	//glColor4f(1, 1, 1, 1);
 	glUniform4f(g_shader[SHADER_ORTHO].m_slot[SSLOT_COLOR], 1, 1, 1, 1);
@@ -43,9 +43,9 @@ void Link::draw()
 	//glEnable(GL_TEXTURE_2D);
 }
 
-void Link::inev(InEv* ev)
+void Link::inev(InEv* ie)
 {
-	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
@@ -57,30 +57,30 @@ void Link::inev(InEv* ev)
 			m_over = false;
 			m_ldown = false;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 
 		m_over = false;
 		m_ldown = false;
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
 		if(m_over)
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 	}
-	else if(ev->type == INEV_MOUSEMOVE)
+	else if(ie->type == INEV_MOUSEMOVE)
 	{
-		int texlen = m_text.length();
+		int texlen = m_text.texlen();
 		if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] &&
-				g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
-				g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
+		                g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+		                g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
 		{
 		}
 		else
@@ -88,15 +88,15 @@ void Link::inev(InEv* ev)
 			m_over = false;
 		}
 
-		if(!ev->intercepted)
+		if(!ie->intercepted)
 		{
 			if(g_mouse.x >= m_pos[0] && g_mouse.y >= m_pos[1] &&
-					g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
-					g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
+			                g_mouse.x <= m_pos[0]+texlen*g_font[m_font].gheight/2 &&
+			                g_mouse.y <= m_pos[1]+g_font[m_font].gheight)
 			{
 				m_over = true;
 
-				ev->intercepted = true;
+				ie->intercepted = true;
 			}
 			else
 			{

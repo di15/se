@@ -1,4 +1,3 @@
-
 #ifndef TEXT_H
 #define TEXT_H
 
@@ -23,7 +22,7 @@ public:
 		m_shadow = false;
 	}
 
-	Text(Widget* parent, const char* n, const std::string& t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
+	Text(Widget* parent, const char* n, const RichText& t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()
 	{
 		m_parent = parent;
 		m_type = WIDGET_TEXT;
@@ -32,7 +31,7 @@ public:
 		//g_applog.flush();
 
 #ifdef USTR_DEBUG
-		g_applog<<"Text(Widget* parent, const char* n, const std::string t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()"<<std::endl;
+		g_applog<<"Text(Widget* parent, const char* n, const RichText t, int f, void (*reframef)(Widget* thisw), bool shdw=true, float r=0.8f, float g=0.8f, float b=0.8f, float a=1) : Widget()"<<std::endl;
 		g_applog.flush();
 #endif
 

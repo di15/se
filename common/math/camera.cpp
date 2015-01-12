@@ -38,7 +38,7 @@ void Camera::frameupd()
 	m_pos = m_pos + m_vel;
 	m_view = m_view + m_vel;
 
-	//Vec3f vNew = m_pos + m_vel * g_frameinterval;
+	//Vec3f vNew = m_pos + m_vel * g_drawfrinterval;
 	//MoveTo(vNew);
 }
 

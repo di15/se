@@ -1,28 +1,25 @@
 #include "gui.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../texture.h"
 #include "font.h"
 #include "../math/3dmath.h"
 #include "../platform.h"
 #include "../window.h"
 #include "draw2d.h"
-#include "../draw/shadow.h"
-#include "../../spriteed/main.h"
+#include "../render/shadow.h"
+#include "cursor.h"
 #include "../debug.h"
+#include "../../spriteed/main.h"
 
+GUI g_gui;
 int g_currw;
 int g_currh;
-GUI g_GUI;
-bool g_mouseoveraction = false;
 int g_kbfocus = 0;
+int g_curst = CU_DEFAULT;
+bool g_mouseoveraction = false;
 
 void GUI::draw()
 {
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
-
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	CheckGLError(__FILE__, __LINE__);
@@ -32,16 +29,11 @@ void GUI::draw()
 #if 0
 	DrawImage(g_texture[0].texname, g_width - 300, 0, g_width, 300, 0, 1, 1, 0);
 #endif
-	
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 	{
 #ifdef DEBUG
-		g_applog<<"gui "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
+		g_applog<<"draw "<<(*i)->m_name<<" "<<__FILE__<<" "<<__LINE__<<std::endl;
 		g_applog.flush();
 #endif
 
@@ -49,11 +41,6 @@ void GUI::draw()
 	}
 
 	CheckGLError(__FILE__, __LINE__);
-	
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
 
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		(*i)->drawover();
@@ -77,18 +64,8 @@ void GUI::draw()
 
 	CheckGLError(__FILE__, __LINE__);
 
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
-
 	EndS();
 	CheckGLError(__FILE__, __LINE__);
-	
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
 
 	UseS(SHADER_COLOR2D);
 	glUniform1f(g_shader[SHADER_COLOR2D].m_slot[SSLOT_WIDTH], (float)g_width);
@@ -97,11 +74,6 @@ void GUI::draw()
 	//glEnable(GL_DEPTH_TEST);
 	//DrawSelector();
 	//DrawMarquee();
-	
-#ifdef DEBUG
-	g_applog<<"gui "<<__FILE__<<" "<<__LINE__<<std::endl;
-	g_applog.flush();
-#endif
 
 	CheckGLError(__FILE__, __LINE__);
 	EndS();
@@ -110,30 +82,64 @@ void GUI::draw()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void GUI::inev(InEv* ev)
+void GUI::inev(InEv* ie)
 {
+#if 0
+	//unsafe
 	for(auto w=m_subwidg.rbegin(); w!=m_subwidg.rend(); w++)
-		(*w)->inev(ev);
-
-	if(!ev->intercepted)
+		(*w)->inev(ie);
+#else
+	//safe, may shift during call
+	int win = 0;
+	while(win < m_subwidg.size())
 	{
-		if(ev->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_MIDDLE && mbuttondownfunc) mbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_MIDDLE && mbuttonupfunc) mbuttonupfunc();
-		else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_RIGHT && rbuttondownfunc) rbuttondownfunc();
-		else if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_RIGHT && rbuttonupfunc) rbuttonupfunc();
-		else if(ev->type == INEV_MOUSEWHEEL && mousewheelfunc) mousewheelfunc(ev->amount);
-		else if(ev->type == INEV_KEYDOWN && keydownfunc[ev->scancode]) keydownfunc[ev->scancode]();
-		else if(ev->type == INEV_KEYUP && keyupfunc[ev->scancode]) keyupfunc[ev->scancode]();
+		int win2 = 0;
+		for(auto wit=m_subwidg.rbegin(); wit!=m_subwidg.rend(); wit++, win2++)
+		{
+			if(win2 < win)
+				continue;
+
+			(*wit)->inev(ie);
+			break;
+		}
+		win++;
+	}
+#endif
+
+
+	if(!ie->intercepted)
+	{
+		//if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT) g_applog<<"mouse up l"<<std::endl;
+
+#if 0
+		if(ie->type == INEV_KEYDOWN && keydownfunc[ie->scancode]) 
+		{
+			char msg[128];
+			sprintf(msg, "scank %d !NUL=%d", ie->scancode, (int)(keydownfunc[ie->scancode]!=NULL));
+			InfoMess("kd",msg);
+		}
+#endif
+
+		if(ie->type == INEV_MOUSEMOVE && mousemovefunc) mousemovefunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && lbuttondownfunc) lbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && lbuttonupfunc) lbuttonupfunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_MIDDLE && mbuttondownfunc) mbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_MIDDLE && mbuttonupfunc) mbuttonupfunc();
+		else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_RIGHT && rbuttondownfunc) rbuttondownfunc();
+		else if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_RIGHT && rbuttonupfunc) rbuttonupfunc();
+		else if(ie->type == INEV_MOUSEWHEEL && mousewheelfunc) mousewheelfunc(ie->amount);
+		else if(ie->type == INEV_KEYDOWN && keydownfunc[ie->scancode]) keydownfunc[ie->scancode]();
+		else if(ie->type == INEV_KEYUP && keyupfunc[ie->scancode]) keyupfunc[ie->scancode]();
+		else if(ie->type == INEV_COPY && keydownfunc[ie->scancode]) keydownfunc[ie->scancode]();
+		else if(ie->type == INEV_PASTE && keydownfunc[ie->scancode]) keydownfunc[ie->scancode]();
+		else if(ie->type == INEV_SELALL && keydownfunc[ie->scancode]) keydownfunc[ie->scancode]();
 	}
 }
 
 void GUI::closeall()
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
-		(*i)->m_opened = false;
+		(*i)->close();
 }
 
 void GUI::close(const char* name)
@@ -149,7 +155,10 @@ void GUI::open(const char* name)
 {
 	for(auto i=m_subwidg.begin(); i!=m_subwidg.end(); i++)
 		if(stricmp((*i)->m_name.c_str(), name) == 0)
-			(*i)->m_opened = true;
+		{
+			(*i)->open();
+			break;	//important - list may shift after open() and tofront() call
+		}
 }
 
 void GUI::reframe()
@@ -184,9 +193,9 @@ void Status(const char* status, bool logthis)
 	}
 	upper[i] = '\0';*/
 
-	GUI* gui = &g_GUI;
+	GUI* gui = &g_gui;
 
-	//gui->get("loading")->get("status", WIDGET_TEXT)->m_text = upper;
+	//gui->get("load")->get("status", WIDGET_TEXT)->m_text = upper;
 	ViewLayer* loadingview = (ViewLayer*)gui->get("loading");
 
 	if(!loadingview)
@@ -197,7 +206,7 @@ void Status(const char* status, bool logthis)
 	if(!statustext)
 		return;
 
-	statustext->m_text = status;
+	statustext->m_text = RichText(UString(status));
 }
 
 bool MousePosition()

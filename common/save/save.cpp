@@ -5,7 +5,7 @@
 #include "../platform.h"
 #include "../math/polygon.h"
 #include "../texture.h"
-#include "../draw/vertexarray.h"
+#include "../render/vertexarray.h"
 #include "../utils.h"
 
 //#define LOADMAP_DEBUG
@@ -13,7 +13,7 @@
 void SavePolygon(FILE* fp, Polyg* p)
 {
 	/*
-	list<Vec3f> m_vertex;	//used for constructing the polygon on-the-fly
+	std::list<Vec3f> m_vertex;	//used for constructing the polygon on-the-fly
 	Vec3f* m_drawva;	//used for drawing outline
 	*/
 

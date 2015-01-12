@@ -1,6 +1,3 @@
-
-
-
 #ifndef GUI_H
 #define GUI_H
 
@@ -11,7 +8,7 @@
 #include "widgets/barbutton.h"
 #include "widgets/button.h"
 #include "widgets/checkbox.h"
-#include "widgets/dropdowns.h"
+#include "widgets/droplist.h"
 #include "widgets/editbox.h"
 #include "widgets/insdraw.h"
 #include "widgets/link.h"
@@ -26,6 +23,7 @@
 class GUI : public Widget
 {
 public:
+	std::list<ViewLayer> view;
 	void (*keyupfunc[SDL_NUM_SCANCODES])();
 	void (*keydownfunc[SDL_NUM_SCANCODES])();
 	void (*anykeyupfunc)(int k);
@@ -44,7 +42,7 @@ public:
 	{
 		m_type = WIDGET_GUI;
 
-		for(int i=0; i<SDL_NUM_SCANCODES; i++)
+		for(int i=0; i<256; i++)
 		{
 			keyupfunc[i] = NULL;
 			keydownfunc[i] = NULL;
@@ -94,18 +92,19 @@ public:
 	}
 
 	void draw();
-	void inev(InEv* ev);
+	void inev(InEv* ie);
 	void closeall();
 	void close(const char* name);
 	void open(const char* name);
 	void reframe();
 };
 
+extern GUI g_gui;
+extern int g_kbfocus;
+extern int g_curst;
 extern int g_currw;
 extern int g_currh;
-extern GUI g_GUI;
 extern bool g_mouseoveraction;
-extern int g_kbfocus;
 
 bool MousePosition();
 void CenterMouse();

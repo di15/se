@@ -76,6 +76,7 @@ extern int g_texwidth;
 extern int g_texheight;
 //extern int g_texindex;
 extern int g_lastLTex;
+extern unsigned int g_temptex;
 
 LoadedTex *LoadBMP(const char *fullpath);
 LoadedTex *LoadTGA(const char *fullpath);

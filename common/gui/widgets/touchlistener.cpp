@@ -1,10 +1,9 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -13,6 +12,7 @@
 #include "textarea.h"
 #include "textblock.h"
 #include "touchlistener.h"
+
 
 TouchListener::TouchListener() : Widget()
 {
@@ -45,9 +45,9 @@ TouchListener::TouchListener(Widget* parent, void (*reframef)(Widget* thisw), vo
 	reframe();
 }
 
-void TouchListener::inev(InEv* ev)
+void TouchListener::inev(InEv* ie)
 {
-	if(ev->type == INEV_MOUSEUP && ev->key == MOUSE_LEFT && !ev->intercepted)
+	if(ie->type == INEV_MOUSEUP && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
@@ -62,31 +62,31 @@ void TouchListener::inev(InEv* ev)
 			m_over = false;
 			m_ldown = false;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 
 		if(m_ldown)
 		{
 			m_ldown = false;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 
 		m_over = false;
 	}
-	else if(ev->type == INEV_MOUSEDOWN && ev->key == MOUSE_LEFT && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEDOWN && ie->key == MOUSE_LEFT && !ie->intercepted)
 	{
 		//mousemove();
 
 		if(m_over)
 		{
 			m_ldown = true;
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;	// intercept mouse event
 		}
 	}
-	else if(ev->type == INEV_MOUSEMOVE && !ev->intercepted)
+	else if(ie->type == INEV_MOUSEMOVE && !ie->intercepted)
 	{
 		if(g_mouse.x >= m_pos[0] && g_mouse.x <= m_pos[2] && g_mouse.y >= m_pos[1] && g_mouse.y <= m_pos[3])
 		{
@@ -97,7 +97,7 @@ void TouchListener::inev(InEv* ev)
 
 			m_over = true;
 
-			ev->intercepted = true;
+			ie->intercepted = true;
 			return;
 		}
 		else

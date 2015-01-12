@@ -1,26 +1,26 @@
 
 #include "window.h"
 #include "texture.h"
-#include "draw/shader.h"
+#include "render/shader.h"
 #include "gui/gui.h"
 #include "gui/font.h"
-#include "draw/shadow.h"
+#include "render/shadow.h"
 #include "math/3dmath.h"
 #include "debug.h"
 
 bool g_quit = false;
-double g_frameinterval = 0.0f;
+double g_drawfrinterval = 0.0f;
 int g_width = INI_WIDTH;
 int g_height = INI_HEIGHT;
 int g_bpp = INI_BPP;
 bool g_fullscreen = false;
 Resolution g_selectedRes;
-vector<Resolution> g_resolution;
-vector<int> g_bpps;
+std::vector<Resolution> g_resolution;
+std::vector<int> g_bpps;
 Vec2i g_mouse;
 Vec2i g_mousestart;
 bool g_keyintercepted = false;
-bool g_keys[256];
+bool g_keys[SDL_NUM_SCANCODES] = {0};
 bool g_mousekeys[3];
 double g_currentTime;
 double g_lastTime = 0.0f;		// This will hold the time from the last frame
@@ -101,7 +101,7 @@ void Resize(int width, int height)
 		//if(g_fullscreen)
 			//Reload();
 			//ReloadTextures();
-		g_GUI.reframe();
+		g_gui.reframe();
 	}
 }
 
@@ -117,10 +117,10 @@ void CalculateFrameRate()
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
- 	g_frameinterval = g_currentTime - frameTime + 0.005f;
+ 	g_drawfrinterval = g_currentTime - frameTime + 0.005f;
 
 	//g_instantFPS = 1.0f / (g_currentTime - frameTime);
-	//g_instantFPS = 1.0f / g_frameinterval;
+	//g_instantFPS = 1.0f / g_drawfrinterval;
 
 	frameTime = g_currentTime;
 
@@ -191,7 +191,7 @@ bool InitWindow()
 
 	if(!pixels)
 	{
-		ErrorMessage("Error", "Couldn't load icon");
+		ErrMess("Error", "Couldn't load icon");
 	}
 
 	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(pixels->data, pixels->sizeX, pixels->sizeY, pixels->channels*8, pixels->channels*pixels->sizeX, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
@@ -202,7 +202,7 @@ bool InitWindow()
 	{
 		char message[256];
 		sprintf(message, "Couldn't create icon: %s", SDL_GetError());
-		ErrorMessage("Error", message);
+		ErrMess("Error", message);
 	}
 
 	// The icon is attached to the window pointer
@@ -312,7 +312,7 @@ bool MakeWindow(const char* title)
 		// In the event that the window could not be made...
 		char msg[256];
 		sprintf(msg, "Could not create window: %s\n", SDL_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 
@@ -324,7 +324,7 @@ bool MakeWindow(const char* title)
 		// In the event that the window could not be made...
 		char msg[256];
 		sprintf(msg, "Could not create renderer: %s\n", SDL_GetError());
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 #endif
@@ -342,7 +342,7 @@ bool MakeWindow(const char* title)
 	if(!g_glcontext)
 	{
 		DestroyWindow(title);
-		ErrorMessage("Error", "Couldn't create GL context");
+		ErrMess("Error", "Couldn't create GL context");
 		return false;
 	}
 
@@ -359,7 +359,7 @@ bool MakeWindow(const char* title)
 	if(!InitWindow())
 	{
 		DestroyWindow(title);
-		ErrorMessage("Error", "Initialization failed");
+		ErrMess("Error", "Initialization failed");
 		return false;
 	}
 

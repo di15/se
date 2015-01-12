@@ -3,7 +3,7 @@
 #include "../platform.h"
 #include "brushside.h"
 #include "plane.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../texture.h"
 #include "../utils.h"
 #include "brush.h"
@@ -30,7 +30,8 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	{
 		m_tris = new Triangle2[m_ntris];
 		if(!m_tris) OutOfMem(__FILE__, __LINE__);
-		memcpy(m_tris, original.m_tris, sizeof(Triangle2)*m_ntris);
+		//assert(original.m_tris != NULL);
+		if(original.m_tris) memcpy(m_tris, original.m_tris, sizeof(Triangle2)*m_ntris);
 	}
 	m_outline = original.m_outline;
 
@@ -42,7 +43,7 @@ BrushSide& BrushSide::operator=(const BrushSide &original)
 	{
 		m_vindices = new int[m_ntris+2];
 		if(!m_vindices) OutOfMem(__FILE__, __LINE__);
-		memcpy(m_vindices, original.m_vindices, sizeof(int)*(m_ntris+2));
+		if(original.m_vindices) memcpy(m_vindices, original.m_vindices, sizeof(int)*(m_ntris+2));
 	}
 
 	//g_applog<<"end copy vindices"<<std::endl;

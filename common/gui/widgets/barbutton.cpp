@@ -1,10 +1,9 @@
-
 #include "../widget.h"
 #include "barbutton.h"
 #include "button.h"
 #include "checkbox.h"
 #include "editbox.h"
-#include "dropdowns.h"
+#include "droplist.h"
 #include "image.h"
 #include "insdraw.h"
 #include "link.h"
@@ -14,6 +13,7 @@
 #include "textblock.h"
 #include "touchlistener.h"
 #include "../gui.h"
+
 #include "../../debug.h"
 
 BarButton::BarButton(Widget* parent, unsigned int sprite, float bar, void (*reframef)(Widget* thisw), void (*click)(), void (*overf)(), void (*out)()) : Button()

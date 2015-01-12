@@ -419,7 +419,7 @@ bool LoadMap(const char* fullpath, Map* map)
 	if(tag[0] != realtag[0] ||  tag[1] != realtag[1] || tag[2] != realtag[2] || tag[3] != realtag[3] || tag[4] != realtag[4])
 	{
 		fclose(fp);
-		ErrorMessage("Error", "Not a map file (invalid header tag).");
+		ErrMess("Error", "Not a map file (invalid header tag).");
 		return false;
 	}
 
@@ -431,7 +431,7 @@ bool LoadMap(const char* fullpath, Map* map)
 		fclose(fp);
 		char msg[128];
 		sprintf(msg, "Map's version (%f) doesn't match %f.", version, MAP_VERSION);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return false;
 	}
 

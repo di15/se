@@ -4,10 +4,10 @@
 #include "utils.h"
 #include "platform.h"
 
-vector<CSound> g_concom;	//construction complete
-vector<CSound> g_waifoo;	//waiting for orders
-vector<CSound> g_acsnd;		//acknowledged
-vector<CSound> g_undatk;	//under attack
+std::vector<CSound> g_concom;	//construction complete
+std::vector<CSound> g_waifoo;	//waiting for orders
+std::vector<CSound> g_acsnd;		//acknowledged
+std::vector<CSound> g_undatk;	//under attack
 
 CSound::CSound(const char* fp)
 {

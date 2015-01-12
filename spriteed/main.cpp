@@ -2,17 +2,17 @@
 
 #include "main.h"
 #include "../common/gui/gui.h"
-#include "../common/draw/shader.h"
+#include "../common/render/shader.h"
 #include "res.h"
 #include "../common/gui/font.h"
 #include "../common/texture.h"
-#include "../common/draw/model.h"
+#include "../common/render/model.h"
 #include "../common/math/frustum.h"
-#include "../common/draw/billboard.h"
+#include "../common/render/billboard.h"
 #include "segui.h"
-#include "../common/draw/particle.h"
-#include "../common/draw/shadow.h"
-#include "../common/draw/particle.h"
+#include "../common/render/particle.h"
+#include "../common/render/shadow.h"
+#include "../common/render/particle.h"
 #include "../common/platform.h"
 #include "../common/utils.h"
 #include "../common/window.h"
@@ -30,6 +30,7 @@
 #include "sesim.h"
 #include "../common/sim/tile.h"
 #include "../common/sim/road.h"
+#include "undo.h"
 
 APPMODE g_mode = LOADING;
 bool g_mouseout = false;
@@ -62,7 +63,7 @@ void Draw()
 	g_applog.flush();
 #endif
 
-    g_GUI.frameupd();
+    g_gui.frameupd();
 
 #ifdef DEBUG
     LastNum(__FILE__, __LINE__);
@@ -74,7 +75,7 @@ void Draw()
 	g_applog.flush();
 #endif
 
-    g_GUI.draw();
+    g_gui.draw();
     //DrawEdMap(&g_edmap);
 
 #ifdef DEBUG
@@ -90,7 +91,7 @@ void Draw()
         Ortho(g_width, g_height, 1, 1, 1, 1);
         char dbgstr[128];
         sprintf(dbgstr, "b's:%d", (int)g_edmap.m_brush.size());
-        DrawShadowedText(MAINFONT8, 0, g_height-16, dbgstr);
+        DrawShadowedText(MAINFONT8, 0, g_height-16, &RichText(dbgstr));
         EndS();
     }
 
@@ -180,11 +181,11 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
     glUniform1iARB(g_shader[g_curS].m_slot[SSLOT_SHADOWMAP], 4);
 	DrawTile();
 	Matrix offmat;
-	Vec3f offvec(-TILE_SIZE, 0, -TILE_SIZE);
+	Vec3f offvec(-g_tilesize, 0, -g_tilesize);
 	offmat.setTranslation((float*)&offvec);
 	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MODELMAT], 1, GL_FALSE, offmat.m_matrix);
 	//DrawTile();
-	offvec = Vec3f(-TILE_SIZE, 0, 0);
+	offvec = Vec3f(-g_tilesize, 0, 0);
 	offmat.setTranslation((float*)&offvec);
 	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MODELMAT], 1, GL_FALSE, offmat.m_matrix);
 	//DrawTile();
@@ -201,7 +202,7 @@ void DrawScene(Matrix projection, Matrix viewmat, Matrix modelmat, Matrix modelv
 	mvp.postmult(viewmat);
 	glUniformMatrix4fv(g_shader[g_curS].m_slot[SSLOT_MVP], 1, GL_FALSE, mvp.m_matrix);
 	glUniform4f(g_shader[g_curS].m_slot[SSLOT_COLOR], 0, 0, 1, 0.2f);
-	VertexArray* va = &g_tileva[g_currinc];
+	VertexArray* va = &g_tileva[g_currincline];
 	glVertexPointer(3, GL_FLOAT, 0, va->vertices);
 	glTexCoordPointer(2, GL_FLOAT, 0, va->texcoords);
 	glNormalPointer(GL_FLOAT, 0, va->normals);
@@ -330,11 +331,11 @@ void UpdateLoading()
     case 2:
         //Status("logo");
         g_mode = EDITOR;
-        g_GUI.closeall();
-        g_GUI.open("editor");
+        g_gui.closeall();
+        g_gui.open("editor");
         //g_mode = LOGO;
         //OpenSoleView("logo");
-        //g_GUI.open("choose file");
+        //g_gui.open("choose file");
         break;
     }
 }
@@ -348,8 +349,8 @@ void UpdateReloading()
         if(Load1Texture())
         {
             g_mode = EDITOR;
-            g_GUI.closeall();
-            g_GUI.open("editor");
+            g_gui.closeall();
+            g_gui.open("editor");
         }
         break;
     }
@@ -447,7 +448,7 @@ void LoadConfig()
 #endif
 
     ifstream f(cfgfull);
-    string line;
+    std::string line;
     char keystr[32];
     char actstr[32];
 
@@ -480,14 +481,17 @@ void LoadConfig()
         else if(stricmp(keystr, "sun_y") == 0)					g_lightOff.y = valuef;
         else if(stricmp(keystr, "sun_z") == 0)					g_lightOff.z = valuef;
         else if(stricmp(keystr, "shadow_pass") == 0)			g_shadowpass = valueb;
+        else if(stricmp(keystr, "antialias") == 0)				g_antialias = valueb;
+        else if(stricmp(keystr, "tile_size_cm") == 0)			g_tilesize = valuei;
+        else if(stricmp(keystr, "max_undo_steps") == 0)			g_maxundo = valuei;
     }
 }
 
 #if 0
 void WriteConfig()
 {
-    ofstream config;
-    config.open(CONFIGFILE, ios_base::out);
+    std::ofstream config;
+    config.open(CONFIGFILE, std::ios_base::out);
 
     int fulls;
     if(g_fullscreen)
@@ -505,7 +509,7 @@ void WriteConfig()
 void EnumerateMaps()
 {
 	WIN32_FIND_DATA ffd;
-	string bldgPath = ExePath() + "\\bldgs\\*";
+	std::string bldgPath = ExePath() + "\\bldgs\\*";
 	HANDLE hFind = FindFirstFile(bldgPath.c_str(), &ffd);
 
 	if(INVALID_HANDLE_VALUE != hFind)
@@ -515,8 +519,8 @@ void EnumerateMaps()
 			if(!strstr(ffd.cFileName, ".bsp"))
 				continue;
 
-			int pos = string( ffd.cFileName ).find_last_of( ".bsp" );
-			string name = string( ffd.cFileName ).substr(0, pos-3);
+			int pos = std::string( ffd.cFileName ).find_last_of( ".bsp" );
+			std::string name = std::string( ffd.cFileName ).substr(0, pos-3);
 
 			g_bldgs.push_back(name);
 		} while(FindNextFile(hFind, &ffd) != 0);
@@ -538,7 +542,7 @@ void ScoreFPS()
         char msg[128];
         //sprintf(msg, "FPS: %f, %fs", (float)g_framesPerSecond, (float)(g_currentTime - g_lastTime)/(float)g_framesPerSecond);
         sprintf(msg, "FPS: %f, %fs", (float)g_instantFPS, (float)(1.0f/g_instantFPS));
-        g_GUI.get("editor")->get("top panel")->get("fps")->m_text = msg;
+        g_gui.get("editor")->get("top panel")->get("fps")->m_text = msg;
     }
 }
 
@@ -557,7 +561,7 @@ void CalcDrawRate()
 
 	// Here we store the elapsed time between the current and last frame,
 	// then keep the current frame in our static variable for the next frame.
-	g_frameinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
+	g_drawfrinterval = (currtime - frametime) / 1000.0f;	// + 0.005f;
 
 	//g_instantdrawfps = 1.0f / (g_currentTime - frameTime);
 	//g_instantdrawfps = 1.0f / g_drawfrinterval;
@@ -640,7 +644,7 @@ void EventLoop()
 
     //SDL_EnableUNICODE(SDL_ENABLE);
 
-    GUI* gui = &g_GUI;
+    GUI* gui = &g_gui;
 
     while (!g_quit)
     {
@@ -661,7 +665,7 @@ void EventLoop()
                 {
                 case SDL_WINDOWEVENT_RESIZED:
 
-					//InfoMessage("info", "resz");
+					//InfoMess("info", "resz");
 
                     if(g_mode == PREREND_ADJFRAME)
                     {
@@ -674,7 +678,7 @@ void EventLoop()
                     }
                     else
                     {
-#if DEBUG
+#ifdef DEBUG
                         g_applog<<"rf"<<g_renderframe<<" rsz "<<e.window.data1<<","<<e.window.data2<<std::endl;
 #endif
                         Resize(e.window.data1, e.window.data2);
@@ -691,6 +695,27 @@ void EventLoop()
                 ev.type = INEV_KEYDOWN;
                 ev.key = e.key.keysym.sym;
                 ev.scancode = e.key.keysym.scancode;
+				
+				//Handle copy
+				if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
+				{
+					//SDL_SetClipboardText( inputText.c_str() );
+					ev.type = INEV_COPY;
+				}
+				//Handle paste
+				if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
+				{
+					//inputText = SDL_GetClipboardText();
+					//renderText = true;
+					ev.type = INEV_PASTE;
+				}
+				//Select all
+				if( e.key.keysym.sym == SDLK_a && SDL_GetModState() & KMOD_CTRL )
+				{
+					//inputText = SDL_GetClipboardText();
+					//renderText = true;
+					ev.type = INEV_SELALL;
+				}
 
                 gui->inev(&ev);
 
@@ -712,7 +737,7 @@ void EventLoop()
                 g_keyintercepted = ev.intercepted;
                 break;
             case SDL_TEXTINPUT:
-                //g_GUI.charin(e.text.text);	//UTF8
+                //g_gui.charin(e.text.text);	//UTF8
                 ev.type = INEV_TEXTIN;
                 ev.text = e.text.text;
 
@@ -727,7 +752,7 @@ void EventLoop()
                 gui->inev(&ev);
                 break;
             case SDL_TEXTEDITING:
-                //g_GUI.charin(e.text.text);	//UTF8
+                //g_gui.charin(e.text.text);	//UTF8
                 ev.type = INEV_TEXTED;
                 ev.text = e.text.text;
                 ev.cursor = e.edit.start;

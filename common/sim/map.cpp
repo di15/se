@@ -3,11 +3,11 @@
 
 
 #include "map.h"
-#include "../draw/shader.h"
+#include "../render/shader.h"
 #include "../texture.h"
 #include "../utils.h"
 #include "../debug.h"
-#include "../draw/shadow.h"
+#include "../render/shadow.h"
 
 Map g_map;
 

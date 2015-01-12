@@ -27,4 +27,4 @@ extern int g_renderframe;
 
 void ToCutSide(CutBrushSide* cuts, BrushSide* eds);
 void CompileMap(const char* full, EdMap* map);
-void ResetView();
+void ResetView(bool checkupscale);

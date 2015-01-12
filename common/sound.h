@@ -17,9 +17,9 @@ public:
 	void play();
 };
 
-extern vector<CSound> g_concom;	//construction complete
-extern vector<CSound> g_waifoo;	//waiting for orders
-extern vector<CSound> g_acsnd;		//acknowledged
+extern std::vector<CSound> g_concom;	//construction complete
+extern std::vector<CSound> g_waifoo;	//waiting for orders
+extern std::vector<CSound> g_acsnd;		//acknowledged
 
 void LoadSounds();
 void ConCom();

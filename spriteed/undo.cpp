@@ -1,7 +1,7 @@
 
 
 #include "undo.h"
-#include "../common/draw/sortb.h"
+#include "../common/render/sortb.h"
 #include "../common/math/camera.h"
 #include "../common/utils.h"
 #include "../common/save/edmap.h"
@@ -10,6 +10,7 @@
 std::list<UndoH> g_undoh;
 int g_currundo = -1;	//the index which we will revert to when pressing undo next time
 bool g_savedlatest = false;
+int g_maxundo = 64;
 //bool g_doubleredo = false;
 //bool g_doubleundo = false;
 //bool g_oncurrh = false;
@@ -27,7 +28,7 @@ UndoH::~UndoH()
 void WriteH(UndoH* towrite)
 {
 	//Important. For some reason there's a memory leak here
-	//if we don't call clear(). Bug in list<>?
+	//if we don't call clear(). Bug in std::list<>?
 	towrite->brushes.clear();
 	towrite->brushes = g_edmap.m_brush;
 	towrite->modelholders.clear();
@@ -87,10 +88,10 @@ void LinkPrevUndo(UndoH* tosave)
 	}
 
 	g_currundo++;
-	//if(g_currundo >= MAX_UNDO)
-	//	g_currundo = MAX_UNDO-1;
-	if(g_currundo > MAX_UNDO)
-		g_currundo = MAX_UNDO;
+	//if(g_currundo >= g_maxundo)
+	//	g_currundo = g_maxundo-1;
+	if(g_currundo > g_maxundo)
+		g_currundo = g_maxundo;
 
 #ifdef UNDO_DEBUG
 	g_applog<<"linkpr gcurrun="<<g_currundo<<std::endl;
@@ -104,7 +105,7 @@ void LinkPrevUndo(UndoH* tosave)
 	g_applog.flush();
 #endif
 
-	int overl = (int)g_undoh.size() - MAX_UNDO;
+	int overl = (int)g_undoh.size() - g_maxundo;
 	if(overl > 0)
 	{
 		j=0;

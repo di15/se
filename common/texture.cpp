@@ -1,6 +1,6 @@
 #include "platform.h"
 #include "texture.h"
-#include "draw/model.h"
+#include "render/model.h"
 #include "gui/gui.h"
 #include "utils.h"
 #include "debug.h"
@@ -48,7 +48,7 @@ LoadedTex *LoadBMP(const char *fullpath)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load BMP File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 
@@ -129,7 +129,7 @@ LoadedTex *LoadTGA(const char *fullpath)
 	{
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load TGA File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 
@@ -436,7 +436,7 @@ LoadedTex *LoadJPG(const char *fullpath)
 		// Display an error message saying the file was not found, then return NULL
 		char msg[MAX_PATH+1];
 		sprintf(msg, "Unable to load JPG File: %s", fullpath);
-		ErrorMessage("Error", msg);
+		ErrMess("Error", msg);
 		return NULL;
 	}
 
@@ -591,9 +591,12 @@ LoadedTex *LoadPNG(const char *fullpath)
 	case PNG_COLOR_TYPE_RGB:
 		pImageData->channels = 3;
 		break;
+	case PNG_COLOR_TYPE_GRAY:
+		pImageData->channels = 1;
+		break;
 	default:
 		g_applog<<fullpath<<" color type "<<png_get_color_type(png_ptr, info_ptr)<<" not supported"<<std::endl;
-		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::std::endl;
+		//std::cout << "Color type " << info_ptr->color_type << " not supported" << std::endl;
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
 		free(pImageData);
@@ -941,6 +944,12 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 		transp = true;
 	}
 
+	if(pImage->channels == 1)
+	{
+		textureType = GL_RED;
+		transp = true;
+	}
+
 
 	CheckGLError(__FILE__, __LINE__);
 
@@ -950,6 +959,7 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
 
 	if(mipmaps)
 	{
+#if 0
 		glEnable(GL_TEXTURE_2D);	// ATI fix
 		// Option 1: with mipmaps
 
@@ -975,6 +985,59 @@ bool CreateTexture(unsigned int &texindex, const char* relative, bool clamp, boo
         gluBuild2DMipmaps(GL_TEXTURE_2D, textureType, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
 
 		CheckGLError(__FILE__, __LINE__);
+#else
+		//if(transp)
+		if(true)
+		{
+			//linear filter, better for thin details with transparency
+		
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+			if(clamp)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			}
+			else
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			}
+
+			glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+
+			CheckGLError(__FILE__, __LINE__);
+		}
+		else
+		{
+			glEnable(GL_TEXTURE_2D);	// ATI fix
+			// Option 1: with mipmaps
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+			if(clamp)
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+			}
+			else
+			{
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			}
+
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
+			//glTexImage2D(GL_TEXTURE_2D, 0, textureType, pImage->sizeX, pImage->sizeY, 0, textureType, GL_UNSIGNED_BYTE, pImage->data);
+			//glGenerateMipmap(GL_TEXTURE_2D);
+			gluBuild2DMipmaps(GL_TEXTURE_2D, textureType, pImage->sizeX, pImage->sizeY, textureType, GL_UNSIGNED_BYTE, pImage->data);
+
+			CheckGLError(__FILE__, __LINE__);
+		}
+#endif
 	}
 	else
 	{
@@ -1209,6 +1272,9 @@ int SavePNG(const char* fullpath, LoadedTex* image)
 
 	if(image->channels == 4)
 		color_type = PNG_COLOR_TYPE_RGBA;
+	else if(image->channels == 1)
+		color_type = PNG_COLOR_TYPE_GRAY;
+
 
 	png_set_IHDR(png_ptr, info_ptr, image->sizeX, image->sizeY, 8, color_type, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 

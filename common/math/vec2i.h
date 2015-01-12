@@ -17,6 +17,11 @@ public:
 	{
 		x = X; y = Y;
 	}
+
+	Vec2i operator/(int scalar)
+	{
+		return Vec2i(x/scalar, y/scalar);
+	}
 };
 
 #endif

@@ -7,7 +7,7 @@
 /* #define void char */
 /* #define const */
 #undef CHAR_IS_UNSIGNED
-#define HAVE_STDDEF_H
+#define HAVE_STDDEF_H   1	//polyf edit
 #define HAVE_STDLIB_H
 #undef NEED_BSD_STRINGS
 #undef NEED_SYS_TYPES_H
