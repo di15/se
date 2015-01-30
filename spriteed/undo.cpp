@@ -10,7 +10,7 @@
 std::list<UndoH> g_undoh;
 int g_currundo = -1;	//the index which we will revert to when pressing undo next time
 bool g_savedlatest = false;
-int g_maxundo = 64;
+int g_maxundo = 8;
 //bool g_doubleredo = false;
 //bool g_doubleundo = false;
 //bool g_oncurrh = false;
